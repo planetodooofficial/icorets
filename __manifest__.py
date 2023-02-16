@@ -12,5 +12,8 @@
     'data': ['security/ir.model.access.csv',
              'views/icore_field.xml',
              ],
+    'website': 'https://planet-odoo.com/',
+    'installable': True,
+    'auto_install': False,
 
 }
