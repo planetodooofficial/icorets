@@ -47,6 +47,7 @@ class ProductInherit(models.Model):
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
 
+    # For updating standard price by rakng sum of cost(basic) and packaging cost
     @api.onchange('cost', 'packaging_cost')
     def sum_cost(self):
         if self.cost and self.packaging_cost:
