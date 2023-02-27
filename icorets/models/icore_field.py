@@ -8,6 +8,16 @@ import datetime
 from datetime import datetime
 
 
+class ProductVariantInherit(models.Model):
+    _inherit = "product.product"
+
+    # For updating standard price by rakng sum of cost(basic) and packaging cost
+    @api.onchange('cost', 'packaging_cost')
+    def sum_cost(self):
+        if self.cost and self.packaging_cost:
+            self.standard_price = self.cost + self.packaging_cost
+
+
 class ProductInherit(models.Model):
     _inherit = "product.template"
 
@@ -28,7 +38,7 @@ class ProductInherit(models.Model):
     user_defined_miscallaneous3 = fields.Char('User Defined Miscallaneous3')
     user_defined_miscallaneous4 = fields.Char('User Defined Miscallaneous4')
     user_defined_miscallaneous5 = fields.Char('User Defined Miscallaneous5')
-    #technical details
+    # technical details
     cost = fields.Float('Cost (Basic)')
     packaging_cost = fields.Float('Packaging Cost')
     manufactured_by = fields.Char('Manufactured By')
@@ -46,12 +56,6 @@ class ProductInherit(models.Model):
         ('fsn_unique', 'unique(fsn)', "FSN code can only be assigned to one product !"),
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
-
-    # For updating standard price by rakng sum of cost(basic) and packaging cost
-    @api.onchange('cost', 'packaging_cost')
-    def sum_cost(self):
-        if self.cost and self.packaging_cost:
-            self.standard_price = self.cost + self.packaging_cost
 
 
 class ProductBrand(models.Model):

@@ -1,31 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
-    <record id="view_icore_form" model="ir.ui.view">
-        <field name="name">view.icore.one</field>
+    <record model="ir.ui.view" id="product_kanban_inherited_view">
+        <field name="name">product.kanban.inherited</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('mt-1')]" position="replace">
+                <div name="product_lst_price" class="mt-1">
+                    Style Code:
+                    <field name="style_code"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+
+<!--    /product template hide standard price-->
+    <record id="product_template_only_form_view_inherit" model="ir.ui.view">
+        <field name="name">product.template.only.form.view.inherit</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//label[@for='standard_price']" position="replace">
+            </xpath>
+
+             <xpath expr="//div[@name='standard_price_uom']" position="replace">
+
+            </xpath>
+
 
             <xpath expr="//notebook/page[@name='general_information']" position="after">
                 <page string="Extra Information">
                     <group string="Other Details">
                         <group>
                             <field name="occasion"/>
-                            <field name="ean_code"/>
-                            <field name="color"/>
                             <field name="material"/>
                             <field name="style_code"/>
                             <field name="brand_id"/>
-                            <field name="asin"/>
                             <field name="buin"/>
                             <field name="parent_buin"/>
-                            <field name="article_code"/>
-                            <field name="size"/>
                         </group>
                         <group>
-                            <field name="cost"/>
-                            <field name="packaging_cost"/>
                             <field name="user_defined_miscallaneous1"/>
                             <field name="user_defined_miscallaneous2"/>
                             <field name="user_defined_miscallaneous3"/>
@@ -45,6 +62,52 @@
                         <field name="manufactured_by"/>
                     </group>
                 </page>
+            </xpath>
+        </field>
+    </record>
+
+<!--    Product Variant Form-->
+        <record id="view_icore_variant_form" model="ir.ui.view">
+        <field name="name">view.icore.variant</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//notebook/page[@name='general_information']" position="after">
+                <page string="Extra Information">
+                    <group string="Other Details">
+                        <group>
+                            <field name="ean_code"/>
+                            <field name="asin"/>
+                            <field name="fsn"/>
+                            <field name="article_code"/>
+                        </group>
+                        <group>
+                            <field name="standard_price"/>
+                            <field name="cost"/>
+                            <field name="packaging_cost"/>
+                        </group>
+
+                    </group>
+
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+<!--    Product Variant Tree-->
+
+    <record id="view_icore_variant_tree" model="ir.ui.view">
+        <field name="name">view.icore.variant.tree</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="article_code"/>
+                <field name="ean_code"/>
+                <field name="asin"/>
+                <field name="fsn"/>
             </xpath>
         </field>
     </record>
