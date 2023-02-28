@@ -11,26 +11,38 @@ from datetime import datetime
 class ProductVariantInherit(models.Model):
     _inherit = "product.product"
 
+    variant_ean_code = fields.Char('EAN Code')
+    variant_article_code = fields.Char('Article Code')
+    variant_asin = fields.Char('ASIN')
+    variant_fsn = fields.Char('FSN')
+    variant_cost = fields.Float('Cost (Basic)')
+    variant_packaging_cost = fields.Float('Packaging Cost')
+
+    _sql_constraints = [
+        ('asin_unique', 'unique(variant_asin)', "ASIN code can only be assigned to one variant product !"),
+        ('ean_code_unique', 'unique(variant_ean_code)', "EAN code can only be assigned to one variant product !"),
+        ('fsn_unique', 'unique(variant_fsn)', "FSN code can only be assigned to one variant product !"),
+    ]
     # For updating standard price by rakng sum of cost(basic) and packaging cost
-    @api.onchange('cost', 'packaging_cost')
-    def sum_cost(self):
-        if self.cost and self.packaging_cost:
-            self.standard_price = self.cost + self.packaging_cost
+    # @api.onchange('cost', 'packaging_cost')
+    # def sum_cost(self):
+    #     if self.cost and self.packaging_cost:
+    #         self.standard_price = self.cost + self.packaging_cost
 
 
 class ProductInherit(models.Model):
     _inherit = "product.template"
 
     material = fields.Char('Moc')
-    color = fields.Char('Color')
+    color = fields.Char('') #not used
     brand_id = fields.Many2one('product.brand', 'Brand')
     occasion = fields.Char('Occasion')
-    ean_code = fields.Char('EAN Code')
+    ean_code = fields.Char('oldeancode') #not used
     style_code = fields.Char('Style Code')
-    article_code = fields.Char('Article Code')
-    size = fields.Char('Style Code')
-    asin = fields.Char('ASIN')
-    fsn = fields.Char('FSN')
+    article_code = fields.Char('ACode') #not used
+    size = fields.Char('') #not used
+    asin = fields.Char('oldasin') #not used
+    fsn = fields.Char('oldfsn') #not used
     buin = fields.Char('BUIN')
     parent_buin = fields.Char('parent_buin')
     user_defined_miscallaneous1 = fields.Char('User Defined Miscallaneous1')
@@ -39,8 +51,8 @@ class ProductInherit(models.Model):
     user_defined_miscallaneous4 = fields.Char('User Defined Miscallaneous4')
     user_defined_miscallaneous5 = fields.Char('User Defined Miscallaneous5')
     # technical details
-    cost = fields.Float('Cost (Basic)')
-    packaging_cost = fields.Float('Packaging Cost')
+    cost = fields.Float('oldcost') #not used
+    packaging_cost = fields.Float('oldpckcost') #not used
     manufactured_by = fields.Char('Manufactured By')
     marketed_by = fields.Char('Marketed By / Customer Care')
     length = fields.Float('Length (Dimensions)')
@@ -50,12 +62,11 @@ class ProductInherit(models.Model):
     country_of_origin = fields.Char('Country of Origin')
     manufacture_year = fields.Date('Manufacture Year')
 
+
     _sql_constraints = [
-        ('asin_unique', 'unique(asin)', "ASIN code can only be assigned to one product !"),
-        ('ean_code_unique', 'unique(ean_code)', "EAN code can only be assigned to one product !"),
-        ('fsn_unique', 'unique(fsn)', "FSN code can only be assigned to one product !"),
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
+
 
 
 class ProductBrand(models.Model):

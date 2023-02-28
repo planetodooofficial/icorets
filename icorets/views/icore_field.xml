@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
+    <!--    For adding style code on product Kanban view-->
+
     <record model="ir.ui.view" id="product_kanban_inherited_view">
         <field name="name">product.kanban.inherited</field>
         <field name="model">product.template</field>
@@ -15,9 +17,22 @@
         </field>
     </record>
 
+<!--    For hiding On hand on product Kanban view-->
+
+    <!--    <record model="ir.ui.view" id="product_kanban_inherited2_view">-->
+    <!--        <field name="name">product.kanban.inherited2</field>-->
+    <!--        <field name="model">product.template</field>-->
+    <!--        <field name="inherit_id" ref="stock.product_template_kanban_stock_view"/>-->
+    <!--        <field name="arch" type="xml">-->
+    <!--            <xpath expr="//div[1]" position="attributes">-->
+    <!--                <attribute name="invisible">1</attribute>-->
+    <!--            </xpath>-->
+    <!--        </field>-->
+    <!--    </record>-->
 
 
-<!--    /product template hide standard price-->
+
+<!--    Product template hide standard price-->
     <record id="product_template_only_form_view_inherit" model="ir.ui.view">
         <field name="name">product.template.only.form.view.inherit</field>
         <field name="model">product.template</field>
@@ -77,15 +92,14 @@
                 <page string="Extra Information">
                     <group string="Other Details">
                         <group>
-                            <field name="ean_code"/>
-                            <field name="asin"/>
-                            <field name="fsn"/>
-                            <field name="article_code"/>
+                            <field name="variant_ean_code"/>
+                            <field name="variant_asin"/>
+                            <field name="variant_fsn"/>
+                            <field name="variant_article_code"/>
                         </group>
                         <group>
-                            <field name="standard_price"/>
-                            <field name="cost"/>
-                            <field name="packaging_cost"/>
+                            <field name="variant_cost"/>
+                            <field name="variant_packaging_cost"/>
                         </group>
 
                     </group>
@@ -104,10 +118,10 @@
         <field name="inherit_id" ref="product.product_product_tree_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
-                <field name="article_code"/>
-                <field name="ean_code"/>
-                <field name="asin"/>
-                <field name="fsn"/>
+                <field name="variant_article_code"/>
+                <field name="variant_ean_code"/>
+                <field name="variant_asin"/>
+                <field name="variant_fsn"/>
             </xpath>
         </field>
     </record>
