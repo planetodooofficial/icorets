@@ -73,7 +73,7 @@
                         <field name="width"/>
                         <field name="height"/>
                         <field name="weight"/>
-                        <field name="country_of_origin"/>
+                        <field name="cntry_of_origin"/>
                         <field name="manufactured_by"/>
                     </group>
                 </page>

@@ -34,15 +34,9 @@ class ProductInherit(models.Model):
     _inherit = "product.template"
 
     material = fields.Char('Moc')
-    color = fields.Char('') #not used
     brand_id = fields.Many2one('product.brand', 'Brand')
     occasion = fields.Char('Occasion')
-    ean_code = fields.Char('oldeancode') #not used
     style_code = fields.Char('Style Code')
-    article_code = fields.Char('ACode') #not used
-    size = fields.Char('') #not used
-    asin = fields.Char('oldasin') #not used
-    fsn = fields.Char('oldfsn') #not used
     buin = fields.Char('BUIN')
     parent_buin = fields.Char('parent_buin')
     user_defined_miscallaneous1 = fields.Char('User Defined Miscallaneous1')
@@ -51,15 +45,14 @@ class ProductInherit(models.Model):
     user_defined_miscallaneous4 = fields.Char('User Defined Miscallaneous4')
     user_defined_miscallaneous5 = fields.Char('User Defined Miscallaneous5')
     # technical details
-    cost = fields.Float('oldcost') #not used
-    packaging_cost = fields.Float('oldpckcost') #not used
+
     manufactured_by = fields.Char('Manufactured By')
     marketed_by = fields.Char('Marketed By / Customer Care')
     length = fields.Float('Length (Dimensions)')
     width = fields.Float('width (Dimensions)')
     height = fields.Float('height (Dimensions)')
     weight = fields.Float('Weight (Dimensions)')
-    country_of_origin = fields.Char('Country of Origin')
+    cntry_of_origin = fields.Char('Country of Origin')
     manufacture_year = fields.Date('Manufacture Year')
 
 
