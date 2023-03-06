@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="paperformat_batch_deposit" model="report.paperformat">
+        <field name="name">Debit Note</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">15</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="debit_tax_invoice_report" model="ir.actions.report">
+        <field name="name">Debit Note</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">icorets.debit_tax_invoice_forms</field>
+        <field name="report_file">icorets.debit_tax_invoice_forms</field>
+        <field name="print_report_name">'Debit Note'</field>
+        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+    </record>
+
+    <template id="debit_tax_invoice_forms">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <style>
+                        table {
+                        font-size: 12px;
+                        }
+                    </style>
+                    <div class="page">
+                        <table style="width:100%;margin-top: 10px">
+                            <tr style="border:1px solid black;">
+                                <th class="text-center" colspan="3">
+                                    <strong>Debit Note (Original for Receipient)</strong>
+                                </th>
+                            </tr>
+                            <tr style="background-color:#87CEEB;border:1px solid black">
+                                <th style="border:1px solid black;" class="text-center">
+                                    <strong>Invoice Details</strong>
+                                </th>
+                                <th style="border:1px solid black;" class="text-center">
+                                    <strong>Bill From</strong>
+                                </th>
+                                <th style="border:1px solid black;" class="text-center">
+                                    <strong>Ship From</strong>
+                                </th>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;">
+                                    <strong>Invoice No.:</strong>
+                                    <t t-esc="o.name"/>
+                                </td>
+                                <td style="border:1px solid black;" rowspan="4">
+                                    <p>
+                                        <t t-esc="o.partner_id.street"/>
+                                        <br/>
+                                        <t t-esc="o.partner_id.street2"/>
+                                        <br/>
+                                        <t t-esc="o.partner_id.city"/>
+                                        <br/>
+                                        <t t-esc="o.partner_id.state_id.name"/>
+                                        <br/>
+                                        <t t-esc="o.partner_id.zip"/>
+                                        <br/>
+                                        <t t-esc="o.partner_id.country_id.name"/>
+                                    </p>
+                                </td>
+                                <td style="border:1px solid black;" rowspan="4"></td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;">
+                                    <strong>Debit Note Date:</strong>
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="height:25px;border:1px solid black;">
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;">
+                                    <strong>Ack. No:</strong>
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;">
+                                    <strong>IRN:</strong>
+                                </td>
+                                <td style="border:1px solid black;">
+                                    <strong>GSTIN Number:</strong>
+                                    <t t-esc="o.partner_id.vat"/>
+                                </td>
+                                <td style="border:1px solid black;">
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;" rowspan="8"></td>
+                                <td style="border:1px solid black;">
+                                    <strong>PAN Number:</strong>
+                                </td>
+                                <td style="border:1px solid black;">
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <th style="background-color:#87CEEB;border:1px solid black" class="text-center">
+                                    <strong>Bill To</strong>
+                                </th>
+                                <th style="background-color:#87CEEB;border:1px solid black" class="text-center">
+                                    <strong>Ship To</strong>
+                                </th>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="height:70px;border:1px solid black" rowspan="4"></td>
+                                <td style="height:70px;border:1px solid black" rowspan="4"></td>
+                            </tr>
+                            <tr>
+
+                            </tr>
+                            <tr>
+
+                            </tr>
+                            <tr>
+
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;">
+                                    <strong>GSTIN Number:</strong>
+                                </td>
+                                <td style="border:1px solid black;">
+                                    <strong>GSTIN Number:</strong>
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;">
+                                    <strong>PAN Number:</strong>
+                                </td>
+                                <td style="border:1px solid black;"></td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td colspan="3" style="border:1px solid black;">
+                                    <strong>Reverse Charge (Y/N):</strong>
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="height:18px;text-align:right" colspan="3">
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="width:100%">
+                            <tr style="background-color:#87CEEB">
+                                <td class="text-center" width="2%">
+                                    <strong>Sr.</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>Reference Invoice#</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>Article Code</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>Size</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>Description</strong>
+                                </td>
+                                <td class="text-center" width="7%">
+                                    <strong>Qty</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>Price/Qty</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>Total Price Excl</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>Tax Rate</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>Tax Amount</strong>
+                                </td>
+                            </tr>
+
+                            <tr style="height:20px;text-align:center">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <t t-esc="o.invoice_line_ids.product_id.brand_id.name"/>
+                                    <br/>
+                                    <!--                                    <t t-esc="o.invoice_line_ids.product_id.color.id"/><br/>-->
+                                </td>
+                                <td>
+                                    <t t-esc="o.invoice_line_ids.quantity"/>
+                                </td>
+                                <td>
+                                    <t t-esc="o.invoice_line_ids.price_unit"/>
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <br/>
+                            <tr>
+                                <td style="text-align:right" colspan="8">
+                                    <strong>Untaxed Amount</strong>
+                                </td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_untaxed"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:right" colspan="8">SGST</td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_tax / 2"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:right" colspan="8">CGST</td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_tax / 2"/>
+                                </td>
+                            </tr>
+                            <hr/>
+                            <tr>
+                                <td style="text-align:right" colspan="8">
+                                    <strong>Total</strong>
+                                </td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_total"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="width:100%;margin-top: 10px">
+                            <tr style="border:1px solid black;">
+                                <td style="text-align:center;border:1px solid black;" colspan="5">Declaration and Terms
+                                    conditions
+                                </td>
+                                <th style="text-align:center;border:1px solid black;" colspan="2" width="15%">No. of
+                                    Cartons
+                                </th>
+                                <td style="border:1px solid black;" colspan="2" rowspan="2" width="15%"></td>
+                                <td style="border:1px solid black;" colspan="3" rowspan="2" width="15%"></td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="height:70px;border:1px solid black" colspan="5">We declare that this invoice
+                                    shows the actual price
+                                    of the goods
+                                    described
+                                    and that all particulars are true and correct. Interest @ 24% will be charged on
+                                    amount
+                                    remaining unpaid after due date of the bill. Goods once sold will not be accepted
+                                    back,
+                                    warranty applicable as provided by the respective brands.
+                                </td>
+
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <th style="text-align:center;border:1px solid black" colspan="9">Subject to Mumbai
+                                    Jurisdiction
+                                </th>
+                                <td style="border:1px solid black;" colspan="4">Authorized Signatory</td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="text-align:center;border:1px solid black" colspan="15">iCOREts Private
+                                    Limited: Studio 150, Satguru
+                                    Nanik Ind, Jay Coach, Plot
+                                    No
+                                    498, Western Express Highway, Goregaon East, Mumbai, Maharashtra 400063, India.
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

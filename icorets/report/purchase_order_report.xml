@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="paperformat_batch_deposit" model="report.paperformat">
+        <field name="name">Purchase Order Report</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">15</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="purchase_order_report" model="ir.actions.report">
+        <field name="name">Purchase Order Report</field>
+        <field name="model">purchase.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">icorets.purchase_order_report_forms</field>
+        <field name="report_file">icorets.purchase_order_report_forms</field>
+        <field name="print_report_name">'Purchase Order Report'</field>
+        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+    </record>
+
+    <template id="purchase_order_report_forms">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <style>
+                        table {
+                        font-size: 12px;
+                        }
+                    </style>
+                    <div class="page">
+                        <table style="width:100%;margin-top: 10px">
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;" class="text-center" colspan="2">Purchase Order</td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="height:70px;border:1px solid black"></td>
+                                <td style="height:70px;border:1px solid black"></td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="height:70px;border:1px solid black"></td>
+                                <td style="height:70px;border:1px solid black"></td>
+                            </tr>
+                        </table>
+
+                        <table style="width:100%">
+                            <tr style="background-color:#87CEEB">
+                                <td class="text-center" width="2%">
+                                    <strong>Sr.</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>ART#</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>EAN</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>DESCRIPTION</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>HSN CODE</strong>
+                                </td>
+                                <td class="text-center" width="7%">
+                                    <strong>SIZE</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>QTY</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>Price</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>Total Taxable Amount</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>GST%</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>GST AMT</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>Total Amount</strong>
+                                </td>
+                            </tr>
+                            <t t-set="sr_no" t-value="1"/>
+                            <t t-foreach="o.order_line" t-as="line">
+                                <tr style="height:20px;text-align:center">
+                                    <td>
+                                        <t t-esc="sr_no"/>
+                                        <t t-set="sr_no" t-value="sr_no+1"/>
+                                    </td>
+
+                                    <td>
+                                        <t t-esc="line.product_id.name"/>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </t>
+                            <br/>
+                            <tr>
+                                <td style="text-align:right" colspan="10">
+                                    <strong>Untaxed Amount</strong>
+                                </td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_untaxed"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:right" colspan="10">SGST</td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_tax / 2"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:right" colspan="10">CGST</td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_tax / 2"/>
+                                </td>
+                            </tr>
+                            <hr/>
+                            <tr>
+                                <td style="text-align:right" colspan="10">
+                                    <strong>Total</strong>
+                                </td>
+                                <td style="text-align:right" colspan="2">₹
+                                    <t t-esc="o.amount_total"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table style="width:100%;margin-top: 10px">
+                            <tr style="border:1px solid black">
+                                <td style="width:50%;border:1px solid black">PAYMENT TERM</td>
+                                <td style="text-align:center;width:50%;border:1px solid black">For iICOREts Private
+                                    Limites
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black">
+                                <td style="height:30px;border:1px solid black">50% advance balance on dispatch</td>
+                                <td style="border:1px solid black"></td>
+                            </tr>
+                            <tr style="border:1px solid black">
+                                <td style="text-align:center;border:1px solid black">Subject to Mumbai
+                                    Jurisdiction
+                                </td>
+                                <td style="text-align:center;border:1px solid black">Authorized Signatory</td>
+                            </tr>
+                            <tr style="border:1px solid black">
+                                <td colspan="2" style="text-align:center;border:1px solid black">iCOREts Private
+                                    Limited: Studio 150, Satguru
+                                    Nanik Ind, Jay Coach, Plot
+                                    No
+                                    498, Western Express Highway, Goregaon East, Mumbai, Maharashtra 400063, India.
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

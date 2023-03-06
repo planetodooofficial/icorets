@@ -13,7 +13,6 @@
              'views/icore_field.xml',
              'report/credit_note.xml',
              'report/debit_note.xml',
-             'report/debit_note.xml',
              'report/amazon.xml',
              'report/flipkart_report.xml',
              'report/myntra_report.xml',
