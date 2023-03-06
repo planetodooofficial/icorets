@@ -6,6 +6,8 @@ from tempfile import TemporaryFile
 import pandas as pd
 import datetime
 from datetime import datetime
+from odoo.exceptions import ValidationError, UserError
+
 
 
 class ImportAttributes(models.TransientModel):
@@ -132,33 +134,38 @@ class ImportAttributes(models.TransientModel):
 
         lst_data = []
 
-        title = list(map(lambda a: a['Title'], data))
+        title = list(map(lambda a: a['SKU Code'], data))
 
         title = list(set(title))
         # print('Print Title : ', title)
 
         new_data = {}
         for a in title:
-            new_data[a] = list(filter(lambda t: t['Title'] == a, data))
+            new_data[a] = list(filter(lambda t: t['SKU Code'] == a, data))
         # print(new_data)
         created_product = []
         for keys, values in new_data.items():
-            # print(keys, values)
+            print(keys, values)
 
             # search_product = self.env["product.template"].search([("name", "=", keys)])
             for i in values:
-                #For product Category
-                search_prod_category = self.env['product.category'].search(
-                    [('name', '=', i['Category']),('parent_id', '=' , 'All')])
-                if not search_prod_category:
-                    search_parent_category = self.env['product.category'].search([('name', '=', 'All')])
-                    search_prod_category = self.env['product.category'].create(
-                        {'name': i['Category'],
-                         'parent_id': search_parent_category.id}
-                    )
+                # #For product Category
+                # search_prod_category = self.env['product.category'].search(
+                #     [('name', '=', i['Sub Category']),('parent_id', '=' , 'All')])
+                # if not search_prod_category:
+                #     search_parent_category = self.env['product.category'].search([('name', '=', 'All')])
+                #     search_prod_category = self.env['product.category'].create(
+                #         {'name': i['Sub Category'],
+                #          'parent_id': search_parent_category.id}
+                #     )
+
+                # Brand Search
                 brand_search = self.env['product.brand'].search([('name','=',i['Brand'])])
                 if not brand_search:
                     brand_search = self.env['product.brand'].create({'name': i['Brand']})
+
+                # uom id for product
+                search_uom = self.env['uom.uom'].search([('name', '=', i['UoM'])])
 
                 # For attribute
                 search_attribute_color = self.env['product.attribute'].search(
@@ -167,55 +174,59 @@ class ImportAttributes(models.TransientModel):
                     [('name', '=', 'Size')])  # Search Size Attribute
 
                 # For value
-                search_attribute_value_color = self.env['product.attribute.value'].search(
-                    [('name', '=', i['Color'])]) # Search Color Attribute value
-                if not search_attribute_value_color:
-                    search_attribute_value_color = self.env['product.attribute.value'].create(
-                        {'name': i['Color']}
-                    )
-                search_attribute_value_size = self.env['product.attribute.value'].search(
-                    [('name', '=', i['Size'])])  # Search Size Attribute value
-                if not search_attribute_value_size:
-                    search_attribute_value_size = self.env['product.attribute.value'].create(
-                        {'name': i['Size']}
-                    )
+                if i['Color']:
+                    search_attribute_value_color = self.env['product.attribute.value'].search(
+                        [('name', '=', i['Color'])]) # Search Color Attribute value
+                    if not search_attribute_value_color:
+                        raise ValidationError(_(f"{i['Color']} Color not available"))
+                # if not search_attribute_value_color:
+                #     search_attribute_value_color = self.env['product.attribute.value'].create(
+                #         {'name': i['Color']}
+                #     )
+                if i['Size']:
+                    search_attribute_value_size = self.env['product.attribute.value'].search(
+                        [('name', '=', i['Size'])])  # Search Size Attribute value
+                    if not search_attribute_value_size:
+                        raise ValidationError(_(f"{i['Size']} Size not available"))
+                # if not search_attribute_value_size:
+                #     search_attribute_value_size = self.env['product.attribute.value'].create(
+                #         {'name': i['Size']}
+                #     )
                 if keys not in created_product:
                     # if not self.env["product.template"].search([("name", "=", keys)]):
                     lst = []
-                    if i['Color'] or i['Size']:
+                    if i['Color']:
 
                         prod_line_vals = (0, 0, {
                             'attribute_id': search_attribute_color.id,
                             'value_ids': [(4, search_attribute_value_color.id)],
                         })
-
+                        lst.append(prod_line_vals)
+                    if i['Size']:
                         prod_line_vals_s = (0, 0, {
                             'attribute_id': search_attribute_size.id,
                             'value_ids': [(4, search_attribute_value_size.id)],
                         })
                         # lst2.append(lst_vrnt)
-                        lst.append(prod_line_vals)
+
                         lst.append(prod_line_vals_s)
 
                     product_vals = {
                         'name': i['Title'],
-                        'ean_code': i['EAN Code'],
+                        'barcode': i['EAN Code'],
                         'material': i['Material'],
                         'occasion': i['Occasion'],
-                        'article_code': i['Article Code'],
                         'style_code': i['Style Code'],
-                        'cost': i['Cost'],
                         'l10n_in_hsn_code': i['HSN Code'],
-                        'packaging_cost': i['Packaging Cost'],
-                        'asin': i['ASIN'],
-                        'fsn': i['FSN'],
+                        'uom_id': search_uom.id,
+                        'uom_po_id': search_uom.id,
                         'brand_id': brand_search.id,
                         'list_price': i['MRP'],
                         'detailed_type': 'product',
                         'standard_price': i['Total Cost'],
-                        'categ_id': search_prod_category.id,
                         'attribute_line_ids': lst,
                     }
+
                     search_product_id = self.env['product.template'].create(product_vals)
 
                     created_product.append(keys)

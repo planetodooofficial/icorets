@@ -17,6 +17,11 @@ class ProductVariantInherit(models.Model):
     variant_fsn = fields.Char('FSN')
     variant_cost = fields.Float('Cost (Basic)')
     variant_packaging_cost = fields.Float('Packaging Cost')
+    brand_id_rel = fields.Many2one(related='product_tmpl_id.brand_id', string="Brand")
+
+    # Inherited and removed domain
+    # product_template_variant_value_ids = fields.Many2many('product.template.attribute.value', relation='product_variant_combination',
+    #                                                        string="Variant Values", ondelete='restrict')
 
     _sql_constraints = [
         ('asin_unique', 'unique(variant_asin)', "ASIN code can only be assigned to one variant product !"),
@@ -66,3 +71,18 @@ class ProductBrand(models.Model):
     _name = "product.brand"
 
     name = fields.Char('Brand Name')
+
+class AccountMoveLineInherit(models.Model):
+    _inherit = 'account.move.line'
+
+    tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
+                                      compute = "check_tax_amount", currency_field='currency_id')
+
+    @api.depends('tax_ids')
+    def check_tax_amount(self):
+        for rec in self:
+            if rec.tax_ids:
+                for tax in rec.tax_ids:
+                    rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
+            else:
+                rec.tax_amount_line = 0
