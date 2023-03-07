@@ -1,3 +1,5 @@
+from num2words import num2words
+
 from odoo import models, api, fields, _
 import base64
 import csv
@@ -20,8 +22,9 @@ class ProductVariantInherit(models.Model):
     brand_id_rel = fields.Many2one(related='product_tmpl_id.brand_id', string="Brand")
 
     # Inherited and removed domain
-    # product_template_variant_value_ids = fields.Many2many('product.template.attribute.value', relation='product_variant_combination',
-    #                                                        string="Variant Values", ondelete='restrict')
+    product_template_variant_value_ids = fields.Many2many('product.template.attribute.value',
+                                                          relation='product_variant_combination',
+                                                          string="Variant Values", ondelete='restrict')
 
     _sql_constraints = [
         ('asin_unique', 'unique(variant_asin)', "ASIN code can only be assigned to one variant product !"),
@@ -60,11 +63,9 @@ class ProductInherit(models.Model):
     cntry_of_origin = fields.Char('Country of Origin')
     manufacture_year = fields.Date('Manufacture Year')
 
-
     _sql_constraints = [
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
-
 
 
 class ProductBrand(models.Model):
@@ -72,11 +73,26 @@ class ProductBrand(models.Model):
 
     name = fields.Char('Brand Name')
 
+
+class AccountMoveInheritClass(models.Model):
+    _inherit = 'account.move'
+
+    check_amount_in_words = fields.Char(compute='_amt_in_words', string='Amount in Words')
+
+
+    # Function for amount in indian words
+    @api.depends('amount_total')
+    def _amt_in_words(self):
+        for rec in self:
+            rec.check_amount_in_words = num2words(str(rec.amount_total), lang='en_IN').replace(',', '').replace('and',
+                                                                                                                '').replace(
+                'point', 'and').replace('thous', 'thousand')
+
 class AccountMoveLineInherit(models.Model):
     _inherit = 'account.move.line'
 
     tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
-                                      compute = "check_tax_amount", currency_field='currency_id')
+                                      compute="check_tax_amount", currency_field='currency_id')
 
     @api.depends('tax_ids')
     def check_tax_amount(self):
@@ -86,3 +102,10 @@ class AccountMoveLineInherit(models.Model):
                     rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
             else:
                 rec.tax_amount_line = 0
+
+
+class SaleOrderInherit(models.Model):
+    _inherit = 'sale.order'
+
+    po_no = fields.Char('PO No')
+    no_of_cartons = fields.Char('No of Cartons')

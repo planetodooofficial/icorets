@@ -222,4 +222,17 @@
         </field>
     </record>
 
+<!--    #inheriting SALE ORDER-->
+     <record id="inherit_sale_order_form" model="ir.ui.view">
+        <field name="name">inherit.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="po_no"/>
+                <field name="no_of_cartons"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
