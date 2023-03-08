@@ -229,10 +229,19 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="warehouse_id" readonly="0"/>
+                <field name="location_id" attrs="{'readonly': [('state', 'not in', 'draft')]}"/>
                 <field name="po_no"/>
                 <field name="no_of_cartons"/>
             </xpath>
-        </field>
+
+
+         <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
+             <field name="stock_quantity" readonly="1"/>
+         </xpath>
+            </field>
     </record>
+
+
 
 </odoo>

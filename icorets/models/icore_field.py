@@ -79,14 +79,14 @@ class AccountMoveInheritClass(models.Model):
 
     check_amount_in_words = fields.Char(compute='_amt_in_words', string='Amount in Words')
 
-
     # Function for amount in indian words
     @api.depends('amount_total')
     def _amt_in_words(self):
         for rec in self:
             rec.check_amount_in_words = num2words(str(rec.amount_total), lang='en_IN').replace(',', '').replace('and',
                                                                                                                 '').replace(
-                'point', 'and').replace('thous', 'thousand')
+                'point', 'and paise').replace('thous', 'thousand')
+
 
 class AccountMoveLineInherit(models.Model):
     _inherit = 'account.move.line'
@@ -109,3 +109,19 @@ class SaleOrderInherit(models.Model):
 
     po_no = fields.Char('PO No')
     no_of_cartons = fields.Char('No of Cartons')
+    location_id = fields.Many2one(
+        'stock.location', ' Source Location',
+        ondelete='restrict', required=True, index=True, check_company=True, copy=False)
+
+
+class SaleOrderLineInherit(models.Model):
+    _inherit = 'sale.order.line'
+
+    stock_quantity = fields.Float('Stock Quantity')
+
+    @api.onchange('product_id')
+    def check_quantity(self):
+        prd_qty = self.env['stock.quant'].search(
+            [('product_id', '=', self.product_id.id), ('location_id', '=', self.order_id.location_id.id)])
+        if self.product_id:
+            self.stock_quantity = prd_qty.quantity
