@@ -7,12 +7,12 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">9</field>
+        <field name="margin_top">30</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">5</field>
         <field name="margin_right">5</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">1</field>
+        <field name="header_spacing">25</field>
         <field name="dpi">90</field>
     </record>
 
@@ -118,9 +118,6 @@
                             <td style="border:1px solid black" rowspan="8">QR</td>
                         </tr>
 
-<!--                        <tr style="border:1px solid black;">-->
-<!--                            <td colspan="1" style="border:1px solid black;"><strong>IRN:</strong></td>-->
-<!--                        </tr>-->
 
                         <tr style="border:1px solid black;">
 
@@ -293,7 +290,7 @@
                                     <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+                                    <t t-esc="line.price_total"/>
 
                                 </td>
                             </tr>
@@ -424,7 +421,7 @@
             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
             <span style="text-align: right;"><b>TAX INVOICE</b></span>
             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+            &#160;&#160;&#160;&#160;&#160;&#160;&#160;
             <span style="text-align: right; padding-left: 10%;">Ref :</span>  <span t-field="o.name"/>
 
         </div>
