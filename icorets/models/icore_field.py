@@ -93,6 +93,7 @@ class AccountMoveLineInherit(models.Model):
 
     tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
                                       compute="check_tax_amount", currency_field='currency_id')
+    myntra_sku_code = fields.Char(string="Myntra SKU Code", copy=False)
 
     @api.depends('tax_ids')
     def check_tax_amount(self):
@@ -103,6 +104,19 @@ class AccountMoveLineInherit(models.Model):
             else:
                 rec.tax_amount_line = 0
 
+    # For getting size
+    def fetch_size(self):
+        lst = []
+        for rec in self:
+            if rec.product_id.product_template_attribute_value_ids:
+                i = 0
+                for size in rec.product_id.product_template_attribute_value_ids:
+                    if i % 2 != 0:
+                        lst.append(size.name)
+                    i += 1
+        if len(lst) > 0:
+            return lst[0]
+
 
 class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
@@ -112,6 +126,15 @@ class SaleOrderInherit(models.Model):
     location_id = fields.Many2one(
         'stock.location', ' Source Location',
         ondelete='restrict', required=True, index=True, check_company=True, copy=False)
+
+    @api.onchange('location_id')
+    def check_quantity(self):
+        if self.location_id:
+            for rec in self.order_line:
+                prd_qty = self.env['stock.quant'].search(
+                    [('product_id', '=', rec.product_id.id), ('location_id', '=', self.location_id.id)])
+                if rec.product_id:
+                    rec.stock_quantity = prd_qty.available_quantity
 
 
 class SaleOrderLineInherit(models.Model):
@@ -124,4 +147,48 @@ class SaleOrderLineInherit(models.Model):
         prd_qty = self.env['stock.quant'].search(
             [('product_id', '=', self.product_id.id), ('location_id', '=', self.order_id.location_id.id)])
         if self.product_id:
-            self.stock_quantity = prd_qty.quantity
+            self.stock_quantity = prd_qty.available_quantity
+
+
+class PurchaseOrderInherit(models.Model):
+    _inherit = 'purchase.order'
+
+    warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
+    is_approve = fields.Boolean('Is Approve')
+
+    # For getting user which used approve button in purchase order in pdf
+    def button_approve(self, force=False):
+        res = super(PurchaseOrderInherit, self).button_approve()
+        self.is_approve = True
+        return res
+
+
+class PurchaseOrderLineInherit(models.Model):
+    _inherit = 'purchase.order.line'
+
+    tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
+                                      compute="check_tax_amount", currency_field='currency_id')
+
+    # For getting size
+    def fetch_size(self):
+        lst = []
+        for rec in self:
+            if rec.product_id.product_template_attribute_value_ids:
+                i = 0
+                for size in rec.product_id.product_template_attribute_value_ids:
+                    if i % 2 != 0:
+                        lst.append(size.name)
+                    i += 1
+        if len(lst) > 0:
+            return lst[0]
+
+    # for getting rax amount
+
+    @api.depends('taxes_id')
+    def check_tax_amount(self):
+        for rec in self:
+            if rec.taxes_id:
+                for tax in rec.taxes_id:
+                    rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
+            else:
+                rec.tax_amount_line = 0

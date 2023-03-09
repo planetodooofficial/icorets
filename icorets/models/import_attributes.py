@@ -134,14 +134,14 @@ class ImportAttributes(models.TransientModel):
 
         lst_data = []
 
-        title = list(map(lambda a: a['SKU Code'], data))
+        title = list(map(lambda a: a['Title'], data))
 
         title = list(set(title))
         # print('Print Title : ', title)
 
         new_data = {}
         for a in title:
-            new_data[a] = list(filter(lambda t: t['SKU Code'] == a, data))
+            new_data[a] = list(filter(lambda t: t['Title'] == a, data))
         # print(new_data)
         created_product = []
         for keys, values in new_data.items():
@@ -151,7 +151,7 @@ class ImportAttributes(models.TransientModel):
             for i in values:
                 # #For product Category
                 # search_prod_category = self.env['product.category'].search(
-                #     [('name', '=', i['Sub Category']),('parent_id', '=' , 'All')])
+                #     [('display_name', '=', i['merge_category'])], limit=1)
                 # if not search_prod_category:
                 #     search_parent_category = self.env['product.category'].search([('name', '=', 'All')])
                 #     search_prod_category = self.env['product.category'].create(
@@ -222,6 +222,7 @@ class ImportAttributes(models.TransientModel):
                         'uom_po_id': search_uom.id,
                         'brand_id': brand_search.id,
                         'list_price': i['MRP'],
+                        'categ_id':search_prod_category.id,
                         'detailed_type': 'product',
                         'standard_price': i['Total Cost'],
                         'attribute_line_ids': lst,

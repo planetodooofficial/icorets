@@ -19,7 +19,7 @@
     <record id="flipkart_tax_invoice_report" model="ir.actions.report">
         <field name="name">Flipkart</field>
         <field name="model">account.move</field>
-        <field name="report_type">qweb-pdf</field>
+        <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.custom_invoice_report_flipkart</field>
         <field name="report_file">icorets.custom_invoice_report_flipkart</field>
         <field name="print_report_name">'Flipkart'</field>

@@ -6,7 +6,7 @@
     'description': """ product """,
     'category': 'Productivity',
     'website': 'https://www.odoomates.tech',
-    'depends': ['base', 'sale', 'product','sale_stock','stock','account','account_accountant'],
+    'depends': ['base', 'sale', 'product','sale_stock','stock','account','account_accountant','purchase'],
     'license': 'LGPL-3',
     'application': True,
     'data': ['security/ir.model.access.csv',

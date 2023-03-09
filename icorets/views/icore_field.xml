@@ -17,7 +17,7 @@
         </field>
     </record>
 
-<!--    For hiding On hand on product Kanban view-->
+    <!--    For hiding On hand on product Kanban view-->
 
     <!--    <record model="ir.ui.view" id="product_kanban_inherited2_view">-->
     <!--        <field name="name">product.kanban.inherited2</field>-->
@@ -32,28 +32,28 @@
 
 
 
-<!--    Product template hide standard price-->
+    <!--    Product template hide standard price-->
     <record id="product_template_only_form_view_inherit" model="ir.ui.view">
         <field name="name">product.template.only.form.view.inherit</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
 
-<!--            <xpath expr="//div[@name='button_box']" position="replace">-->
-                <div name="button_box" position="inside">
-                    <button name="162" type="action" icon="fa-sitemap" class="oe_stat_button"  groups="product.group_product_variant">
-                        <field string="Variants" name="product_variant_count" widget="statinfo"/>
-                    </button>
-                </div>
-<!--            </xpath>-->
+            <!--            <xpath expr="//div[@name='button_box']" position="replace">-->
+            <div name="button_box" position="inside">
+                <button name="162" type="action" icon="fa-sitemap" class="oe_stat_button"  groups="product.group_product_variant">
+                    <field string="Variants" name="product_variant_count" widget="statinfo"/>
+                </button>
+            </div>
+            <!--            </xpath>-->
 
 
-<!--            <xpath expr="//label[@for='standard_price']" position="replace">-->
-<!--            </xpath>-->
+            <!--            <xpath expr="//label[@for='standard_price']" position="replace">-->
+            <!--            </xpath>-->
 
-<!--             <xpath expr="//div[@name='standard_price_uom']" position="replace">-->
+            <!--             <xpath expr="//div[@name='standard_price_uom']" position="replace">-->
 
-<!--            </xpath>-->
+            <!--            </xpath>-->
 
 
             <xpath expr="//notebook/page[@name='general_information']" position="after">
@@ -91,8 +91,8 @@
         </field>
     </record>
 
-<!--    Product Variant Form-->
-        <record id="view_icore_variant_form" model="ir.ui.view">
+    <!--    Product Variant Form-->
+    <record id="view_icore_variant_form" model="ir.ui.view">
         <field name="name">view.icore.variant</field>
         <field name="model">product.product</field>
         <field name="inherit_id" ref="product.product_normal_form_view"/>
@@ -120,7 +120,7 @@
     </record>
 
 
-<!--    Product Variant Tree-->
+    <!--    Product Variant Tree-->
 
     <record id="view_icore_variant_tree" model="ir.ui.view">
         <field name="name">view.icore.variant.tree</field>
@@ -130,7 +130,7 @@
             <xpath expr="//field[@name='default_code']" position="after">
                 <field name="brand_id_rel" optional="hide"/>
                 <field name="variant_article_code"/>
-<!--                <field name="barcode"/>-->
+                <!--                <field name="barcode"/>-->
                 <field name="variant_asin"/>
                 <field name="variant_fsn"/>
             </xpath>
@@ -200,7 +200,7 @@
     </record>
 
 
-       <record model="ir.actions.act_window" id="action_brand_form">
+    <record model="ir.actions.act_window" id="action_brand_form">
         <field name="name">Product Brands</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.brand</field>
@@ -211,7 +211,9 @@
     <menuitem id="menu_brand" name="Brands"
               action="action_brand_form" parent="stock.menu_stock_inventory_control" sequence="30"/>
 
-     <record id="inherit_account_move" model="ir.ui.view">
+    <!--    Account move line inherit-->
+
+    <record id="inherit_account_move_line" model="ir.ui.view">
         <field name="name">inherit.account.move.form</field>
         <field name="model">account.move.line</field>
         <field name="inherit_id" ref="account.view_move_line_tree"/>
@@ -222,8 +224,8 @@
         </field>
     </record>
 
-<!--    #inheriting SALE ORDER-->
-     <record id="inherit_sale_order_form" model="ir.ui.view">
+    <!--    #inheriting SALE ORDER-->
+    <record id="inherit_sale_order_form" model="ir.ui.view">
         <field name="name">inherit.sale.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
@@ -235,13 +237,35 @@
                 <field name="no_of_cartons"/>
             </xpath>
 
-
-         <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
-             <field name="stock_quantity" readonly="1"/>
-         </xpath>
-            </field>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
+                <field name="stock_quantity" readonly="1"/>
+            </xpath>
+        </field>
     </record>
 
+    <!--    Inheriting account move-->
 
+    <record id="inherit_account_move" model="ir.ui.view">
+    <field name="name">inherit.account.move.form</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="after">
+                <field name="myntra_sku_code" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+<!--    Inheriting purchase Order-->
+    <record id="inherit_purchase_order" model="ir.ui.view">
+    <field name="name">inherit.purchase.order.form</field>
+    <field name="model">purchase.order</field>
+    <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="warehouse_id"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

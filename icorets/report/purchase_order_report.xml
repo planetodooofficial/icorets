@@ -7,19 +7,19 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">10</field>
+        <field name="margin_top">30</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">5</field>
         <field name="margin_right">5</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">15</field>
+        <field name="header_spacing">25</field>
         <field name="dpi">90</field>
     </record>
 
     <record id="purchase_order_report" model="ir.actions.report">
         <field name="name">Purchase Order Report</field>
         <field name="model">purchase.order</field>
-        <field name="report_type">qweb-pdf</field>
+        <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.purchase_order_report_forms</field>
         <field name="report_file">icorets.purchase_order_report_forms</field>
         <field name="print_report_name">'Purchase Order Report'</field>
@@ -39,19 +39,56 @@
                     <div class="page">
                         <table style="width:100%;margin-top: 10px">
                             <tr style="border:1px solid black;">
-                                <td style="border:1px solid black;" class="text-center" colspan="2">Purchase Order</td>
+                                <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="2"><b>PURCHASE ORDER</b></td>
                             </tr>
                             <tr style="border:1px solid black;">
-                                <td style="height:70px;border:1px solid black"></td>
-                                <td style="height:70px;border:1px solid black"></td>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Seller Name :</b> <t t-esc="o.partner_id.name"/><br/>
+                                Address : <t t-esc="o.partner_id.street"/><br/>
+                                <t t-esc="o.partner_id.street2"/><br/>
+                                <t t-esc="o.partner_id.city"/>,
+                                <t t-esc="o.partner_id.zip"/>,
+                                <t t-esc="o.partner_id.state_id.name"/>,
+                                <t t-esc="o.partner_id.country_id.name"/><br/>
+                                State Code : <t t-esc="o.partner_id.state_id.code"/><br/>
+                                GSTIN Number : <t t-esc="o.partner_id.vat"/>
+
+                                </td>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px">
+                                    <b>Billing Address:</b><br/>
+                                    <t t-esc="o.company_id.street"/>
+                                    <br/>
+                                    <t t-esc="o.company_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.company_id.city"/>,<t t-esc="o.company_id.zip"/>
+                                    <t t-esc="o.company_id.state_id.name"/>,
+                                    <t t-esc="o.company_id.country_id.name"/>
+                                    <br/>
+                                    <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
+                                </td>
                             </tr>
                             <tr style="border:1px solid black;">
-                                <td style="height:70px;border:1px solid black"></td>
-                                <td style="height:70px;border:1px solid black"></td>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px">
+                                    <br/>
+                                    <b>PO Number :</b> <t t-esc="o.name"/><br/>
+                                    <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>
+                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/><br/>
+                                    <b> Whether tax to be paid under reverse charge (Y/N) :</b> N
+                                </td>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px">
+                                    <b>Shipping Address:</b><br/>
+                                    <t t-esc="o.warehouse_id.partner_id.street"/>
+                                    <br/>
+                                    <t t-esc="o.warehouse_id.partner_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.warehouse_id.partner_id.city"/>,<t t-esc="o.warehouse_id.partner_id.zip"/>
+                                    <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,
+                                    <t t-esc="o.warehouse_id.partner_id.country_id.name"/>
+
+                                </td>
                             </tr>
                         </table>
 
-                        <table style="width:100%">
+                        <table class="table table-sm o_main_table" style="width:100%">
                             <tr style="background-color:#87CEEB">
                                 <td class="text-center" width="2%">
                                     <strong>Sr.</strong>
@@ -99,14 +136,40 @@
                                     </td>
 
                                     <td>
-                                        <t t-esc="line.product_id.name"/>
+                                         <t t-esc="line.product_id.variant_article_code"/>
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>
+                                        <t t-esc="line.product_id.barcode"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.product_id.l10n_in_hsn_code"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.fetch_size()"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.product_qty"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.price_unit"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.price_subtotal"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.taxes_id))"/>
+                                    </td>
+
+                                    <td style="text-align: right">
+                                        <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+
+                                    <td>
+                                        <t t-esc="line.price_total"/>
+                                    </td>
                                 </tr>
                             </t>
                             <br/>
@@ -142,6 +205,12 @@
                         </table>
                         <br/>
                         <table style="width:100%;margin-top: 10px">
+                            <tr>
+                                <td colspan="2">
+                                    <b>APPROVED BY :</b> <t t-esc="request.env.user.name"/>
+                                </td>
+                                <td></td>
+                            </tr>
                             <tr style="border:1px solid black">
                                 <td style="width:50%;border:1px solid black">PAYMENT TERM</td>
                                 <td style="text-align:center;width:50%;border:1px solid black">For iICOREts Private
@@ -149,14 +218,15 @@
                                 </td>
                             </tr>
                             <tr style="border:1px solid black">
-                                <td style="height:30px;border:1px solid black">50% advance balance on dispatch</td>
-                                <td style="border:1px solid black"></td>
+                                <td style="height:100px;border:1px solid black;vertical-align: top">50% advance balance on dispatch</td>
+                                <td style="height:100px;border:1px solid black"></td>
                             </tr>
+
                             <tr style="border:1px solid black">
-                                <td style="text-align:center;border:1px solid black">Subject to Mumbai
-                                    Jurisdiction
+                                <td style="text-align:center;border:1px solid black"><b>Subject to Mumbai
+                                    Jurisdiction</b>
                                 </td>
-                                <td style="text-align:center;border:1px solid black">Authorized Signatory</td>
+                                <td style="text-align:center;border:1px solid black"><b>Authorized Signatory</b></td>
                             </tr>
                             <tr style="border:1px solid black">
                                 <td colspan="2" style="text-align:center;border:1px solid black">iCOREts Private

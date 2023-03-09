@@ -112,7 +112,8 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Ack. No:</strong><br/>
-                            <strong>IRN No :</strong></td>
+                            <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
+
                         </tr>
                         <tr>
                             <td style="border:1px solid black" rowspan="8">QR</td>
@@ -212,6 +213,9 @@
                             <td class="text-center" width="20%">
                                 <strong>Description</strong>
                             </td>
+                            <td class="text-center">
+                                <strong>Size</strong>
+                            </td>
                             <td class="text-center" width="4%">
                                 <strong>Qty</strong>
                             </td>
@@ -255,6 +259,14 @@
                                     <span t-field="prd.name" />,
                                 </t><br/>
                                     HSN Code :<t t-esc="line.product_id.l10n_in_hsn_code"/><br/>
+                                </td>
+                                <td>
+<!--                                    <t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">-->
+<!--                                        <t t-if="prd">-->
+<!--                                            <t t-esc ="list(prd.mapped('name'))"/>-->
+<!--                                        </t>-->
+<!--                                    </t>-->
+                                    <t t-esc="line.fetch_size()"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
