@@ -29,7 +29,7 @@
 
      <template id="debit_tax_invoice_forms">
         <t t-call="web.html_container">
-            <t t-foreach="docs.filtered(lambda x: x.move_type == 'out_refund')" t-as="doc">
+            <t t-foreach="docs.filtered(lambda x: x.move_type == 'in_refund')" t-as="doc">
                 <t t-call="icorets.debit_report_original" t-lang="doc.partner_id.lang"/>
             </t>
         </t>
