@@ -1,3 +1,5 @@
+from lxml import etree
+
 from num2words import num2words
 
 from odoo import models, api, fields, _
@@ -8,6 +10,8 @@ from tempfile import TemporaryFile
 import pandas as pd
 import datetime
 from datetime import datetime
+
+from odoo.tools import json
 
 
 class ProductVariantInherit(models.Model):
@@ -127,6 +131,7 @@ class SaleOrderInherit(models.Model):
         'stock.location', ' Source Location',
         ondelete='restrict', required=True, index=True, check_company=True, copy=False)
 
+    # For checking quantity
     @api.onchange('location_id')
     def check_quantity(self):
         if self.location_id:
@@ -135,6 +140,21 @@ class SaleOrderInherit(models.Model):
                     [('product_id', '=', rec.product_id.id), ('location_id', '=', self.location_id.id)])
                 if rec.product_id:
                     rec.stock_quantity = prd_qty.available_quantity
+
+    # @api.model
+    # def get_view(self, view_id=None, view_type='form', **options):
+    #     res = super(SaleOrderInherit, self).get_view(view_id, view_type, **options)
+    #     if view_type == 'form' and self._context.get('default_custom_payment_type'):
+    #         doc = etree.XML(res['arch'])
+    #         domain = "[('type', '=', 'bank')]"
+    #         for node in doc.xpath("//field[@name='location_id']"):
+    #             node.set('domain', domain)
+    #             test = node.get("modifiers")
+    #             modifiers = json.loads(node.get("modifiers"))
+    #             modifiers['domain'] = domain
+    #             node.set("modifiers", json.dumps(modifiers))
+    #         res['arch'] = etree.tostring(doc)
+    #     return res
 
 
 class SaleOrderLineInherit(models.Model):
@@ -192,3 +212,15 @@ class PurchaseOrderLineInherit(models.Model):
                     rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
             else:
                 rec.tax_amount_line = 0
+
+
+class StockPickingInherit(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.model
+    def create(self, values):
+        res = super(StockPickingInherit, self).create(values)
+        stock_transfers_search = self.env['sale.order'].search([('name', '=', res.origin)])
+        if stock_transfers_search:
+            res.location_id = stock_transfers_search.location_id.id
+        return res

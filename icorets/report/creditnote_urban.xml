@@ -19,7 +19,7 @@
     <record id="credit_urban_swing_tax_invoice_report" model="ir.actions.report">
         <field name="name">Credit Urban Swing</field>
         <field name="model">account.move</field>
-        <field name="report_type">qweb-pdf</field>
+        <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.credit_urban_swing_tax_invoice_forms</field>
         <field name="report_file">icorets.credit_urban_swing_tax_invoice_forms</field>
         <field name="print_report_name">'Credit Urban Swing'</field>
