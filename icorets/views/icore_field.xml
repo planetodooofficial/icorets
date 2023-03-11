@@ -108,6 +108,7 @@
                             <field name="variant_article_code"/>
                         </group>
                         <group>
+                            <field name="variant_total_cost"/>
                             <field name="variant_cost"/>
                             <field name="variant_packaging_cost"/>
                         </group>
@@ -265,7 +266,25 @@
             <xpath expr="//field[@name='currency_id']" position="after">
                 <field name="warehouse_id"/>
             </xpath>
+            <xpath expr="//sheet//notebook/page[@name='products']/field[@name='order_line']/tree/field[@name='name']" position="after">
+                <field name="remark" optional="hide"/>
+            </xpath>
         </field>
     </record>
+
+<!--    Inherited for deductee type field-->
+    <record id="inherit_res_partner" model="ir.ui.view">
+    <field name="name">inherit.purchase.order.form</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="po_accounting_v16.partner_form_inherited"/>
+        <field name="arch" type="xml">
+             <xpath expr="//field[@name='deductee_type_id']" position="replace">
+                <field name="deductee_type_id" required="0" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+
+
 
 </odoo>

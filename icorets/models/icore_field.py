@@ -23,6 +23,7 @@ class ProductVariantInherit(models.Model):
     variant_fsn = fields.Char('FSN')
     variant_cost = fields.Float('Cost (Basic)')
     variant_packaging_cost = fields.Float('Packaging Cost')
+    variant_total_cost = fields.Float('Total Cost')
     brand_id_rel = fields.Many2one(related='product_tmpl_id.brand_id', string="Brand")
 
     # Inherited and removed domain
@@ -188,6 +189,8 @@ class PurchaseOrderLineInherit(models.Model):
 
     tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
                                       compute="check_tax_amount", currency_field='currency_id')
+
+    remark = fields.Text('Remarks')
 
     # For getting size
     def fetch_size(self):

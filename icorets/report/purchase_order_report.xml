@@ -6,7 +6,7 @@
         <field name="format">A4</field>
         <field name="page_height">0</field>
         <field name="page_width">0</field>
-        <field name="orientation">Portrait</field>
+        <field name="orientation">Landscape</field>
         <field name="margin_top">30</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">5</field>
@@ -30,7 +30,7 @@
     <template id="purchase_order_report_forms">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="icorets.report_invoice_layout">
                     <style>
                         table {
                         font-size: 12px;
@@ -39,10 +39,10 @@
                     <div class="page">
                         <table style="width:100%;margin-top: 10px">
                             <tr style="border:1px solid black;">
-                                <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="2"><b>PURCHASE ORDER</b></td>
+                                <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="3"><b>PURCHASE ORDER</b></td>
                             </tr>
                             <tr style="border:1px solid black;">
-                                <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Seller Name :</b> <t t-esc="o.partner_id.name"/><br/>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Vendor :</b> <t t-esc="o.partner_id.name"/><br/>
                                 Address : <t t-esc="o.partner_id.street"/><br/>
                                 <t t-esc="o.partner_id.street2"/><br/>
                                 <t t-esc="o.partner_id.city"/>,
@@ -65,16 +65,7 @@
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
                                 </td>
-                            </tr>
-                            <tr style="border:1px solid black;">
-                                <td style="height:70px;border:1px solid black;padding-left: 3px">
-                                    <br/>
-                                    <b>PO Number :</b> <t t-esc="o.name"/><br/>
-                                    <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>
-                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/><br/>
-                                    <b> Whether tax to be paid under reverse charge (Y/N) :</b> N
-                                </td>
-                                <td style="height:70px;border:1px solid black;padding-left: 3px">
+                                  <td style="height:70px;border:1px solid black;padding-left: 3px">
                                     <b>Shipping Address:</b><br/>
                                     <t t-esc="o.warehouse_id.partner_id.street"/>
                                     <br/>
@@ -86,6 +77,28 @@
 
                                 </td>
                             </tr>
+<!--                            <tr style="border:1px solid black;">-->
+<!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
+<!--                                    <br/>-->
+<!--                                    <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
+<!--                                    <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
+<!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/><br/>-->
+<!--                                </td>-->
+<!--                                <td></td>-->
+<!--                                <td></td>-->
+<!--                                <td></td>-->
+<!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
+<!--                                    <b>Shipping Address:</b><br/>-->
+<!--                                    <t t-esc="o.warehouse_id.partner_id.street"/>-->
+<!--                                    <br/>-->
+<!--                                    <t t-esc="o.warehouse_id.partner_id.street2"/>-->
+<!--                                    <br/>-->
+<!--                                    <t t-esc="o.warehouse_id.partner_id.city"/>,<t t-esc="o.warehouse_id.partner_id.zip"/>-->
+<!--                                    <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,-->
+<!--                                    <t t-esc="o.warehouse_id.partner_id.country_id.name"/>-->
+
+<!--                                </td>-->
+<!--                            </tr>-->
                         </table>
 
                         <table class="table table-sm o_main_table" style="width:100%">
@@ -102,6 +115,9 @@
                                 <td class="text-center" width="12%">
                                     <strong>DESCRIPTION</strong>
                                 </td>
+                                  <td class="text-center" width="12%">
+                                    <strong>REMARKS</strong>
+                                </td>
                                 <td class="text-center" width="12%">
                                     <strong>HSN CODE</strong>
                                 </td>
@@ -112,7 +128,7 @@
                                     <strong>QTY</strong>
                                 </td>
                                 <td class="text-center" width="12%">
-                                    <strong>Price</strong>
+                                    <strong>Price/Qty</strong>
                                 </td>
                                 <td class="text-center" width="10%">
                                     <strong>Total Taxable Amount</strong>
@@ -142,7 +158,10 @@
                                         <t t-esc="line.product_id.barcode"/>
                                     </td>
                                     <td>
-                                        <t t-esc="line.name"/>
+                                        <t t-esc="line.product_id.name"/>
+                                    </td>
+                                    <td style="text-align: left">
+                                        <t t-esc="line.remark"/>
                                     </td>
                                     <td>
                                         <t t-esc="line.product_id.l10n_in_hsn_code"/>
@@ -174,7 +193,7 @@
                             </t>
                             <br/>
                             <tr>
-                                <td style="text-align:right" colspan="10">
+                                <td style="text-align:right" colspan="11">
                                     <strong>Untaxed Amount</strong>
                                 </td>
                                 <td style="text-align:right" colspan="2">₹
@@ -182,20 +201,20 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td style="text-align:right" colspan="10">SGST</td>
+                                <td style="text-align:right" colspan="11">SGST</td>
                                 <td style="text-align:right" colspan="2">₹
                                     <t t-esc="o.amount_tax / 2"/>
                                 </td>
                             </tr>
                             <tr>
-                                <td style="text-align:right" colspan="10">CGST</td>
+                                <td style="text-align:right" colspan="11">CGST</td>
                                 <td style="text-align:right" colspan="2">₹
                                     <t t-esc="o.amount_tax / 2"/>
                                 </td>
                             </tr>
                             <hr/>
                             <tr>
-                                <td style="text-align:right" colspan="10">
+                                <td style="text-align:right" colspan="11">
                                     <strong>Total</strong>
                                 </td>
                                 <td style="text-align:right" colspan="2">₹
@@ -242,4 +261,96 @@
             </t>
         </t>
     </template>
+
+        <!--    #header and layout-->
+    <template id="external_layout_stripped_invoice">
+
+        <style>
+            div.absolute {
+              position: absolute;
+              top: 0px;
+              right: 0;
+              width: 200px;
+              height: 100px;
+}
+        </style>
+
+        <div t-attf-class="header o_company_#{company.id}_layout" att-style="report_header_style">
+
+<!--            <table style="width: 100%;border-0px !important">-->
+<!--                <tr>-->
+<!--                    <td style="width:60%;float: left;vertical-align: bottom;border-right: 0px;">-->
+<!--                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/>-->
+<!--                    </td>-->
+<!--                    <td style="width:35%;float: right;vertical-align: center;font-size: 14px;text-align: right;border-right: 0px !important;border-bottom: 0px !important;border-top: 0px !important;">-->
+<!--                        <span>PURCHASE ORDER</span>-->
+<!--                    </td>-->
+<!--                    <td style="vertical-align: bottom;width:35%;font-weight: bold;text-align: left; font-size: 16px;">-->
+<!--                                    <span style="valign: top;text-align: left;">-->
+<!--                                        <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
+<!--                                     <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
+<!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/>-->
+<!--                                    </span>-->
+
+
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            </table>-->
+
+<!--            Format 2-->
+<!--            <div><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/></div>-->
+<!--            <div><span><b>Purchase Order</b></span></div>-->
+            <div class="absolute">
+                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/>
+            </div>
+            <div style="position: absolute;top: 10px;left: 570px;">
+                <b>PO Number :</b> <t t-esc="o.name"/><br/>
+                                     <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>
+                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/>
+                </div>
+
+
+        </div>
+
+
+        <div t-attf-class="article o_report_layout_striped o_company_#{company.id}_layout"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div>
+
+            </div>
+
+            <t t-raw="0"/>
+        </div>
+        <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
+            <div class="text-center">
+                <div t-field="company.website"/>
+                <div t-if="report_type == 'pdf'">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_invoice_layout">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+
+        <t t-call="icorets.external_layout_stripped_invoice">
+            <t t-raw="0"/>
+        </t>
+    </template>
+
+
 </odoo>
