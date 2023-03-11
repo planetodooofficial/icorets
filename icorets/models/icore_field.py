@@ -21,7 +21,7 @@ class ProductVariantInherit(models.Model):
     variant_article_code = fields.Char('Article Code')
     variant_asin = fields.Char('ASIN')
     variant_fsn = fields.Char('FSN')
-    variant_cost = fields.Float('Cost (Basic)')
+    variant_cost = fields.Float('Invalid Cost') #not used
     variant_packaging_cost = fields.Float('Packaging Cost')
     variant_total_cost = fields.Float('Total Cost')
     brand_id_rel = fields.Many2one(related='product_tmpl_id.brand_id', string="Brand")
