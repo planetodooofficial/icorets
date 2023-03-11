@@ -173,21 +173,21 @@
                                         <t t-esc="line.product_qty"/>
                                     </td>
                                     <td>
-                                        <t t-esc="line.price_unit"/>
+                                        <t t-esc="'%.2f'% line.price_unit"/>
                                     </td>
                                     <td>
-                                        <t t-esc="line.price_subtotal"/>
+                                        <t t-esc="'%.2f'% line.price_subtotal"/>
                                     </td>
                                     <td>
                                         <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.taxes_id))"/>
                                     </td>
 
                                     <td style="text-align: right">
-                                        <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
+                                        <t t-esc="'%.2f'% line.tax_amount_line" />
                                     </td>
 
                                     <td>
-                                        <t t-esc="line.price_total"/>
+                                        <t t-esc="'%.2f'% line.price_total"/>
                                     </td>
                                 </tr>
                             </t>
@@ -197,7 +197,7 @@
                                     <strong>Untaxed Amount</strong>
                                 </td>
                                 <td style="text-align:right" colspan="2">₹
-                                    <t t-esc="o.amount_untaxed"/>
+                                    <t t-esc="'%.2f'% o.amount_untaxed"/>
                                 </td>
                             </tr>
                             <tr>
@@ -218,7 +218,7 @@
                                     <strong>Total</strong>
                                 </td>
                                 <td style="text-align:right" colspan="2">₹
-                                    <t t-esc="o.amount_total"/>
+                                    <t t-esc="'%.2f'% o.amount_total"/>
                                 </td>
                             </tr>
                         </table>
@@ -305,8 +305,8 @@
             </div>
             <div style="position: absolute;top: 10px;left: 570px;">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
-                                     <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>
-                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/>
+                                     <b>PO Date :</b> <span t-field="o.date_approve" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                                    <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 </div>
 
 
