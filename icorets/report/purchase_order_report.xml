@@ -223,13 +223,13 @@
                             </tr>
                         </table>
                         <br/>
-                        <table style="width:100%;margin-top: 10px">
-                            <tr>
-                                <td colspan="2">
-                                    <b>APPROVED BY :</b> <t t-esc="request.env.user.name"/>
-                                </td>
-                                <td></td>
-                            </tr>
+                        <table style="width:100%;margin-top: 10px;page-break : avoid">
+<!--                            <tr>-->
+<!--                                <td colspan="2">-->
+<!--                                    <b>APPROVED BY :</b> <t t-esc="request.env.user.name"/>-->
+<!--                                </td>-->
+<!--                                <td></td>-->
+<!--                            </tr>-->
                             <tr style="border:1px solid black">
                                 <td style="width:50%;border:1px solid black">PAYMENT TERM</td>
                                 <td style="text-align:center;width:50%;border:1px solid black">For iICOREts Private
@@ -305,8 +305,9 @@
             </div>
             <div style="position: absolute;top: 10px;left: 570px;">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
-                                     <b>PO Date :</b> <span t-field="o.date_approve" t-options='{"format": "dd/MM/yyyy"}'/><br/>
-                                    <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                 <b>PO Date :</b> <span t-field="o.date_approve" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                <b>Approved By :</b> <t t-esc="request.env.user.name"/>
                 </div>
 
 
