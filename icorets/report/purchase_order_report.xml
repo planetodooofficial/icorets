@@ -303,7 +303,7 @@
             <div class="absolute">
                 <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/>
             </div>
-            <div style="position: absolute;top: 10px;left: 570px;">
+            <div style="position: absolute;top: 10px;left: 870px;">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
                  <b>PO Date :</b> <span t-field="o.date_approve" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
