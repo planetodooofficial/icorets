@@ -334,7 +334,7 @@
         </div>
     </template>
 
-    <template id="report_invoice_layout">
+    <template id="report_invoice_layout_po">
         <t t-if="not o" t-set="o" t-value="doc"/>
         <t t-if="not company">
             <!-- Multicompany -->
