@@ -48,7 +48,7 @@
                     }
                 </style>
                 <div class="page">
-                    <table style="width:100%;margin-top: 0px">
+                                  <table style="width:100%;margin-top: 0px">
                         <tr style="border:1px solid black;">
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Original for Receipient)</strong></th>
                         </tr>
@@ -114,8 +114,7 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Ack. No:</strong><br/>
-                            <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
-
+                            <strong>IRN No :</strong></td>
                         </tr>
                         <tr>
                             <td style="border:1px solid black" rowspan="8">QR</td>
