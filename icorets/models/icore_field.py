@@ -162,7 +162,7 @@ class SaleOrderLineInherit(models.Model):
     _inherit = 'sale.order.line'
 
     stock_quantity = fields.Float('Stock Quantity')
-    hsn_c = fields.Many2one(string='HSN Code', related='product_id.sale_hsn')
+    hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.sale_hsn')
 
     @api.onchange('product_id')
     def check_quantity(self):
@@ -192,7 +192,7 @@ class PurchaseOrderLineInherit(models.Model):
                                       compute="check_tax_amount", currency_field='currency_id')
 
     remark = fields.Text('Remarks')
-    hsn_c = fields.Many2one(string='HSN Code', related='product_id.purchase_hsn')
+    hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.purchase_hsn')
 
     # For getting size
     def fetch_size(self):
