@@ -236,6 +236,20 @@ class PurchaseOrderLineInherit(models.Model):
         if len(lst) > 0:
             return lst[0]
 
+    # For fetching color
+
+    def fetch_color(self):
+        lst = []
+        for rec in self:
+            if rec.product_id.product_template_attribute_value_ids:
+                i = 0
+                for color in rec.product_id.product_template_attribute_value_ids:
+                    if i % 2 == 0 :
+                        lst.append(color.name)
+                    i += 1
+        if len(lst) > 0:
+            return lst[0]
+
     # for getting rax amount
 
     @api.depends('taxes_id')
