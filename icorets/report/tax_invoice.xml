@@ -393,7 +393,7 @@
 
     <template id="tax_invoice_report_duplicate">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout_invoice">
+            <t t-call="icorets.report_invoice_layout">
                 <style>
                     table {
                     font-size: 12px;
@@ -1102,7 +1102,7 @@
 
 
     <!--    #header and layout-->
-    <template id="external_layout_stripped_invoice_invoice">
+    <template id="external_layout_stripped_invoice">
         <div t-attf-class="header o_company_#{company.id}_layout">
 
             <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 220px;margin-top: 15px" alt="Logo"/>
@@ -1140,7 +1140,7 @@
         </div>
     </template>
 
-    <template id="report_invoice_layout_invoice">
+    <template id="report_invoice_layout">
         <t t-if="not o" t-set="o" t-value="doc"/>
         <t t-if="not company">
             <!-- Multicompany -->
@@ -1155,7 +1155,7 @@
             </t>
         </t>
 
-        <t t-call="icorets.external_layout_stripped_invoice_invoice">
+        <t t-call="icorets.external_layout_stripped_invoice">
             <t t-raw="0"/>
         </t>
     </template>

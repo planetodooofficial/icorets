@@ -41,7 +41,7 @@
 
     <template id="tax_invoice_report_original">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout_invoice">
+            <t t-call="icorets.report_invoice_layout">
                 <style>
                     table {
                     font-size: 12px;
@@ -408,7 +408,7 @@
     </template>
     <template id="tax_invoice_report_duplicate">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout_invoice">
+            <t t-call="icorets.report_invoice_layout">
                 <style>
                     table {
                     font-size: 12px;
@@ -776,7 +776,7 @@
     </template>
     <template id="tax_invoice_report_triplicate">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout_invoice">
+            <t t-call="icorets.report_invoice_layout">
                 <style>
                     table {
                     font-size: 12px;
@@ -1200,7 +1200,7 @@
         </div>
     </template>
 
-    <template id="report_invoice_layout_invoice">
+    <template id="report_invoice_layout">
         <t t-if="not o" t-set="o" t-value="doc"/>
         <t t-if="not company">
             <!-- Multicompany -->
