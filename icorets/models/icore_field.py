@@ -164,6 +164,13 @@ class SaleOrderLineInherit(models.Model):
     stock_quantity = fields.Float('Stock Quantity')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.sale_hsn')
 
+
+    # Populating HSN Field data in Invoice line item from product HSN
+    def _prepare_invoice_line(self, **optional_values):
+        result = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
+        result['hsn_code'] = self.product_id.l10n_in_hsn_code.sale_hsn
+        return result
+
     @api.onchange('product_id')
     def check_quantity(self):
         prd_qty = self.env['stock.quant'].search(
