@@ -21,7 +21,7 @@ class ProductVariantInherit(models.Model):
     variant_article_code = fields.Char('Article Code')
     variant_asin = fields.Char('ASIN')
     variant_fsn = fields.Char('FSN')
-    variant_cost = fields.Float('Invalid Cost') #not used
+    variant_cost = fields.Float('Invalid Cost')  # not used
     variant_packaging_cost = fields.Float('Packaging Cost')
     variant_total_cost = fields.Float('Total Cost')
     brand_id_rel = fields.Many2one(related='product_tmpl_id.brand_id', string="Brand")
@@ -130,7 +130,7 @@ class SaleOrderInherit(models.Model):
     no_of_cartons = fields.Char('No of Cartons')
     location_id = fields.Many2one(
         'stock.location', ' Source Location',
-        ondelete='restrict', required=True, index=True, check_company=True, copy=False)
+        ondelete='restrict', required=True, index=True, check_company=True)
 
     # For checking quantity
     @api.onchange('location_id')
@@ -163,7 +163,6 @@ class SaleOrderLineInherit(models.Model):
 
     stock_quantity = fields.Float('Stock Quantity')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.sale_hsn')
-
 
     # Populating HSN Field data in Invoice line item from product HSN
     def _prepare_invoice_line(self, **optional_values):
@@ -201,6 +200,14 @@ class PurchaseOrderLineInherit(models.Model):
 
     remark = fields.Text('Remarks')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.purchase_hsn')
+
+    # Adding Purchase HSN Code in Bills
+
+    def _prepare_account_move_line(self, move=False):
+        res = super(PurchaseOrderLineInherit, self)._prepare_account_move_line(move)
+        hsn = self.product_id.product_tmpl_id.purchase_hsn
+        res.update({'hsn_id': hsn.id})
+        return res
 
     # For getting size
     def fetch_size(self):
