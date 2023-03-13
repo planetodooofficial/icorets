@@ -30,7 +30,7 @@
     <template id="purchase_order_report_forms">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="icorets.report_invoice_layout">
+                <t t-call="icorets.report_invoice_layout_po">
                     <style>
                         table {
                         font-size: 12px;
@@ -349,7 +349,7 @@
             </t>
         </t>
 
-        <t t-call="icorets.external_layout_stripped_po">
+        <t t-call="icorets.external_layout_stripped_invoice_po">
             <t t-raw="0"/>
         </t>
     </template>

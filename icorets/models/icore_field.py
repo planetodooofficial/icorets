@@ -29,18 +29,19 @@ class ProductVariantInherit(models.Model):
     # Inherited and removed domain
     product_template_variant_value_ids = fields.Many2many('product.template.attribute.value',
                                                           relation='product_variant_combination',
-                                                          string="Variant Values", ondelete='restrict')
+                                                          string="Variant Values", ondelete='restrict', domain=[])
 
     _sql_constraints = [
         ('asin_unique', 'unique(variant_asin)', "ASIN code can only be assigned to one variant product !"),
         ('ean_code_unique', 'unique(variant_ean_code)', "EAN code can only be assigned to one variant product !"),
         ('fsn_unique', 'unique(variant_fsn)', "FSN code can only be assigned to one variant product !"),
     ]
+
     # For updating standard price by rakng sum of cost(basic) and packaging cost
-    # @api.onchange('cost', 'packaging_cost')
-    # def sum_cost(self):
-    #     if self.cost and self.packaging_cost:
-    #         self.standard_price = self.cost + self.packaging_cost
+    @api.onchange('cost', 'packaging_cost')
+    def sum_cost(self):
+        if self.cost and self.packaging_cost:
+            self.standard_price = self.cost + self.packaging_cost
 
 
 class ProductInherit(models.Model):
@@ -122,7 +123,7 @@ class AccountMoveLineInherit(models.Model):
         if len(lst) > 0:
             return lst[0]
 
-    #Fetch Color
+    # Fetch Color
 
     def fetch_color(self):
         lst = []
@@ -130,7 +131,7 @@ class AccountMoveLineInherit(models.Model):
             if rec.product_id.product_template_attribute_value_ids:
                 i = 0
                 for color in rec.product_id.product_template_attribute_value_ids:
-                    if i % 2 == 0 :
+                    if i % 2 == 0:
                         lst.append(color.name)
                     i += 1
         if len(lst) > 0:
@@ -244,7 +245,7 @@ class PurchaseOrderLineInherit(models.Model):
             if rec.product_id.product_template_attribute_value_ids:
                 i = 0
                 for color in rec.product_id.product_template_attribute_value_ids:
-                    if i % 2 == 0 :
+                    if i % 2 == 0:
                         lst.append(color.name)
                     i += 1
         if len(lst) > 0:

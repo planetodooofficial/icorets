@@ -134,14 +134,14 @@ class ImportAttributes(models.TransientModel):
 
         lst_data = []
 
-        title = list(map(lambda a: a['Title'], data))
+        title = list(map(lambda a: a['Style Code'], data))
 
         title = list(set(title))
         # print('Print Title : ', title)
 
         new_data = {}
         for a in title:
-            new_data[a] = list(filter(lambda t: t['Title'] == a, data))
+            new_data[a] = list(filter(lambda t: t['Style Code'] == a, data))
         # print(new_data)
         created_product = []
         for keys, values in new_data.items():
@@ -222,7 +222,6 @@ class ImportAttributes(models.TransientModel):
                         'uom_po_id': search_uom.id,
                         'brand_id': brand_search.id,
                         'list_price': i['MRP'],
-                        'categ_id':search_prod_category.id,
                         'detailed_type': 'product',
                         'standard_price': i['Total Cost'],
                         'attribute_line_ids': lst,
@@ -233,7 +232,7 @@ class ImportAttributes(models.TransientModel):
                     created_product.append(keys)
 
                 else:
-                    search_product = self.env["product.template"].search([("name", "=", keys)])
+                    search_product = self.env["product.template"].search([("style_code", "=", keys)])
                     for attribute in search_product.attribute_line_ids:
                         if attribute.attribute_id.name == "Color":
                             if i['Color'] not in attribute.value_ids:
