@@ -111,6 +111,8 @@
                             <field name="variant_total_cost"/>
 <!--                            <field name="variant_cost"/>-->
                             <field name="variant_packaging_cost"/>
+                            <field name="color"/>
+                            <field name="size"/>
                         </group>
 
                     </group>

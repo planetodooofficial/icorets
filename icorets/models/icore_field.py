@@ -25,6 +25,8 @@ class ProductVariantInherit(models.Model):
     variant_packaging_cost = fields.Float('Packaging Cost')
     variant_total_cost = fields.Float('Total Cost')
     brand_id_rel = fields.Many2one(related='product_tmpl_id.brand_id', string="Brand")
+    color = fields.Char('Color')
+    size = fields.Char('Size')
 
     # Inherited and removed domain
     product_template_variant_value_ids = fields.Many2many('product.template.attribute.value',
