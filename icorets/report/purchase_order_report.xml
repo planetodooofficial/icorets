@@ -165,7 +165,7 @@
                                         <t t-esc="line.remark"/>
                                     </td>
                                     <td>
-                                        <t t-esc="line.hsn_c"/>
+                                        <t t-esc="line.hsn_c.hsnsac_code"/>
                                     </td>
                                     <td>
                                         <t t-esc="line.fetch_size()"/>
@@ -264,7 +264,7 @@
     </template>
 
         <!--    #header and layout-->
-    <template id="external_layout_stripped_invoice">
+    <template id="external_layout_stripped_invoice_po">
 
         <style>
             div.absolute {
@@ -349,7 +349,7 @@
             </t>
         </t>
 
-        <t t-call="icorets.external_layout_stripped_invoice">
+        <t t-call="icorets.external_layout_stripped_po">
             <t t-raw="0"/>
         </t>
     </template>

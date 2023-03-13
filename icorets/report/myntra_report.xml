@@ -39,7 +39,7 @@
 
     <template id="myntra_report_original">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout">
+            <t t-call="icorets.report_invoice_layout_invoice">
                 <style>
                     table {
                     font-size: 12px;
@@ -407,7 +407,7 @@
     </template>
     <template id="myntra_report_duplicate">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout">
+            <t t-call="icorets.report_invoice_layout_invoice">
                 <style>
                     table {
                     font-size: 12px;
@@ -775,7 +775,7 @@
     </template>
     <template id="myntra_report_triplicate">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout">
+            <t t-call="icorets.report_invoice_layout_invoice">
                 <style>
                     table {
                     font-size: 12px;
@@ -1203,7 +1203,7 @@
         </div>
     </template>
 
-    <template id="report_invoice_layout">
+    <template id="report_invoice_layout_invoice">
         <t t-if="not o" t-set="o" t-value="doc"/>
         <t t-if="not company">
             <!-- Multicompany -->

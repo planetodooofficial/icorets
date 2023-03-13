@@ -391,7 +391,7 @@
     </template>
 
     <!--    #header and layout-->
-    <template id="external_layout_stripped_invoice">
+    <template id="external_layout_stripped_invoice_credit">
 
         <div t-attf-class="header o_company_#{company.id}_layout">
 
@@ -445,7 +445,7 @@
             </t>
         </t>
 
-        <t t-call="icorets.external_layout_stripped_invoice">
+        <t t-call="icorets.external_layout_stripped_invoice_credit">
             <t t-raw="0"/>
         </t>
     </template>
