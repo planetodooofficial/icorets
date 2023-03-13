@@ -241,6 +241,10 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
                 <field name="stock_quantity" readonly="1" force_save="1"/>
             </xpath>
+
+            <xpath expr="//field[@name='order_line']/tree/field[@name='hsn_id']" position="replace">
+                <field name="hsn_c" optional="hide"/>
+            </xpath>
         </field>
     </record>
 
@@ -269,6 +273,10 @@
             <xpath expr="//sheet//notebook/page[@name='products']/field[@name='order_line']/tree/field[@name='name']" position="after">
                 <field name="remark" optional="hide"/>
             </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='hsn_id']" position="replace">
+                    <field name="hsn_c" optional="hide"/>
+            </xpath>
+
         </field>
     </record>
 
@@ -283,8 +291,5 @@
             </xpath>
         </field>
     </record>
-
-
-
 
 </odoo>
