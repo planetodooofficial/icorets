@@ -168,7 +168,8 @@ class SaleOrderLineInherit(models.Model):
     # Populating HSN Field data in Invoice line item from product HSN
     def _prepare_invoice_line(self, **optional_values):
         result = super(SaleOrderLineInherit, self)._prepare_invoice_line(**optional_values)
-        result['hsn_code'] = self.product_id.l10n_in_hsn_code.sale_hsn
+        hsn = self.product_id.product_tmpl_id.sale_hsn
+        result['hsn_id'] = hsn.id
         return result
 
     @api.onchange('product_id')
