@@ -158,7 +158,8 @@
                                         <t t-esc="line.product_id.barcode"/>
                                     </td>
                                     <td>
-                                        <t t-esc="line.product_id.name"/>
+                                        <t t-esc="line.product_id.name"/><br/>
+                                        <t t-esc="line.product_id.product_template_attribute_value_ids"/>
                                     </td>
                                     <td style="text-align: left">
                                         <t t-esc="line.remark"/>
