@@ -37,7 +37,7 @@
 
     <template id="debit_report_original">
         <t t-foreach="docs" t-as="o">
-            <t t-call="icorets.report_invoice_layout">
+            <t t-call="icorets.report_invoice_layout_credit">
                 <style>
                     table {
                     font-size: 12px;

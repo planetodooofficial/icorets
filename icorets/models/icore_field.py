@@ -122,6 +122,20 @@ class AccountMoveLineInherit(models.Model):
         if len(lst) > 0:
             return lst[0]
 
+    #Fetch Color
+
+    def fetch_color(self):
+        lst = []
+        for rec in self:
+            if rec.product_id.product_template_attribute_value_ids:
+                i = 0
+                for color in rec.product_id.product_template_attribute_value_ids:
+                    if i % 2 == 0 :
+                        lst.append(color.name)
+                    i += 1
+        if len(lst) > 0:
+            return lst[0]
+
 
 class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
