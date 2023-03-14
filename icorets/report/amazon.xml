@@ -17,6 +17,24 @@
     </record>
 
 
+    <!--    Landscape-->
+     <record id="paperformat_batch_deposit_flipkart" model="report.paperformat">
+        <field name="name">Tax Invoice</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">8</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+
     <record id="tax_invoice_report_amazon" model="ir.actions.report">
         <field name="name">Amazon</field>
         <field name="model">account.move</field>
@@ -25,21 +43,21 @@
         <field name="print_report_name">'Amazon'</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="icorets.paperformat_invoice_report"/>
+        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_flipkart"/>
 
     </record>
 
     <template id="custom_invoice_report_amazon">
         <t t-call="web.html_container">
             <t t-foreach="docs.filtered(lambda x: x.move_type == 'out_invoice')" t-as="doc">
-                <t t-call="icorets.tax_invoice_report_original" t-lang="doc.partner_id.lang"/>
-                <t t-call="icorets.tax_invoice_report_duplicate" t-lang="doc.partner_id.lang"/>
-                <t t-call="icorets.tax_invoice_report_triplicate" t-lang="doc.partner_id.lang"/>
+                <t t-call="icorets.tax_invoice_amazon_original" t-lang="doc.partner_id.lang"/>
+                <t t-call="icorets.tax_invoice_amazon_duplicate" t-lang="doc.partner_id.lang"/>
+                <t t-call="icorets.tax_invoice_amazon_triplicate" t-lang="doc.partner_id.lang"/>
             </t>
         </t>
     </template>
 
-    <template id="tax_invoice_report_original">
+    <template id="tax_invoice_amazon_original">
         <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -212,10 +230,10 @@
                                 <strong>EAN</strong>
                             </td>
                             <td class="text-center" width="20%">
-                                <strong>Description</strong>
+                                <strong>Remarks</strong>
                             </td>
                             <td class="text-center">
-                                <strong>Size</strong>
+                                <strong>HSN/SAC</strong>
                             </td>
                             <td class="text-center" width="4%">
                                 <strong>Qty</strong>
@@ -252,23 +270,15 @@
                                 <td>
                                     <t t-esc="line.product_id.barcode"/>
                                 </td>
-                                <td>
-                                    <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
-                                    <t t-esc="line.product_id.brand_id_rel.name"/><br/>
-                                    <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color and Size :</b></span><t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">
-                                    <span t-field="prd.name" />,
-                                </t><br/>
-                                    HSN Code :<t t-esc="line.product_id.l10n_in_hsn_code"/><br/>
+
+                                <td style="text-align: left">
+                                    <t t-esc="line.remarks"/>
                                 </td>
                                 <td>
-<!--                                    <t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">-->
-<!--                                        <t t-if="prd">-->
-<!--                                            <t t-esc ="list(prd.mapped('name'))"/>-->
-<!--                                        </t>-->
-<!--                                    </t>-->
-                                    <t t-esc="line.fetch_size()"/>
+
+                                    <t t-esc="line.hsn_id.hsnsac_code"/><br/>
                                 </td>
+
                                 <td>
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
                                 </td>
@@ -308,43 +318,35 @@
                                 </td>
                             </tr>
                         </t>
-                        <!--                        </table>-->
-                        <!--                        <table class="table table-sm o_main_table">-->
-                        <tr>
-                            <td style="text-align:right" colspan="10"><strong>Untaxed Amount</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_untaxed"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">SGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">CGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/></td>
-                        </tr>
-                        <hr/>
-                        <tr>
-                            <td colspan="5">
-                                <strong style="text-align: left;">Amt. Chargeble (In Words) :-
-                                    <t t-if="doc.currency_id.name == 'INR'">
-                                        <span style="text-transform: capitalize;" t-esc="doc.check_amount_in_words.replace(',', '')"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                                    </t>
-                                </strong>
-                            </td>
-                            <td style="text-align:right" colspan="5"><strong>Total</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_total"/></td>
-                        </tr>
+
                     </table>
-                    <br/>
+                           <div class="clearfix mb-4">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                    <!--Tax totals-->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-call="account.document_tax_totals"/>
+
+                                    <!--Payments-->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <table>-->
+                    <!--                        <tr>-->
+                    <!--                            <td style="border: 0px">-->
+                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
+                        <t t-if="doc.currency_id.name == 'INR'">
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                        </t>
+                        <t t-else="">
+                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                        </t>
+                    </strong>
+
+
                     <table style="width:100%;margin-top: 10px;page-break-inside: avoid;">
                         <tr style="border:1px solid black;">
                             <th style="text-align:center;border:1px solid black;width=45%" colspan="3">UDYAM
@@ -406,7 +408,7 @@
             </t>
         </t>
     </template>
-    <template id="tax_invoice_report_duplicate">
+    <template id="tax_invoice_amazon_duplicate">
         <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -419,7 +421,7 @@
                         <tr style="border:1px solid black;">
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Duplicate for Transporter)</strong></th>
                         </tr>
-                        <tr style="background-color:#87CEEB;border:1px solid black">
+                         <tr style="background-color:#87CEEB;border:1px solid black">
                             <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
@@ -481,8 +483,7 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Ack. No:</strong><br/>
-                            <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
-
+                            <strong>IRN No :</strong></td>
                         </tr>
                         <tr>
                             <td style="border:1px solid black" rowspan="8">QR</td>
@@ -580,10 +581,10 @@
                                 <strong>EAN</strong>
                             </td>
                             <td class="text-center" width="20%">
-                                <strong>Description</strong>
+                                <strong>Remarks</strong>
                             </td>
                             <td class="text-center">
-                                <strong>Size</strong>
+                                <strong>HSN/SAC</strong>
                             </td>
                             <td class="text-center" width="4%">
                                 <strong>Qty</strong>
@@ -620,23 +621,15 @@
                                 <td>
                                     <t t-esc="line.product_id.barcode"/>
                                 </td>
-                                <td>
-                                    <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
-                                    <t t-esc="line.product_id.brand_id_rel.name"/><br/>
-                                    <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color and Size :</b></span><t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">
-                                    <span t-field="prd.name" />,
-                                </t><br/>
-                                    HSN Code :<t t-esc="line.product_id.l10n_in_hsn_code"/><br/>
+
+                                <td style="text-align: left">
+                                    <t t-esc="line.remarks"/>
                                 </td>
                                 <td>
-<!--                                    <t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">-->
-<!--                                        <t t-if="prd">-->
-<!--                                            <t t-esc ="list(prd.mapped('name'))"/>-->
-<!--                                        </t>-->
-<!--                                    </t>-->
-                                    <t t-esc="line.fetch_size()"/>
+
+                                    <t t-esc="line.hsn_id.hsnsac_code"/><br/>
                                 </td>
+
                                 <td>
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
                                 </td>
@@ -676,43 +669,34 @@
                                 </td>
                             </tr>
                         </t>
-                        <!--                        </table>-->
-                        <!--                        <table class="table table-sm o_main_table">-->
-                        <tr>
-                            <td style="text-align:right" colspan="10"><strong>Untaxed Amount</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_untaxed"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">SGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">CGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/></td>
-                        </tr>
-                        <hr/>
-                        <tr>
-                            <td colspan="5">
-                                <strong style="text-align: left;">Amt. Chargeble (In Words) :-
-                                    <t t-if="doc.currency_id.name == 'INR'">
-                                        <span style="text-transform: capitalize;" t-esc="doc.check_amount_in_words.replace(',', '')"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                                    </t>
-                                </strong>
-                            </td>
-                            <td style="text-align:right" colspan="5"><strong>Total</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_total"/></td>
-                        </tr>
+
                     </table>
-                    <br/>
+                           <div class="clearfix mb-4">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                    <!--Tax totals-->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-call="account.document_tax_totals"/>
+
+                                    <!--Payments-->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <table>-->
+                    <!--                        <tr>-->
+                    <!--                            <td style="border: 0px">-->
+                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
+                        <t t-if="doc.currency_id.name == 'INR'">
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                        </t>
+                        <t t-else="">
+                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                        </t>
+                    </strong>
+
                     <table style="width:100%;margin-top: 10px;page-break-inside: avoid;">
                         <tr style="border:1px solid black;">
                             <th style="text-align:center;border:1px solid black;width=45%" colspan="3">UDYAM
@@ -774,7 +758,7 @@
             </t>
         </t>
     </template>
-    <template id="tax_invoice_report_triplicate">
+    <template id="tax_invoice_amazon_triplicate">
         <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -787,7 +771,7 @@
                         <tr style="border:1px solid black;">
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Triplicate for Supplier)</strong></th>
                         </tr>
-                        <tr style="background-color:#87CEEB;border:1px solid black">
+                         <tr style="background-color:#87CEEB;border:1px solid black">
                             <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
@@ -849,8 +833,7 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Ack. No:</strong><br/>
-                            <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
-
+                            <strong>IRN No :</strong></td>
                         </tr>
                         <tr>
                             <td style="border:1px solid black" rowspan="8">QR</td>
@@ -948,10 +931,10 @@
                                 <strong>EAN</strong>
                             </td>
                             <td class="text-center" width="20%">
-                                <strong>Description</strong>
+                                <strong>Remarks</strong>
                             </td>
                             <td class="text-center">
-                                <strong>Size</strong>
+                                <strong>HSN/SAC</strong>
                             </td>
                             <td class="text-center" width="4%">
                                 <strong>Qty</strong>
@@ -988,23 +971,15 @@
                                 <td>
                                     <t t-esc="line.product_id.barcode"/>
                                 </td>
-                                <td>
-                                    <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
-                                    <t t-esc="line.product_id.brand_id_rel.name"/><br/>
-                                    <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color and Size :</b></span><t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">
-                                    <span t-field="prd.name" />,
-                                </t><br/>
-                                    HSN Code :<t t-esc="line.product_id.l10n_in_hsn_code"/><br/>
+
+                                <td style="text-align: left">
+                                    <t t-esc="line.remarks"/>
                                 </td>
                                 <td>
-<!--                                    <t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">-->
-<!--                                        <t t-if="prd">-->
-<!--                                            <t t-esc ="list(prd.mapped('name'))"/>-->
-<!--                                        </t>-->
-<!--                                    </t>-->
-                                    <t t-esc="line.fetch_size()"/>
+
+                                    <t t-esc="line.hsn_id.hsnsac_code"/><br/>
                                 </td>
+
                                 <td>
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
                                 </td>
@@ -1044,43 +1019,35 @@
                                 </td>
                             </tr>
                         </t>
-                        <!--                        </table>-->
-                        <!--                        <table class="table table-sm o_main_table">-->
-                        <tr>
-                            <td style="text-align:right" colspan="10"><strong>Untaxed Amount</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_untaxed"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">SGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">CGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/></td>
-                        </tr>
-                        <hr/>
-                        <tr>
-                            <td colspan="5">
-                                <strong style="text-align: left;">Amt. Chargeble (In Words) :-
-                                    <t t-if="doc.currency_id.name == 'INR'">
-                                        <span style="text-transform: capitalize;" t-esc="doc.check_amount_in_words.replace(',', '')"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                                    </t>
-                                </strong>
-                            </td>
-                            <td style="text-align:right" colspan="5"><strong>Total</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_total"/></td>
-                        </tr>
+
                     </table>
-                    <br/>
+
+                           <div class="clearfix mb-4">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                    <!--Tax totals-->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-call="account.document_tax_totals"/>
+
+                                    <!--Payments-->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <table>-->
+                    <!--                        <tr>-->
+                    <!--                            <td style="border: 0px">-->
+                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
+                        <t t-if="doc.currency_id.name == 'INR'">
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                        </t>
+                        <t t-else="">
+                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                        </t>
+                    </strong>
+
                     <table style="width:100%;margin-top: 10px;page-break-inside: avoid;">
                         <tr style="border:1px solid black;">
                             <th style="text-align:center;border:1px solid black;width=45%" colspan="3">UDYAM
@@ -1166,12 +1133,12 @@
         <div t-attf-class="header o_company_#{company.id}_layout">
 
             <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 220px;margin-top: 15px" alt="Logo"/>
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            <span style="text-align: right;"><b>TAX INVOICE</b></span>
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            <span style="text-align: right; padding-left: 10%;">Ref :</span>  <span t-field="o.name"/>
+<!--            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;-->
+<!--            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;-->
+<!--            <span style="text-align: right;"><b>TAX INVOICE</b></span>-->
+<!--            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;-->
+<!--            &#160;&#160;&#160;&#160;&#160;&#160;&#160;-->
+<!--            <span style="text-align: right; padding-left: 10%;">Ref :</span>  <span t-field="o.name"/>-->
 
         </div>
 

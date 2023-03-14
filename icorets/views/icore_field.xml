@@ -259,6 +259,7 @@
         <field name="arch" type="xml">
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="after">
                 <field name="myntra_sku_code" optional="hide"/>
+                <field name="remarks" optional="hide"/>
             </xpath>
         </field>
     </record>

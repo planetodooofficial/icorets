@@ -16,6 +16,23 @@
         <field name="dpi">90</field>
     </record>
 
+<!--    Landscape-->
+     <record id="paperformat_batch_deposit_flipkart" model="report.paperformat">
+        <field name="name">Tax Invoice</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">8</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
     <record id="flipkart_tax_invoice_report" model="ir.actions.report">
         <field name="name">Flipkart</field>
         <field name="model">account.move</field>
@@ -24,7 +41,7 @@
         <field name="report_file">icorets.custom_invoice_report_flipkart</field>
         <field name="print_report_name">'Flipkart'</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit"/>
+        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_flipkart"/>
     </record>
 
     <template id="custom_invoice_report_flipkart">
@@ -210,7 +227,10 @@
                                 <strong>EAN</strong>
                             </td>
                             <td class="text-center" width="20%">
-                                <strong>Description</strong>
+                                <strong>Remarks</strong>
+                            </td>
+                            <td class="text-center">
+                                <strong>HSN/SAC</strong>
                             </td>
                             <td class="text-center" width="4%">
                                 <strong>Qty</strong>
@@ -247,14 +267,12 @@
                                 <td>
                                     <t t-esc="line.product_id.barcode"/>
                                 </td>
+                                <td style="text-align: left">
+                                    <t t-esc="line.remarks"/>
+
+                                </td>
                                 <td>
-                                    <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
-                                    <t t-esc="line.product_id.brand_id_rel.name"/><br/>
-                                    <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color and Size :</b></span><t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">
-                                    <span t-field="prd.name" />,
-                                </t><br/>
-                                    HSN Code :<t t-esc="line.product_id.l10n_in_hsn_code"/><br/>
+                                    <t t-esc="line.hsn_id.hsnsac_code"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
@@ -295,43 +313,33 @@
                                 </td>
                             </tr>
                         </t>
-                        <!--                        </table>-->
-                        <!--                        <table class="table table-sm o_main_table">-->
-                        <tr>
-                            <td style="text-align:right" colspan="10"><strong>Untaxed Amount</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_untaxed"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">SGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">CGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/></td>
-                        </tr>
-                        <hr/>
-                        <tr>
-                            <td colspan="5">
-                                <strong style="text-align: left;">Amt. Chargeble (In Words) :-
-                                    <t t-if="doc.currency_id.name == 'INR'">
-                                        <span style="text-transform: capitalize;" t-esc="doc.check_amount_in_words.replace(',', '')"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                                    </t>
-                                </strong>
-                            </td>
-                            <td style="text-align:right" colspan="5"><strong>Total</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_total"/></td>
-                        </tr>
                     </table>
-                    <br/>
+                          <div class="clearfix mb-4">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                    <!--Tax totals-->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-call="account.document_tax_totals"/>
+
+                                    <!--Payments-->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <table>-->
+                    <!--                        <tr>-->
+                    <!--                            <td style="border: 0px">-->
+                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
+                        <t t-if="doc.currency_id.name == 'INR'">
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                        </t>
+                        <t t-else="">
+                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                        </t>
+                    </strong>
+
                     <table style="width:100%;margin-top: 10px;page-break-inside: avoid;">
                         <tr style="border:1px solid black;">
                             <th style="text-align:center;border:1px solid black;width=45%" colspan="3">UDYAM
@@ -367,9 +375,9 @@
                                 </t>
                             </td>
                             <td style="bordr:1px solid black;text-align: center" colspan="3">
-                                iCOREts Private Limited
-                                A/C # 50200016765210
-                                IFSC Code: HDFC0001799
+                                iCOREts Private Limited<br/>
+                                A/C # 50200016765210<br/>
+                                IFSC Code: HDFC0001799<br/>
                                 Bank: HDFC Bank (JVLR Branch)
                             </td>
                         </tr>
@@ -566,7 +574,10 @@
                                 <strong>EAN</strong>
                             </td>
                             <td class="text-center" width="20%">
-                                <strong>Description</strong>
+                                <strong>Remarks</strong>
+                            </td>
+                            <td class="text-center">
+                                <strong>HSN/SAC</strong>
                             </td>
                             <td class="text-center" width="4%">
                                 <strong>Qty</strong>
@@ -603,14 +614,12 @@
                                 <td>
                                     <t t-esc="line.product_id.barcode"/>
                                 </td>
+                                <td style="text-align: left">
+                                    <t t-esc="line.remarks"/>
+
+                                </td>
                                 <td>
-                                    <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
-                                    <t t-esc="line.product_id.brand_id_rel.name"/><br/>
-                                    <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color and Size :</b></span><t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">
-                                    <span t-field="prd.name" />,
-                                </t><br/>
-                                    HSN Code :<t t-esc="line.product_id.l10n_in_hsn_code"/><br/>
+                                    <t t-esc="line.hsn_id.hsnsac_code"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
@@ -651,43 +660,33 @@
                                 </td>
                             </tr>
                         </t>
-                        <!--                        </table>-->
-                        <!--                        <table class="table table-sm o_main_table">-->
-                        <tr>
-                            <td style="text-align:right" colspan="10"><strong>Untaxed Amount</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_untaxed"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">SGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">CGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/></td>
-                        </tr>
-                        <hr/>
-                        <tr>
-                            <td colspan="5">
-                                <strong style="text-align: left;">Amt. Chargeble (In Words) :-
-                                    <t t-if="doc.currency_id.name == 'INR'">
-                                        <span style="text-transform: capitalize;" t-esc="doc.check_amount_in_words.replace(',', '')"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                                    </t>
-                                </strong>
-                            </td>
-                            <td style="text-align:right" colspan="5"><strong>Total</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_total"/></td>
-                        </tr>
                     </table>
-                    <br/>
+                          <div class="clearfix mb-4">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                    <!--Tax totals-->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-call="account.document_tax_totals"/>
+
+                                    <!--Payments-->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <table>-->
+                    <!--                        <tr>-->
+                    <!--                            <td style="border: 0px">-->
+                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
+                        <t t-if="doc.currency_id.name == 'INR'">
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                        </t>
+                        <t t-else="">
+                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                        </t>
+                    </strong>
+
                     <table style="width:100%;margin-top: 10px;page-break-inside: avoid;">
                         <tr style="border:1px solid black;">
                             <th style="text-align:center;border:1px solid black;width=45%" colspan="3">UDYAM
@@ -723,9 +722,9 @@
                                 </t>
                             </td>
                             <td style="bordr:1px solid black;text-align: center" colspan="3">
-                                iCOREts Private Limited
-                                A/C # 50200016765210
-                                IFSC Code: HDFC0001799
+                                iCOREts Private Limited<br/>
+                                A/C # 50200016765210<br/>
+                                IFSC Code: HDFC0001799<br/>
                                 Bank: HDFC Bank (JVLR Branch)
                             </td>
                         </tr>
@@ -922,7 +921,10 @@
                                 <strong>EAN</strong>
                             </td>
                             <td class="text-center" width="20%">
-                                <strong>Description</strong>
+                                <strong>Remarks</strong>
+                            </td>
+                            <td class="text-center">
+                                <strong>HSN/SAC</strong>
                             </td>
                             <td class="text-center" width="4%">
                                 <strong>Qty</strong>
@@ -959,14 +961,12 @@
                                 <td>
                                     <t t-esc="line.product_id.barcode"/>
                                 </td>
+                                <td style="text-align: left">
+                                    <t t-esc="line.remarks"/>
+
+                                </td>
                                 <td>
-                                    <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
-                                    <t t-esc="line.product_id.brand_id_rel.name"/><br/>
-                                    <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color and Size :</b></span><t t-foreach="line.product_id.product_template_attribute_value_ids" t-as="prd">
-                                    <span t-field="prd.name" />,
-                                </t><br/>
-                                    HSN Code :<t t-esc="line.product_id.l10n_in_hsn_code"/><br/>
+                                    <t t-esc="line.hsn_id.hsnsac_code"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
@@ -1007,43 +1007,33 @@
                                 </td>
                             </tr>
                         </t>
-                        <!--                        </table>-->
-                        <!--                        <table class="table table-sm o_main_table">-->
-                        <tr>
-                            <td style="text-align:right" colspan="10"><strong>Untaxed Amount</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_untaxed"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">SGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:right" colspan="10">CGST</td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_tax / 2"/></td>
-                        </tr>
-                        <hr/>
-                        <tr>
-                            <td colspan="5">
-                                <strong style="text-align: left;">Amt. Chargeble (In Words) :-
-                                    <t t-if="doc.currency_id.name == 'INR'">
-                                        <span style="text-transform: capitalize;" t-esc="doc.check_amount_in_words.replace(',', '')"/>
-                                    </t>
-                                    <t t-else="">
-                                        <span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                                    </t>
-                                </strong>
-                            </td>
-                            <td style="text-align:right" colspan="5"><strong>Total</strong></td>
-                            <td style="text-align:right" colspan="3">₹
-                                <t t-esc="o.amount_total"/></td>
-                        </tr>
                     </table>
-                    <br/>
+                          <div class="clearfix mb-4">
+                        <div id="total" class="row">
+                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                    <!--Tax totals-->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-call="account.document_tax_totals"/>
+
+                                    <!--Payments-->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <table>-->
+                    <!--                        <tr>-->
+                    <!--                            <td style="border: 0px">-->
+                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
+                        <t t-if="doc.currency_id.name == 'INR'">
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                        </t>
+                        <t t-else="">
+                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                        </t>
+                    </strong>
+
                     <table style="width:100%;margin-top: 10px;page-break-inside: avoid;">
                         <tr style="border:1px solid black;">
                             <th style="text-align:center;border:1px solid black;width=45%" colspan="3">UDYAM
@@ -1079,9 +1069,9 @@
                                 </t>
                             </td>
                             <td style="bordr:1px solid black;text-align: center" colspan="3">
-                                iCOREts Private Limited
-                                A/C # 50200016765210
-                                IFSC Code: HDFC0001799
+                                iCOREts Private Limited<br/>
+                                A/C # 50200016765210<br/>
+                                IFSC Code: HDFC0001799<br/>
                                 Bank: HDFC Bank (JVLR Branch)
                             </td>
                         </tr>
@@ -1131,10 +1121,10 @@
             <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 220px;margin-top: 15px" alt="Logo"/>
             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            <span style="text-align: right;"><b>TAX INVOICE</b></span>
+            <span style="text-align: right;"><b></b></span>
             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
             &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            <span style="text-align: right; padding-left: 10%;">Ref :</span>  <span t-field="o.name"/>
+<!--            <span style="text-align: right; padding-left: 10%;">Ref :</span>  <span t-field="o.name"/>-->
 
         </div>
 

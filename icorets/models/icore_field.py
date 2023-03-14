@@ -102,6 +102,7 @@ class AccountMoveLineInherit(models.Model):
     tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
                                       compute="check_tax_amount", currency_field='currency_id')
     myntra_sku_code = fields.Char(string="Myntra SKU Code", copy=False)
+    remarks = fields.Text('Remarks')
 
     @api.depends('tax_ids')
     def check_tax_amount(self):
