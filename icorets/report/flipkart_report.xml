@@ -87,7 +87,7 @@
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
-                                    <strong>PAN Number</strong>
+                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
                                 </p>
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
@@ -166,7 +166,7 @@
                                     <t t-esc="o.partner_shipping_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.partner_shipping_id.vat"/><br/>
-                                    <strong>PAN Number</strong>
+                                    <strong>PAN Number</strong> <t t-esc="o.partner_shipping_id.x_studio_pan"/>
                                 </p>
                             </td>
                             <td style="border:1px solid black" rowspan="4">
@@ -442,7 +442,7 @@
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
-                                    <strong>PAN Number</strong>
+                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
                                 </p>
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
@@ -513,7 +513,7 @@
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/>
                                                 <br/>
                                                  <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/><br/>
-                                                 <strong>PAN Number</strong>
+                                                 <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>
                                             </p>
                                         </t>
                                     </t>
@@ -789,7 +789,7 @@
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
-                                    <strong>PAN Number</strong>
+                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
                                 </p>
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
@@ -860,7 +860,7 @@
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/>
                                                 <br/>
                                                  <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/><br/>
-                                                 <strong>PAN Number</strong>
+                                                 <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>
                                             </p>
                                         </t>
                                     </t>
