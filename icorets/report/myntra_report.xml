@@ -68,8 +68,8 @@
                         <tr style="border:1px solid black;">
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Original for Receipient)</strong></th>
                         </tr>
-                        <tr style="background-color:#87CEEB;border:1px solid black">
-                                                         <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
+                                                <tr style="background-color:#87CEEB;border:1px solid black">
+                            <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
                         </tr>
@@ -92,35 +92,17 @@
                                 </p>
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
-<!--                                <t t-if="o.invoice_line_ids">-->
-<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
-<!--                                        <t t-if="acc.sale_line_ids.order_id.warehouse_id">-->
-<!--                                            <p>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.street')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.street2')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.city')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.zip')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.state_id.name')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.country_id.name')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                            </p>-->
-<!--                                        </t>-->
-
-<!--                                    </t>-->
-<!--                                </t>-->
-                                        <p>
-                                            <t t-esc="o.warehouse_id.partner_id.street"/>
-                                                <br/>
-                                                <t t-esc="o.warehouse_id.partner_id.street2"/>
-                                                <br/>
-                                                <t t-esc="o.warehouse_id.partner_id.city"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.zip"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.country_id.name"/>
-                                                <br/>
-                                            </p>
+                                <p>
+                                    <t t-esc="o.dispatch_partner_id.street"/>
+                                    <br/>
+                                    <t t-esc="o.dispatch_partner_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.dispatch_partner_id.city"/>,
+                                    <t t-esc="o.dispatch_partner_id.zip"/>,
+                                    <t t-esc="o.dispatch_partner_id.state_id.name"/>,
+                                    <t t-esc="o.dispatch_partner_id.country_id.name"/>
+                                    <br/>
+                                </p>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -130,18 +112,19 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>PO#</strong>
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.po_no">
-                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>
-                                    </t>
-                                </t>
+<!--                                <t t-if="o.invoice_line_ids">-->
+<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+<!--                                        <t t-if="acc.sale_line_ids.order_id.po_no">-->
+<!--                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>-->
+<!--                                    </t>-->
+<!--                                </t>-->
+                                <span t-esc="o.po_no"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
-                                <strong>Ack. No:</strong><br/>
-                                <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
+                                <strong>Ack. No:</strong> <span t-esc="o.l10n_in_transaction_id.irn"/><br/>
+                                <strong>IRN No :</strong><span t-esc="o.l10n_in_transaction_id.ack_no"/> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
                         <tr>
@@ -423,8 +406,8 @@
                         <tr style="border:1px solid black;">
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Duplicate for Transporter)</strong></th>
                         </tr>
-                        <tr style="background-color:#87CEEB;border:1px solid black">
-                                                         <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
+                                                <tr style="background-color:#87CEEB;border:1px solid black">
+                            <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
                         </tr>
@@ -447,35 +430,17 @@
                                 </p>
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
-<!--                                <t t-if="o.invoice_line_ids">-->
-<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
-<!--                                        <t t-if="acc.sale_line_ids.order_id.warehouse_id">-->
-<!--                                            <p>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.street')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.street2')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.city')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.zip')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.state_id.name')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.country_id.name')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                            </p>-->
-<!--                                        </t>-->
-
-<!--                                    </t>-->
-<!--                                </t>-->
-                                        <p>
-                                            <t t-esc="o.warehouse_id.partner_id.street"/>
-                                                <br/>
-                                                <t t-esc="o.warehouse_id.partner_id.street2"/>
-                                                <br/>
-                                                <t t-esc="o.warehouse_id.partner_id.city"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.zip"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.country_id.name"/>
-                                                <br/>
-                                            </p>
+                                <p>
+                                    <t t-esc="o.dispatch_partner_id.street"/>
+                                    <br/>
+                                    <t t-esc="o.dispatch_partner_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.dispatch_partner_id.city"/>,
+                                    <t t-esc="o.dispatch_partner_id.zip"/>,
+                                    <t t-esc="o.dispatch_partner_id.state_id.name"/>,
+                                    <t t-esc="o.dispatch_partner_id.country_id.name"/>
+                                    <br/>
+                                </p>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -485,18 +450,19 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>PO#</strong>
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.po_no">
-                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>
-                                    </t>
-                                </t>
+<!--                                <t t-if="o.invoice_line_ids">-->
+<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+<!--                                        <t t-if="acc.sale_line_ids.order_id.po_no">-->
+<!--                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>-->
+<!--                                    </t>-->
+<!--                                </t>-->
+                                <span t-esc="o.po_no"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
-                                <strong>Ack. No:</strong><br/>
-                                <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
+                                <strong>Ack. No:</strong> <span t-esc="o.l10n_in_transaction_id.irn"/><br/>
+                                <strong>IRN No :</strong><span t-esc="o.l10n_in_transaction_id.ack_no"/> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
                         <tr>
@@ -776,8 +742,8 @@
                         <tr style="border:1px solid black;">
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Triplicate for Supplier)</strong></th>
                         </tr>
-                        <tr style="background-color:#87CEEB;border:1px solid black">
-                                                         <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
+                                                <tr style="background-color:#87CEEB;border:1px solid black">
+                            <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
                         </tr>
@@ -800,35 +766,17 @@
                                 </p>
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
-<!--                                <t t-if="o.invoice_line_ids">-->
-<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
-<!--                                        <t t-if="acc.sale_line_ids.order_id.warehouse_id">-->
-<!--                                            <p>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.street')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.street2')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.city')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.zip')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.state_id.name')[0]"/>,-->
-<!--                                                <t t-esc="acc.sale_line_ids.order_id.mapped('warehouse_id.partner_id.country_id.name')[0]"/>-->
-<!--                                                <br/>-->
-<!--                                            </p>-->
-<!--                                        </t>-->
-
-<!--                                    </t>-->
-<!--                                </t>-->
-                                        <p>
-                                            <t t-esc="o.warehouse_id.partner_id.street"/>
-                                                <br/>
-                                                <t t-esc="o.warehouse_id.partner_id.street2"/>
-                                                <br/>
-                                                <t t-esc="o.warehouse_id.partner_id.city"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.zip"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,
-                                                <t t-esc="o.warehouse_id.partner_id.country_id.name"/>
-                                                <br/>
-                                            </p>
+                                <p>
+                                    <t t-esc="o.dispatch_partner_id.street"/>
+                                    <br/>
+                                    <t t-esc="o.dispatch_partner_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.dispatch_partner_id.city"/>,
+                                    <t t-esc="o.dispatch_partner_id.zip"/>,
+                                    <t t-esc="o.dispatch_partner_id.state_id.name"/>,
+                                    <t t-esc="o.dispatch_partner_id.country_id.name"/>
+                                    <br/>
+                                </p>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -838,18 +786,19 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>PO#</strong>
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.po_no">
-                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>
-                                    </t>
-                                </t>
+<!--                                <t t-if="o.invoice_line_ids">-->
+<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+<!--                                        <t t-if="acc.sale_line_ids.order_id.po_no">-->
+<!--                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>-->
+<!--                                    </t>-->
+<!--                                </t>-->
+                                <span t-esc="o.po_no"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
-                                <strong>Ack. No:</strong><br/>
-                                <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
+                                <strong>Ack. No:</strong> <span t-esc="o.l10n_in_transaction_id.irn"/><br/>
+                                <strong>IRN No :</strong><span t-esc="o.l10n_in_transaction_id.ack_no"/> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
                         <tr>

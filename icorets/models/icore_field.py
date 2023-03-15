@@ -86,7 +86,8 @@ class AccountMoveInheritClass(models.Model):
     _inherit = 'account.move'
 
     check_amount_in_words = fields.Char(compute='_amt_in_words', string='Amount in Words')
-    warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
+    # warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
+    po_no = fields.Char('PO No')
 
     # Function for amount in indian words
     @api.depends('amount_total')
@@ -166,7 +167,8 @@ class SaleOrderInherit(models.Model):
     # Inherited for warehouse
     def _prepare_invoice(self):
         invoice_vals = super(SaleOrderInherit, self)._prepare_invoice()
-        invoice_vals['warehouse_id'] = self.warehouse_id.id
+        invoice_vals['dispatch_partner_id'] = self.warehouse_id.partner_id.id
+        invoice_vals['po_no'] = self.po_no
         return invoice_vals
 
     # @api.model

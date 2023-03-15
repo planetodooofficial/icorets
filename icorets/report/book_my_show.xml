@@ -16,28 +16,28 @@
         <field name="dpi">90</field>
     </record>
 
-    <record id="taxes_invoice_report" model="ir.actions.report">
-        <field name="name">Tax Invoice</field>
+    <record id="taxes_invoice_report_bms" model="ir.actions.report">
+        <field name="name">Book My Show</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-html</field>
-        <field name="report_name">icorets.taxes_invoice_forms</field>
-        <field name="report_file">icorets.taxes_invoice_forms</field>
-        <field name="print_report_name">'Tax Invoice'</field>
+        <field name="report_name">icorets.taxes_invoice_forms_bms</field>
+        <field name="report_file">icorets.taxes_invoice_forms_bms</field>
+        <field name="print_report_name">'Tax Invoice BMS'</field>
         <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_invoice"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
     </record>
 
-    <template id="taxes_invoice_forms">
+    <template id="taxes_invoice_forms_bms">
         <t t-call="web.html_container">
             <t t-foreach="docs.filtered(lambda x: x.move_type == 'out_invoice')" t-as="doc">
-                <t t-call="icorets.tax_invoice_report_original" t-lang="doc.partner_id.lang"/>
-                <t t-call="icorets.tax_invoice_report_duplicate" t-lang="doc.partner_id.lang"/>
-                <t t-call="icorets.tax_invoice_report_triplicate" t-lang="doc.partner_id.lang"/>
+                <t t-call="icorets.tax_invoice_report_bms_original" t-lang="doc.partner_id.lang"/>
+                <t t-call="icorets.tax_invoice_report_bms_duplicate" t-lang="doc.partner_id.lang"/>
+                <t t-call="icorets.tax_invoice_report_bms_triplicate" t-lang="doc.partner_id.lang"/>
             </t>
         </t>
     </template>
 
-    <template id="tax_invoice_report_original">
+    <template id="tax_invoice_report_bms_original">
         <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -391,7 +391,7 @@
         </t>
     </template>
 
-    <template id="tax_invoice_report_duplicate">
+    <template id="tax_invoice_report_bms_duplicate">
         <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -745,7 +745,7 @@
         </t>
     </template>
 
-    <template id="tax_invoice_report_triplicate">
+    <template id="tax_invoice_report_bms_triplicate">
         <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>

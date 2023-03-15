@@ -20,6 +20,7 @@
              'report/creditnote_urban.xml',
              'report/tax_invoice.xml',
              'report/purchase_order_report.xml',
+             'report/book_my_show.xml',
              ],
     'website': 'https://planet-odoo.com/',
     'installable': True,
