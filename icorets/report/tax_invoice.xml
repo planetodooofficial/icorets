@@ -277,10 +277,10 @@
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_unit"/>
+                                    <t t-esc="'%.2f'% line.price_unit"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_subtotal"/>
+                                    <t t-esc="'%.2f'% line.price_subtotal"/>
                                 </td>
                                 <td style="text-align: left">
                                     <!--                                        <t t-esc="line.tax_ids.name"/>-->
@@ -307,7 +307,7 @@
                                     <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_total"/>
+                                    <t t-esc="'%.2f'% line.price_total"/>
 
                                 </td>
                             </tr>
@@ -593,7 +593,7 @@
                                 </th>
                             </tr>
                         </thead>
-                        <t t-set="sr_no" t-value="1"/>
+                                                <t t-set="sr_no" t-value="1"/>
                         <t t-foreach="o.invoice_line_ids" t-as="line">
                             <tr style="height:20px;text-align:center">
                                 <td>
@@ -623,10 +623,10 @@
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_unit"/>
+                                    <t t-esc="'%.2f'% line.price_unit"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_subtotal"/>
+                                    <t t-esc="'%.2f'% line.price_subtotal"/>
                                 </td>
                                 <td style="text-align: left">
                                     <!--                                        <t t-esc="line.tax_ids.name"/>-->
@@ -653,7 +653,7 @@
                                     <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_total"/>
+                                    <t t-esc="'%.2f'% line.price_total"/>
 
                                 </td>
                             </tr>
@@ -939,7 +939,7 @@
                                 </th>
                             </tr>
                         </thead>
-                        <t t-set="sr_no" t-value="1"/>
+                                                <t t-set="sr_no" t-value="1"/>
                         <t t-foreach="o.invoice_line_ids" t-as="line">
                             <tr style="height:20px;text-align:center">
                                 <td>
@@ -969,10 +969,10 @@
                                     <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_unit"/>
+                                    <t t-esc="'%.2f'% line.price_unit"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_subtotal"/>
+                                    <t t-esc="'%.2f'% line.price_subtotal"/>
                                 </td>
                                 <td style="text-align: left">
                                     <!--                                        <t t-esc="line.tax_ids.name"/>-->
@@ -999,7 +999,7 @@
                                     <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.price_total"/>
+                                    <t t-esc="'%.2f'% line.price_total"/>
 
                                 </td>
                             </tr>

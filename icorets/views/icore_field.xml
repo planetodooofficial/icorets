@@ -246,7 +246,12 @@
 
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
                 <field name="hsn_c" optional="hide"/>
+                <field name="article_code" optional="hide"/>
             </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="after">
+                <field name="article_code" optional="hide"/>
+            </xpath>
+
         </field>
     </record>
 
@@ -263,6 +268,10 @@
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="after">
                 <field name="myntra_sku_code" optional="hide"/>
                 <field name="remarks" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
+                <field name="article_code" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -281,6 +290,9 @@
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
                     <field name="hsn_c" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="after">
+                <field name="article_code" optional="hide"/>
             </xpath>
 
         </field>

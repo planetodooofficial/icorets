@@ -104,7 +104,9 @@ class AccountMoveLineInherit(models.Model):
                                       compute="check_tax_amount", currency_field='currency_id')
     myntra_sku_code = fields.Char(string="Myntra SKU Code", copy=False)
     remarks = fields.Text('Remarks')
+    article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
 
+    # For updaing tax amount
     @api.depends('tax_ids')
     def check_tax_amount(self):
         for rec in self:
@@ -188,6 +190,7 @@ class SaleOrderLineInherit(models.Model):
 
     stock_quantity = fields.Float('Stock Quantity')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.sale_hsn')
+    article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
 
     # Populating HSN Field data in Invoice line item from product HSN
     def _prepare_invoice_line(self, **optional_values):
@@ -225,6 +228,7 @@ class PurchaseOrderLineInherit(models.Model):
 
     remark = fields.Text('Remarks')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.purchase_hsn')
+    article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
 
     # Adding Purchase HSN Code in Bills
 
