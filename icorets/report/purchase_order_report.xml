@@ -302,7 +302,7 @@
 <!--            <div><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/></div>-->
 <!--            <div><span><b>Purchase Order</b></span></div>-->
             <div class="absolute">
-                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/>
+                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 60px;width: 200px;" alt="Logo"/>
             </div>
             <div style="position: absolute;top: 10px;left: 870px;">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
