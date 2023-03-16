@@ -129,11 +129,22 @@
 
                         </tr>
                              <tr>
-                            <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
-                                     <t t-if="doc.l10n_in_transaction_id.qr_code_data">
-                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
-                                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
-                            </td>
+                            <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
+                                    <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+
+                                </td>
+                            </t>
+                            <t t-else="">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="6">
+                                    <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+
+                                </td>
+                            </t>
                         </tr>
 
 
@@ -475,11 +486,22 @@
 
                         </tr>
                              <tr>
-                            <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
-                                     <t t-if="doc.l10n_in_transaction_id.qr_code_data">
-                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                            <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
+                                    <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
                 ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
-                            </td>
+
+                                </td>
+                            </t>
+                            <t t-else="">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="6">
+                                    <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+
+                                </td>
+                            </t>
                         </tr>
 
 
@@ -819,11 +841,22 @@
 
                         </tr>
                             <tr>
-                            <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
-                                     <t t-if="doc.l10n_in_transaction_id.qr_code_data">
-                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                            <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
+                                    <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
                 ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
-                            </td>
+
+                                </td>
+                            </t>
+                            <t t-else="">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="6">
+                                    <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+
+                                </td>
+                            </t>
                         </tr>
 
 
