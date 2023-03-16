@@ -39,7 +39,7 @@
                     <div class="page">
                         <table style="width:100%;margin-top: 10px">
                             <tr style="border:1px solid black;">
-                                <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="3"><b>PURCHASE ORDER</b></td>
+                                    <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="3"><b>PURCHASE ORDER</b></td>
                             </tr>
                             <tr style="border:1px solid black;">
                                 <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Vendor :</b> <t t-esc="o.partner_id.name"/><br/>

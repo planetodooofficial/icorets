@@ -16,7 +16,6 @@
              'report/amazon.xml',
              'report/flipkart_report.xml',
              'report/myntra_report.xml',
-             # 'report/urban_swing.xml',
              'report/creditnote_urban.xml',
              'report/tax_invoice.xml',
              'report/purchase_order_report.xml',

@@ -79,8 +79,9 @@
                             </td>
                             <td style="border:1px solid black;width: 30%" rowspan="4">
                                 <p>
-                                    <t t-esc="o.company_id.street"/>
-                                    <br/>
+                                    <t t-esc="o.company_id.name"/><br/>
+                                    <t t-esc="o.company_id.street"/>,
+
                                     <t t-esc="o.company_id.street2"/>
                                     <br/>
                                     <t t-esc="o.company_id.city"/>,<t t-esc="o.company_id.zip"/>
@@ -128,51 +129,43 @@
 
                         </tr>
                         <tr>
-                            <td style="border:1px solid black" rowspan="8">QR</td>
+                            <td style="border:1px solid black;text-align:center" rowspan="8">
+                                <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+                            </td>
                         </tr>
 
 
                         <tr style="border:1px solid black;">
 
-                            <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
+                           <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
                             <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Ship To</strong></th>
                         </tr>
                         <tr style="border:1px solid black;">
 
                             <td style="border:1px solid black;width: 30%" rowspan="4">
-                                <p>
-                                    <t t-esc="o.partner_shipping_id.street"/>
-                                    <br/>
-                                    <t t-esc="o.partner_shipping_id.street2"/>
-                                    <br/>
-                                    <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
-                                    <t t-esc="o.partner_shipping_id.state_id.name"/>,
-                                    <t t-esc="o.partner_shipping_id.country_id.name"/>
-                                    <br/>
-                                    <strong>GST Number</strong> <t t-esc="o.partner_shipping_id.vat"/><br/>
-                                    <strong>PAN Number</strong> <t t-esc="o.partner_shipping_id.x_studio_pan"/>
-                                </p>
-                            </td>
-                            <td style="border:1px solid black" rowspan="4">
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
                                             <p>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.street')[0]"/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
                                                 <br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.street2')[0]"/>
-                                                <br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.city')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.zip')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.state_id.name')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.country_id.name')[0]"/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.city')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.zip')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/>
+                                                <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/><br/>
+                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.x_studio_pan')[0]"/>
                                                 <br/>
                                             </p>
                                         </t>
                                         <t t-else="">
                                             <p>
-                                                <t t-esc="o.partner_id.street"/>
-                                                <br/>
+                                                <t t-esc="o.partner_id.name"/><br/>
+                                                <t t-esc="o.partner_id.street"/>,
                                                 <t t-esc="o.partner_id.street2"/>
                                                 <br/>
                                                 <t t-esc="o.partner_id.city"/>,
@@ -180,10 +173,25 @@
                                                 <t t-esc="o.partner_id.state_id.name"/>,
                                                 <t t-esc="o.partner_id.country_id.name"/>
                                                 <br/>
+                                                <strong>GST Number</strong> <t t-esc="o.partner_id.vat"/><br/>
+                                                <strong>PAN Number</strong> <t t-esc="o.partner_id.x_studio_pan"/>
                                             </p>
                                         </t>
                                     </t>
                                 </t>
+                            </td>
+                            <td style="border:1px solid black" rowspan="4">
+                                <p>
+                                    <t t-esc="o.partner_shipping_id.name"/><br/>
+                                    <t t-esc="o.partner_shipping_id.street"/>,
+                                    <t t-esc="o.partner_shipping_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
+                                    <t t-esc="o.partner_shipping_id.state_id.name"/>,
+                                    <t t-esc="o.partner_shipping_id.country_id.name"/>
+                                    <br/>
+
+                                </p>
                             </td>
                         </tr>
                         <tr>
@@ -417,8 +425,9 @@
                             </td>
                             <td style="border:1px solid black;width: 30%" rowspan="4">
                                 <p>
-                                    <t t-esc="o.company_id.street"/>
-                                    <br/>
+                                    <t t-esc="o.company_id.name"/><br/>
+                                    <t t-esc="o.company_id.street"/>,
+
                                     <t t-esc="o.company_id.street2"/>
                                     <br/>
                                     <t t-esc="o.company_id.city"/>,<t t-esc="o.company_id.zip"/>
@@ -466,51 +475,43 @@
 
                         </tr>
                         <tr>
-                            <td style="border:1px solid black" rowspan="8">QR</td>
+                            <td style="border:1px solid black;text-align:center" rowspan="8">
+                                     <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+                            </td>
                         </tr>
 
 
                         <tr style="border:1px solid black;">
 
-                            <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
+                           <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
                             <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Ship To</strong></th>
                         </tr>
                         <tr style="border:1px solid black;">
 
                             <td style="border:1px solid black;width: 30%" rowspan="4">
-                                <p>
-                                    <t t-esc="o.partner_shipping_id.street"/>
-                                    <br/>
-                                    <t t-esc="o.partner_shipping_id.street2"/>
-                                    <br/>
-                                    <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
-                                    <t t-esc="o.partner_shipping_id.state_id.name"/>,
-                                    <t t-esc="o.partner_shipping_id.country_id.name"/>
-                                    <br/>
-                                    <strong>GST Number</strong> <t t-esc="o.partner_shipping_id.vat"/><br/>
-                                    <strong>PAN Number</strong> <t t-esc="o.partner_shipping_id.x_studio_pan"/>
-                                </p>
-                            </td>
-                            <td style="border:1px solid black" rowspan="4">
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
                                             <p>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.street')[0]"/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
                                                 <br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.street2')[0]"/>
-                                                <br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.city')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.zip')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.state_id.name')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.country_id.name')[0]"/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.city')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.zip')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/>
+                                                <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/><br/>
+                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.x_studio_pan')[0]"/>
                                                 <br/>
                                             </p>
                                         </t>
                                         <t t-else="">
                                             <p>
-                                                <t t-esc="o.partner_id.street"/>
-                                                <br/>
+                                                <t t-esc="o.partner_id.name"/><br/>
+                                                <t t-esc="o.partner_id.street"/>,
                                                 <t t-esc="o.partner_id.street2"/>
                                                 <br/>
                                                 <t t-esc="o.partner_id.city"/>,
@@ -518,10 +519,25 @@
                                                 <t t-esc="o.partner_id.state_id.name"/>,
                                                 <t t-esc="o.partner_id.country_id.name"/>
                                                 <br/>
+                                                <strong>GST Number</strong> <t t-esc="o.partner_id.vat"/><br/>
+                                                <strong>PAN Number</strong> <t t-esc="o.partner_id.x_studio_pan"/>
                                             </p>
                                         </t>
                                     </t>
                                 </t>
+                            </td>
+                            <td style="border:1px solid black" rowspan="4">
+                                <p>
+                                    <t t-esc="o.partner_shipping_id.name"/><br/>
+                                    <t t-esc="o.partner_shipping_id.street"/>,
+                                    <t t-esc="o.partner_shipping_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
+                                    <t t-esc="o.partner_shipping_id.state_id.name"/>,
+                                    <t t-esc="o.partner_shipping_id.country_id.name"/>
+                                    <br/>
+
+                                </p>
                             </td>
                         </tr>
                         <tr>
@@ -753,8 +769,9 @@
                             </td>
                             <td style="border:1px solid black;width: 30%" rowspan="4">
                                 <p>
-                                    <t t-esc="o.company_id.street"/>
-                                    <br/>
+                                    <t t-esc="o.company_id.name"/><br/>
+                                    <t t-esc="o.company_id.street"/>,
+
                                     <t t-esc="o.company_id.street2"/>
                                     <br/>
                                     <t t-esc="o.company_id.city"/>,<t t-esc="o.company_id.zip"/>
@@ -802,51 +819,43 @@
 
                         </tr>
                         <tr>
-                            <td style="border:1px solid black" rowspan="8">QR</td>
+                            <td style="border:1px solid black;text-align:center" rowspan="8">
+                                     <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+                            </td>
                         </tr>
 
 
                         <tr style="border:1px solid black;">
 
-                            <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
+                           <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
                             <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Ship To</strong></th>
                         </tr>
                         <tr style="border:1px solid black;">
 
                             <td style="border:1px solid black;width: 30%" rowspan="4">
-                                <p>
-                                    <t t-esc="o.partner_shipping_id.street"/>
-                                    <br/>
-                                    <t t-esc="o.partner_shipping_id.street2"/>
-                                    <br/>
-                                    <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
-                                    <t t-esc="o.partner_shipping_id.state_id.name"/>,
-                                    <t t-esc="o.partner_shipping_id.country_id.name"/>
-                                    <br/>
-                                    <strong>GST Number</strong> <t t-esc="o.partner_shipping_id.vat"/><br/>
-                                    <strong>PAN Number</strong> <t t-esc="o.partner_shipping_id.x_studio_pan"/>
-                                </p>
-                            </td>
-                            <td style="border:1px solid black" rowspan="4">
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
                                             <p>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.street')[0]"/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
                                                 <br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.street2')[0]"/>
-                                                <br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.city')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.zip')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.state_id.name')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_shipping_id.country_id.name')[0]"/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.city')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.zip')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/>
+                                                <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/><br/>
+                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.x_studio_pan')[0]"/>
                                                 <br/>
                                             </p>
                                         </t>
                                         <t t-else="">
                                             <p>
-                                                <t t-esc="o.partner_id.street"/>
-                                                <br/>
+                                                <t t-esc="o.partner_id.name"/><br/>
+                                                <t t-esc="o.partner_id.street"/>,
                                                 <t t-esc="o.partner_id.street2"/>
                                                 <br/>
                                                 <t t-esc="o.partner_id.city"/>,
@@ -854,10 +863,25 @@
                                                 <t t-esc="o.partner_id.state_id.name"/>,
                                                 <t t-esc="o.partner_id.country_id.name"/>
                                                 <br/>
+                                                <strong>GST Number</strong> <t t-esc="o.partner_id.vat"/><br/>
+                                                <strong>PAN Number</strong> <t t-esc="o.partner_id.x_studio_pan"/>
                                             </p>
                                         </t>
                                     </t>
                                 </t>
+                            </td>
+                            <td style="border:1px solid black" rowspan="4">
+                                <p>
+                                    <t t-esc="o.partner_shipping_id.name"/><br/>
+                                    <t t-esc="o.partner_shipping_id.street"/>,
+                                    <t t-esc="o.partner_shipping_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
+                                    <t t-esc="o.partner_shipping_id.state_id.name"/>,
+                                    <t t-esc="o.partner_shipping_id.country_id.name"/>
+                                    <br/>
+
+                                </p>
                             </td>
                         </tr>
                         <tr>
