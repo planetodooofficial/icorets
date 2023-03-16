@@ -112,7 +112,7 @@
                         <tr>
                             <td style="border:1px solid black;text-align:center" rowspan="8">
                                 <t t-if="doc.l10n_in_transaction_id.qr_code_data">
-                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
+                                    <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
                 ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
                             </td>
                         </tr>
@@ -405,23 +405,23 @@
 
                     <div style="text-align: center;font-size: 25px;">
                         <b>Booking ID:</b><br/>
-                    <t t-esc="o.po_no"/> <br/>
+                        <t t-esc="o.po_no"/> <br/>
                         <br/><br/>
 
-                    <b>Invoice#</b><br/>
-                    <t t-esc="o.name"/><br/>
+                        <b>Invoice#</b><br/>
+                        <t t-esc="o.name"/><br/>
 
                         <b>Qty :</b><br/>
-                         <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
+                        <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
 
                         <br/><br/>
 
                         <b><t t-esc="o.partner_id.name"/></b><br/>
-                            <t t-esc="o.partner_id.mobile"/><br/><br/><br/>
+                        <t t-esc="o.partner_id.mobile"/><br/><br/><br/>
 
-                    <b>Address :</b>
+                        <b>Address :</b>
 
-                       <br/>
+                        <br/>
                         <t t-esc="o.partner_id.street"/>,
                         <t t-esc="o.partner_id.street2"/>
                         <br/>
@@ -430,10 +430,10 @@
                         <t t-esc="o.partner_id.state_id.name"/>,
                         <t t-esc="o.partner_id.country_id.name"/><br/><br/>
 
-                    <b>Event :</b><br/>
-                    <t t-esc="o.event"/>
+                        <b>Event :</b><br/>
+                        <t t-esc="o.event"/>
 
-                         </div>
+                    </div>
 
                 </div>
             </t>
