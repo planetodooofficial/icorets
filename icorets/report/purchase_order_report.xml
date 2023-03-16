@@ -109,37 +109,37 @@
                                 <td class="text-center" width="10%">
                                     <strong>ART#</strong>
                                 </td>
-                                <td class="text-center" width="12%">
+                                <td class="text-center" width="10%">
                                     <strong>EAN</strong>
                                 </td>
                                 <td class="text-center" width="12%">
                                     <strong>DESCRIPTION</strong>
                                 </td>
-                                  <td class="text-center" width="12%">
+                                  <td class="text-center" width="15%">
                                     <strong>REMARKS</strong>
                                 </td>
-                                <td class="text-center" width="12%">
+                                <td class="text-center" width="10%">
                                     <strong>HSN CODE</strong>
                                 </td>
                                 <td class="text-center" width="7%">
                                     <strong>SIZE</strong>
                                 </td>
-                                <td class="text-center" width="12%">
+                                <td class="text-center" width="7%">
                                     <strong>QTY</strong>
                                 </td>
-                                <td class="text-center" width="12%">
+                                <td class="text-center" width="10%">
                                     <strong>Price/Qty</strong>
                                 </td>
                                 <td class="text-center" width="10%">
                                     <strong>Total Taxable Amount</strong>
                                 </td>
-                                <td class="text-center" width="10%">
+                                <td class="text-center" width="15%">
                                     <strong>GST%</strong>
                                 </td>
-                                <td class="text-center" width="10%">
+                                <td class="text-center" width="12%">
                                     <strong>GST AMT</strong>
                                 </td>
-                                <td class="text-center" width="10%">
+                                <td class="text-center" width="15%">
                                     <strong>Total Amount</strong>
                                 </td>
                             </tr>
@@ -161,7 +161,7 @@
                                         <t t-esc="line.product_id.name"/><br/>
                                         Color: <t t-esc="line.fetch_color()"/>
                                     </td>
-                                    <td style="text-align: left">
+                                    <td style="text-align: left;width=20%">
                                         <t t-esc="line.remark"/>
                                     </td>
                                     <td>
@@ -179,15 +179,15 @@
                                     <td>
                                         <t t-esc="'%.2f'% line.price_subtotal"/>
                                     </td>
-                                    <td>
+                                    <td style="width=15%">
                                         <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.taxes_id))"/>
                                     </td>
 
-                                    <td style="text-align: right">
+                                    <td style="text-align: right;width=12%">
                                         <t t-esc="'%.2f'% line.tax_amount_line" />
                                     </td>
 
-                                    <td>
+                                    <td style="width=12%">
                                         <t t-esc="'%.2f'% line.price_total"/>
                                     </td>
                                 </tr>
