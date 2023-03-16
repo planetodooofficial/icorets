@@ -402,20 +402,19 @@
         <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout_sticker">
                 <div class="page">
-                      <style>
-                    table {
-                    font-size: 18px;
-                    }
-                </style>
 
-                    <div style="text-align: center">
+                    <div style="text-align: center;font-size: 25px;">
                         <b>Booking ID:</b><br/>
                     <t t-esc="o.po_no"/> <br/>
                         <br/><br/>
 
                     <b>Invoice#</b><br/>
-                    <t t-esc="o.name"/>
-                        <b>Qty :</b> 2<br/><br/>
+                    <t t-esc="o.name"/><br/>
+
+                        <b>Qty :</b><br/>
+                         <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
+
+                        <br/><br/>
 
                         <b><t t-esc="o.partner_id.name"/></b><br/>
                             <t t-esc="o.partner_id.mobile"/><br/><br/><br/>
