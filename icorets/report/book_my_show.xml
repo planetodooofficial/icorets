@@ -104,16 +104,13 @@
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
-                                <strong>Ack. No:</strong> <span t-esc="o.l10n_in_transaction_id.irn"/><br/>
-                                <strong>IRN No :</strong><span t-esc="o.l10n_in_transaction_id.ack_no"/> </td> <!--# IRN No break on letter 46-->
+                            <td style="border:1px solid black;">
+                                <strong>Ack. No:</strong> <br/>
+                                <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
                         <tr>
-                            <td style="border:1px solid black;text-align:center" rowspan="8">
-                                <t t-if="doc.l10n_in_transaction_id.qr_code_data">
-                                    <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
-                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+                            <td style="border:1px solid black;text-align:center" rowspan="4">
                             </td>
                         </tr>
 
@@ -324,7 +321,7 @@
                     <!--                            <td style="border: 0px">-->
                     <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
                         <t t-if="doc.currency_id.name == 'INR'">
-                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
                         </t>
                         <t t-else="">
                             <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only

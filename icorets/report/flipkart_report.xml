@@ -39,7 +39,7 @@
         <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.custom_invoice_report_flipkart</field>
         <field name="report_file">icorets.custom_invoice_report_flipkart</field>
-        <field name="print_report_name">'Flipkart'</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_flipkart"/>
     </record>
@@ -122,28 +122,28 @@
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
+                            <td style="border:1px solid black;">
                                 <strong>Ack. No:</strong> <span t-esc="o.l10n_in_transaction_id.irn"/><br/>
                                 <strong>IRN No :</strong><span t-esc="o.l10n_in_transaction_id.ack_no"/> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
-                        <tr>
-                            <td style="border:1px solid black;text-align:center" rowspan="8">
+                            <tr>
+                            <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
                                      <t t-if="doc.l10n_in_transaction_id.qr_code_data">
                         <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
-                                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
+                ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
                             </td>
                         </tr>
 
 
                         <tr style="border:1px solid black;">
 
-                           <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
+                            <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
                             <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Ship To</strong></th>
                         </tr>
                         <tr style="border:1px solid black;">
 
-                            <td style="border:1px solid black;padding-left: 3px;width: 30%" rowspan="4">
+                            <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
@@ -164,7 +164,8 @@
                                         <t t-else="">
                                             <p>
                                                 <t t-esc="o.partner_id.name"/><br/>
-                                                <t t-esc="o.partner_id.street"/>,
+                                                <t t-esc="o.partner_id.street"/>
+                                                <br/>
                                                 <t t-esc="o.partner_id.street2"/>
                                                 <br/>
                                                 <t t-esc="o.partner_id.city"/>,
@@ -179,10 +180,11 @@
                                     </t>
                                 </t>
                             </td>
-                            <td style="border:1px solid black;padding-left: 3px;" rowspan="4">
+                            <td style="border:1px solid black;padding-left: 3px" rowspan="4">
                                 <p>
                                     <t t-esc="o.partner_shipping_id.name"/><br/>
-                                    <t t-esc="o.partner_shipping_id.street"/>,
+                                    <t t-esc="o.partner_shipping_id.street"/>
+                                    <br/>
                                     <t t-esc="o.partner_shipping_id.street2"/>
                                     <br/>
                                     <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
@@ -204,10 +206,8 @@
                         </tr>
 
                         <tr style="border:1px solid black;">
-                            <td colspan="3" style="border:1px solid black;"><strong>Reverse Charge (Y/N) : N</strong></td>
-                        </tr>
-                        <tr style="border:1px solid black;">
-                            <td style="text-align:right" colspan="3"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
+                            <td style="border:1px solid black;width: 50%"><strong>Reverse Charge (Y/N) : N</strong></td>
+                            <td colspan="2" style="width: 50%;"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
                         </tr>
                     </table>
                     <br/>
@@ -332,7 +332,7 @@
                     <!--                            <td style="border: 0px">-->
                     <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
                         <t t-if="doc.currency_id.name == 'INR'">
-                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
                         </t>
                         <t t-else="">
                             <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
@@ -468,13 +468,14 @@
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
+                            <td style="border:1px solid black;">
                                 <strong>Ack. No:</strong> <span t-esc="o.l10n_in_transaction_id.irn"/><br/>
                                 <strong>IRN No :</strong><span t-esc="o.l10n_in_transaction_id.ack_no"/> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
-                        <tr>
-                            <td style="border:1px solid black;text-align:center" rowspan="8">     <t t-if="doc.l10n_in_transaction_id.qr_code_data">
+                             <tr>
+                            <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
+                                     <t t-if="doc.l10n_in_transaction_id.qr_code_data">
                         <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
                 ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
                             </td>
@@ -483,12 +484,12 @@
 
                         <tr style="border:1px solid black;">
 
-                           <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
+                            <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
                             <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Ship To</strong></th>
                         </tr>
                         <tr style="border:1px solid black;">
 
-                            <td style="border:1px solid black;padding-left: 3px;width: 30%" rowspan="4">
+                            <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
@@ -509,7 +510,8 @@
                                         <t t-else="">
                                             <p>
                                                 <t t-esc="o.partner_id.name"/><br/>
-                                                <t t-esc="o.partner_id.street"/>,
+                                                <t t-esc="o.partner_id.street"/>
+                                                <br/>
                                                 <t t-esc="o.partner_id.street2"/>
                                                 <br/>
                                                 <t t-esc="o.partner_id.city"/>,
@@ -524,10 +526,11 @@
                                     </t>
                                 </t>
                             </td>
-                            <td style="border:1px solid black;padding-left: 3px;" rowspan="4">
+                            <td style="border:1px solid black;padding-left: 3px" rowspan="4">
                                 <p>
                                     <t t-esc="o.partner_shipping_id.name"/><br/>
-                                    <t t-esc="o.partner_shipping_id.street"/>,
+                                    <t t-esc="o.partner_shipping_id.street"/>
+                                    <br/>
                                     <t t-esc="o.partner_shipping_id.street2"/>
                                     <br/>
                                     <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
@@ -547,20 +550,10 @@
                         <tr>
 
                         </tr>
-<!--                        <tr style="border:1px solid black;">-->
-<!--                            <td style="border:1px solid black;"><strong>GSTIN Number:</strong>-->
-<!--                                <t t-esc="o.partner_id.vat"/></td>-->
-<!--                            <td></td>-->
-<!--                        </tr>-->
-<!--                        <tr style="border:1px solid black;">-->
-<!--                            <td style="border:1px solid black;"><strong>PAN Number:</strong></td>-->
-<!--                            <td></td>-->
-<!--                        </tr>-->
+
                         <tr style="border:1px solid black;">
-                            <td colspan="3" style="border:1px solid black;"><strong>Reverse Charge (Y/N) : N</strong></td>
-                        </tr>
-                        <tr style="border:1px solid black;">
-                            <td style="text-align:right" colspan="3"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
+                            <td style="border:1px solid black;width: 50%"><strong>Reverse Charge (Y/N) : N</strong></td>
+                            <td colspan="2" style="width: 50%;"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
                         </tr>
                     </table>
                     <br/>
@@ -685,7 +678,7 @@
                     <!--                            <td style="border: 0px">-->
                     <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
                         <t t-if="doc.currency_id.name == 'INR'">
-                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
                         </t>
                         <t t-else="">
                             <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
@@ -821,13 +814,13 @@
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
+                            <td style="border:1px solid black;">
                                 <strong>Ack. No:</strong> <span t-esc="o.l10n_in_transaction_id.irn"/><br/>
                                 <strong>IRN No :</strong><span t-esc="o.l10n_in_transaction_id.ack_no"/> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
-                        <tr>
-                            <td style="border:1px solid black;text-align:center" rowspan="8">
+                             <tr>
+                            <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
                                      <t t-if="doc.l10n_in_transaction_id.qr_code_data">
                         <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %
                 ('QR', doc.l10n_in_transaction_id.qr_code_data, 200, 200)"/></t>
@@ -837,12 +830,12 @@
 
                         <tr style="border:1px solid black;">
 
-                           <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
+                            <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Bill To</strong></th>
                             <th style="background-color:#87CEEB;border:1px solid black" class="text-center"><strong>Ship To</strong></th>
                         </tr>
                         <tr style="border:1px solid black;">
 
-                            <td style="border:1px solid black;padding-left: 3px;width: 30%" rowspan="4">
+                            <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
@@ -863,7 +856,8 @@
                                         <t t-else="">
                                             <p>
                                                 <t t-esc="o.partner_id.name"/><br/>
-                                                <t t-esc="o.partner_id.street"/>,
+                                                <t t-esc="o.partner_id.street"/>
+                                                <br/>
                                                 <t t-esc="o.partner_id.street2"/>
                                                 <br/>
                                                 <t t-esc="o.partner_id.city"/>,
@@ -878,10 +872,11 @@
                                     </t>
                                 </t>
                             </td>
-                            <td style="border:1px solid blac;kpadding-left: 3px;" rowspan="4">
+                            <td style="border:1px solid black;padding-left: 3px" rowspan="4">
                                 <p>
                                     <t t-esc="o.partner_shipping_id.name"/><br/>
-                                    <t t-esc="o.partner_shipping_id.street"/>,
+                                    <t t-esc="o.partner_shipping_id.street"/>
+                                    <br/>
                                     <t t-esc="o.partner_shipping_id.street2"/>
                                     <br/>
                                     <t t-esc="o.partner_shipping_id.city"/>,<t t-esc="o.partner_shipping_id.zip"/>
@@ -901,20 +896,10 @@
                         <tr>
 
                         </tr>
-<!--                        <tr style="border:1px solid black;">-->
-<!--                            <td style="border:1px solid black;"><strong>GSTIN Number:</strong>-->
-<!--                                <t t-esc="o.partner_id.vat"/></td>-->
-<!--                            <td></td>-->
-<!--                        </tr>-->
-<!--                        <tr style="border:1px solid black;">-->
-<!--                            <td style="border:1px solid black;"><strong>PAN Number:</strong></td>-->
-<!--                            <td></td>-->
-<!--                        </tr>-->
+
                         <tr style="border:1px solid black;">
-                            <td colspan="3" style="border:1px solid black;"><strong>Reverse Charge (Y/N) : N</strong></td>
-                        </tr>
-                        <tr style="border:1px solid black;">
-                            <td style="text-align:right" colspan="3"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
+                            <td style="border:1px solid black;width: 50%"><strong>Reverse Charge (Y/N) : N</strong></td>
+                            <td colspan="2" style="width: 50%;"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
                         </tr>
                     </table>
                     <br/>
@@ -1039,7 +1024,7 @@
                     <!--                            <td style="border: 0px">-->
                     <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
                         <t t-if="doc.currency_id.name == 'INR'">
-                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/>
+                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
                         </t>
                         <t t-else="">
                             <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only

@@ -39,7 +39,7 @@
         <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.credit_tax_invoice_forms</field>
         <field name="report_file">icorets.credit_tax_invoice_forms</field>
-        <field name="print_report_name">'Credit Note'</field>
+        <field name="print_report_name">(object.name or '').replace('/','_')</field>
         <field name="paperformat_id" ref="icorets.paperformat_credit"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
     </record>
