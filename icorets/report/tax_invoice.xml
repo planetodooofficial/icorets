@@ -285,7 +285,7 @@
                                 <td>
                                     <t t-esc="'%.2f'% line.price_subtotal"/>
                                 </td>
-                                <td style="text-align: left">
+                                <td>
                                     <!--                                        <t t-esc="line.tax_ids.name"/>-->
                                     <t t-if="line.tax_ids">
                                         <t t-foreach="line.tax_ids" t-as="t">
@@ -657,7 +657,7 @@
                                 <td>
                                     <t t-esc="'%.2f'% line.price_subtotal"/>
                                 </td>
-                                <td style="text-align: left">
+                                <td>
                                     <!--                                        <t t-esc="line.tax_ids.name"/>-->
                                     <t t-if="line.tax_ids">
                                         <t t-foreach="line.tax_ids" t-as="t">
@@ -1031,7 +1031,7 @@
                                 <td>
                                     <t t-esc="'%.2f'% line.price_subtotal"/>
                                 </td>
-                                <td style="text-align: left">
+                                <td>
                                     <!--                                        <t t-esc="line.tax_ids.name"/>-->
                                     <t t-if="line.tax_ids">
                                         <t t-foreach="line.tax_ids" t-as="t">
