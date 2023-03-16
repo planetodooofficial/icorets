@@ -431,8 +431,8 @@
                         <t t-esc="o.partner_id.country_id.name"/><br/><br/>
 
                     <b>Event :</b><br/>
+                    <t t-esc="o.event"/>
 
-                    Mumbai Indians vs Rajasthan Royals
                          </div>
 
                 </div>
