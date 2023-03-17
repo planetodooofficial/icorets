@@ -40,10 +40,10 @@ class ProductVariantInherit(models.Model):
     ]
 
     # For updating standard price by rakng sum of cost(basic) and packaging cost
-    @api.onchange('cost', 'packaging_cost')
+    @api.onchange('standard_price', 'packaging_cost')
     def sum_cost(self):
-        if self.cost and self.packaging_cost:
-            self.standard_price = self.cost + self.packaging_cost
+        if self.standard_price and self.packaging_cost:
+            self.variant_total_cost = self.standard_price + self.packaging_cost
 
 
 class ProductInherit(models.Model):
@@ -172,12 +172,13 @@ class SaleOrderInherit(models.Model):
         invoice_vals['po_no'] = self.po_no
         return invoice_vals
 
+    # Function for domain on location according to warehouse
     # @api.model
     # def get_view(self, view_id=None, view_type='form', **options):
-    #     res = super(SaleOrderInherit, self).get_view(view_id, view_type, **options)
-    #     if view_type == 'form' and self._context.get('default_custom_payment_type'):
+    #     res = super(SaleOrderInherit, self).get_view(view_id,view_type, **options)
+    #     if view_type == 'form':
     #         doc = etree.XML(res['arch'])
-    #         domain = "[('type', '=', 'bank')]"
+    #         domain = f"[('warehouse_id.code', '=', {self.location_id.location_id.name})]"
     #         for node in doc.xpath("//field[@name='location_id']"):
     #             node.set('domain', domain)
     #             test = node.get("modifiers")
@@ -186,6 +187,7 @@ class SaleOrderInherit(models.Model):
     #             node.set("modifiers", json.dumps(modifiers))
     #         res['arch'] = etree.tostring(doc)
     #     return res
+
 
 
 class SaleOrderLineInherit(models.Model):

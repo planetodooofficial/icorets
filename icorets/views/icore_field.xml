@@ -17,6 +17,25 @@
         </field>
     </record>
 
+<!--    For removing attributes in carrier id in stock picking-->
+
+    <record model="ir.ui.view" id="stock_picking_inherited_view">
+        <field name="name">stock.picking.inherited</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="delivery.view_picking_withcarrier_out_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='carrier_data']/field[@name='carrier_id']" position="replace">
+                <field name="carrier_id" options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+            <xpath expr="//group[@name='carrier_data']/div[@name='tracking']" position="replace">
+             <div name="tracking">
+                <field name="carrier_tracking_ref" class="oe_inline"/>
+                <button type='object' class="fa fa-arrow-right oe_link" confirm="Cancelling a delivery may not be undoable. Are you sure you want to continue?" name="cancel_shipment" string="Cancel" attrs="{'invisible':['|','|','|',('carrier_tracking_ref','=',False),('delivery_type','in', ['fixed', 'base_on_rule']),('delivery_type','=',False),('state','not in',('done'))]}"/>
+            </div>
+            </xpath>
+        </field>
+    </record>
+
     <!--    For adding codes in product.product smart button view-->
     <record id="product_variant_form_view_inherit" model="ir.ui.view">
         <field name="name">product.variant.only.form.view.inherit</field>
