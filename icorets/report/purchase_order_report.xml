@@ -39,18 +39,18 @@
                     <div class="page">
                         <table style="width:100%;margin-top: 10px">
                             <tr style="border:1px solid black;">
-                                    <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="3"><b>PURCHASE ORDER</b></td>
+                                <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="3"><b>PURCHASE ORDER</b></td>
                             </tr>
                             <tr style="border:1px solid black;">
                                 <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Vendor :</b> <t t-esc="o.partner_id.name"/><br/>
-                                Address : <t t-esc="o.partner_id.street"/><br/>
-                                <t t-esc="o.partner_id.street2"/><br/>
-                                <t t-esc="o.partner_id.city"/>,
-                                <t t-esc="o.partner_id.zip"/>,
-                                <t t-esc="o.partner_id.state_id.name"/>,
-                                <t t-esc="o.partner_id.country_id.name"/><br/>
-                                State Code : <t t-esc="o.partner_id.state_id.code"/><br/>
-                                GSTIN Number : <t t-esc="o.partner_id.vat"/>
+                                    Address : <t t-esc="o.partner_id.street"/><br/>
+                                    <t t-esc="o.partner_id.street2"/><br/>
+                                    <t t-esc="o.partner_id.city"/>,
+                                    <t t-esc="o.partner_id.zip"/>,
+                                    <t t-esc="o.partner_id.state_id.name"/>,
+                                    <t t-esc="o.partner_id.country_id.name"/><br/>
+                                    State Code : <t t-esc="o.partner_id.state_id.code"/><br/>
+                                    GSTIN Number : <t t-esc="o.partner_id.vat"/>
 
                                 </td>
                                 <td style="height:70px;border:1px solid black;padding-left: 3px">
@@ -65,7 +65,7 @@
                                     <br/>
                                     <strong>GST Number :</strong> <t t-esc="o.company_id.vat"/><br/>
                                 </td>
-                                  <td style="height:70px;border:1px solid black;padding-left: 3px">
+                                <td style="height:70px;border:1px solid black;padding-left: 3px">
                                     <b>Shipping Address:</b><br/>
                                     <t t-esc="o.warehouse_id.partner_id.street"/>
                                     <br/>
@@ -77,28 +77,28 @@
 
                                 </td>
                             </tr>
-<!--                            <tr style="border:1px solid black;">-->
-<!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
-<!--                                    <br/>-->
-<!--                                    <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
-<!--                                    <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
-<!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/><br/>-->
-<!--                                </td>-->
-<!--                                <td></td>-->
-<!--                                <td></td>-->
-<!--                                <td></td>-->
-<!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
-<!--                                    <b>Shipping Address:</b><br/>-->
-<!--                                    <t t-esc="o.warehouse_id.partner_id.street"/>-->
-<!--                                    <br/>-->
-<!--                                    <t t-esc="o.warehouse_id.partner_id.street2"/>-->
-<!--                                    <br/>-->
-<!--                                    <t t-esc="o.warehouse_id.partner_id.city"/>,<t t-esc="o.warehouse_id.partner_id.zip"/>-->
-<!--                                    <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,-->
-<!--                                    <t t-esc="o.warehouse_id.partner_id.country_id.name"/>-->
+                            <!--                            <tr style="border:1px solid black;">-->
+                            <!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
+                            <!--                                    <br/>-->
+                            <!--                                    <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
+                            <!--                                    <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
+                            <!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/><br/>-->
+                            <!--                                </td>-->
+                            <!--                                <td></td>-->
+                            <!--                                <td></td>-->
+                            <!--                                <td></td>-->
+                            <!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
+                            <!--                                    <b>Shipping Address:</b><br/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.street"/>-->
+                            <!--                                    <br/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.street2"/>-->
+                            <!--                                    <br/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.city"/>,<t t-esc="o.warehouse_id.partner_id.zip"/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.country_id.name"/>-->
 
-<!--                                </td>-->
-<!--                            </tr>-->
+                            <!--                                </td>-->
+                            <!--                            </tr>-->
                         </table>
 
                         <table class="table table-sm o_main_table" style="width:100%">
@@ -115,7 +115,7 @@
                                 <td class="text-center" width="12%">
                                     <strong>DESCRIPTION</strong>
                                 </td>
-                                  <td class="text-center" width="15%">
+                                <td class="text-center" width="15%">
                                     <strong>REMARKS</strong>
                                 </td>
                                 <td class="text-center" width="10%">
@@ -152,7 +152,7 @@
                                     </td>
 
                                     <td>
-                                         <t t-esc="line.product_id.variant_article_code"/>
+                                        <t t-esc="line.product_id.variant_article_code"/>
                                     </td>
                                     <td>
                                         <t t-esc="line.product_id.barcode"/>
@@ -192,45 +192,54 @@
                                     </td>
                                 </tr>
                             </t>
-                            <br/>
                             <tr>
-                                <td style="text-align:right" colspan="11">
-                                    <strong>Untaxed Amount</strong>
+                                <td colspan="7"> <b>TOTAL</b></td>
+                                <td style="text-align: center">
+                                    <t t-esc="sum(l.product_qty for l in o.order_line) "/>
                                 </td>
-                                <td style="text-align:right" colspan="2">₹
-                                    <t t-esc="'%.2f'% o.amount_untaxed"/>
+                                <td style="text-align: center">
+                                    <t t-esc="sum(l.price_unit for l in o.order_line) "/>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td style="text-align:right" colspan="11">SGST</td>
-                                <td style="text-align:right" colspan="2">₹
-                                    <t t-esc="o.amount_tax / 2"/>
+                                <td style="text-align: center">
+                                    <t t-esc="sum(l.price_subtotal for l in o.order_line) "/>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td style="text-align:right" colspan="11">CGST</td>
-                                <td style="text-align:right" colspan="2">₹
-                                    <t t-esc="o.amount_tax / 2"/>
+                                <td></td>
+                                <td style="text-align: center">
+                                    <t t-esc="sum(l.tax_amount_line for l in o.order_line) "/>
                                 </td>
-                            </tr>
-                            <hr/>
-                            <tr>
-                                <td style="text-align:right" colspan="11">
-                                    <strong>Total</strong>
-                                </td>
-                                <td style="text-align:right" colspan="2">₹
-                                    <t t-esc="'%.2f'% o.amount_total"/>
+                                <td style="text-align: center">
+                                    <t t-esc="sum(l.price_total for l in o.order_line) "/>
                                 </td>
                             </tr>
                         </table>
+                        <div class="clearfix mb-4">
+                            <div id="total" class="row">
+                                <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
+                                    <table class="table table-sm" style="page-break-inside: avoid;">
+
+                                        <!--Tax totals-->
+                                        <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                        <t t-call="account.document_tax_totals"/>
+
+                                        <!--Payments-->
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
+
+                                <span style="font-size: 12px" t-esc="o.currency_id.amount_to_text(o.amount_total)"/> only
+                        </strong>
+
+
                         <br/>
                         <table style="width:100%;margin-top: 10px;page-break-inside : avoid">
-<!--                            <tr>-->
-<!--                                <td colspan="2">-->
-<!--                                    <b>APPROVED BY :</b> <t t-esc="request.env.user.name"/>-->
-<!--                                </td>-->
-<!--                                <td></td>-->
-<!--                            </tr>-->
+                            <!--                            <tr>-->
+                            <!--                                <td colspan="2">-->
+                            <!--                                    <b>APPROVED BY :</b> <t t-esc="request.env.user.name"/>-->
+                            <!--                                </td>-->
+                            <!--                                <td></td>-->
+                            <!--                            </tr>-->
                             <tr style="border:1px solid black">
                                 <td style="width:50%;border:1px solid black">PAYMENT TERM</td>
                                 <td style="text-align:center;width:50%;border:1px solid black">For iICOREts Private
@@ -263,53 +272,53 @@
         </t>
     </template>
 
-        <!--    #header and layout-->
+    <!--    #header and layout-->
     <template id="external_layout_stripped_invoice_po">
 
         <style>
             div.absolute {
-              position: absolute;
-              top: 0px;
-              right: 0;
-              width: 200px;
-              height: 100px;
-}
+            position: absolute;
+            top: 0px;
+            right: 0;
+            width: 200px;
+            height: 100px;
+            }
         </style>
 
         <div t-attf-class="header o_company_#{company.id}_layout" att-style="report_header_style">
 
-<!--            <table style="width: 100%;border-0px !important">-->
-<!--                <tr>-->
-<!--                    <td style="width:60%;float: left;vertical-align: bottom;border-right: 0px;">-->
-<!--                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/>-->
-<!--                    </td>-->
-<!--                    <td style="width:35%;float: right;vertical-align: center;font-size: 14px;text-align: right;border-right: 0px !important;border-bottom: 0px !important;border-top: 0px !important;">-->
-<!--                        <span>PURCHASE ORDER</span>-->
-<!--                    </td>-->
-<!--                    <td style="vertical-align: bottom;width:35%;font-weight: bold;text-align: left; font-size: 16px;">-->
-<!--                                    <span style="valign: top;text-align: left;">-->
-<!--                                        <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
-<!--                                     <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
-<!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/>-->
-<!--                                    </span>-->
+            <!--            <table style="width: 100%;border-0px !important">-->
+            <!--                <tr>-->
+            <!--                    <td style="width:60%;float: left;vertical-align: bottom;border-right: 0px;">-->
+            <!--                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/>-->
+            <!--                    </td>-->
+            <!--                    <td style="width:35%;float: right;vertical-align: center;font-size: 14px;text-align: right;border-right: 0px !important;border-bottom: 0px !important;border-top: 0px !important;">-->
+            <!--                        <span>PURCHASE ORDER</span>-->
+            <!--                    </td>-->
+            <!--                    <td style="vertical-align: bottom;width:35%;font-weight: bold;text-align: left; font-size: 16px;">-->
+            <!--                                    <span style="valign: top;text-align: left;">-->
+            <!--                                        <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
+            <!--                                     <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
+            <!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/>-->
+            <!--                                    </span>-->
 
 
-<!--                    </td>-->
-<!--                </tr>-->
-<!--            </table>-->
+            <!--                    </td>-->
+            <!--                </tr>-->
+            <!--            </table>-->
 
-<!--            Format 2-->
-<!--            <div><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/></div>-->
-<!--            <div><span><b>Purchase Order</b></span></div>-->
+            <!--            Format 2-->
+            <!--            <div><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/></div>-->
+            <!--            <div><span><b>Purchase Order</b></span></div>-->
             <div class="absolute">
                 <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 60px;width: 200px;" alt="Logo"/>
             </div>
             <div style="position: absolute;top: 10px;left: 870px;">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
-                 <b>PO Date :</b> <span t-field="o.date_approve" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                <b>PO Date :</b> <span t-field="o.x_studio_po_date" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 <b>Approved By :</b> <t t-esc="request.env.user.name"/>
-                </div>
+            </div>
 
 
         </div>
