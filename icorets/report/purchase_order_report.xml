@@ -7,12 +7,12 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Landscape</field>
-        <field name="margin_top">25</field>
+        <field name="margin_top">30</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">5</field>
         <field name="margin_right">5</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">25</field>
+        <field name="header_spacing">20</field>
         <field name="dpi">90</field>
     </record>
 
@@ -42,7 +42,7 @@
                                 <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="3"><b>PURCHASE ORDER</b></td>
                             </tr>
                             <tr style="border:1px solid black;">
-                                <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Vendor :</b> <t t-esc="o.partner_id.name"/><br/>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Vendor : <t t-esc="o.partner_id.name"/></b><br/>
                                     Address : <t t-esc="o.partner_id.street"/><br/>
                                     <t t-esc="o.partner_id.street2"/><br/>
                                     <t t-esc="o.partner_id.city"/>,
@@ -315,7 +315,7 @@
             <div class="absolute">
                 <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 60px;width: 200px;" alt="Logo"/>
             </div>
-            <div style="position: absolute;top: 10px;left: 890px;font-size: 12px">
+            <div style="position: absolute;top: 10px;left: 915px;font-size: 14px">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
                 <b>PO Date :</b> <span t-field="o.x_studio_po_date" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
