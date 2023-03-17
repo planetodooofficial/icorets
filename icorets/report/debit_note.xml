@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="paperformat_batch_deposit" model="report.paperformat">
+    <record id="paperformat_debit" model="report.paperformat">
         <field name="name">Debit Note</field>
         <field name="default" eval="False"/>
         <field name="format">A4</field>
@@ -23,7 +23,7 @@
         <field name="report_name">icorets.debit_tax_invoice_forms</field>
         <field name="report_file">icorets.debit_tax_invoice_forms</field>
         <field name="print_report_name">(object.name or '').replace('/','_')</field>
-        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit"/>
+        <field name="paperformat_id" ref="icorets.paperformat_debit"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
     </record>
 
