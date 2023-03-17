@@ -282,7 +282,7 @@
             position: absolute;
             top: 0px;
             right: 0;
-            width: 250px;
+            width: 300px;
             height: 100px;
             }
         </style>
@@ -315,7 +315,7 @@
             <div class="absolute">
                 <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 60px;width: 200px;" alt="Logo"/>
             </div>
-            <div style="position: absolute;top: 10px;left: 915px;font-size: 14px">
+            <div style="position: absolute;top: 10px;left: 950px;font-size: 14px">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
                 <b>PO Date :</b> <span t-field="o.x_studio_po_date" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
