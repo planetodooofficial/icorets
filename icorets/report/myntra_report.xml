@@ -94,6 +94,7 @@
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
                                 <p>
+                                    <t t-esc="o.dispatch_partner_id.parent_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
                                     <t t-esc="o.dispatch_partner_id.street2"/>
@@ -451,6 +452,7 @@
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
                                 <p>
+                                    <t t-esc="o.dispatch_partner_id.parent_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
                                     <t t-esc="o.dispatch_partner_id.street2"/>
@@ -806,6 +808,7 @@
                             </td>
                             <td style="border:1px solid black;" rowspan="4">
                                 <p>
+                                    <t t-esc="o.dispatch_partner_id.parent_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
                                     <t t-esc="o.dispatch_partner_id.street2"/>

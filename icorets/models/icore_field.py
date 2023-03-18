@@ -75,6 +75,11 @@ class ProductInherit(models.Model):
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
 
+    @api.onchange('sale_hsn')
+    def set_hsn(self):
+        if self.sale_hsn:
+            self.l10n_in_hsn_code = self.sale_hsn.hsnsac_code
+
 
 class ProductBrand(models.Model):
     _name = "product.brand"
