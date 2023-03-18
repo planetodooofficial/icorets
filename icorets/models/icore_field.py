@@ -74,7 +74,7 @@ class ProductInherit(models.Model):
     _sql_constraints = [
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
-# Addedfunc for hsn
+# Added func for hsn
     @api.onchange('sale_hsn')
     def set_hsn(self):
         if self.sale_hsn:
