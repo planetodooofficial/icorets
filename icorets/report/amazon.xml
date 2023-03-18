@@ -71,7 +71,7 @@
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Original for Receipient)</strong></th>
                         </tr>
                         <tr style="background-color:#87CEEB;border:1px solid black">
-                           <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
+                            <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
                         </tr>
@@ -80,7 +80,7 @@
                                 <t t-esc="o.name"/>
                             </td>
                             <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
-                                <p>
+
                                     <t t-esc="o.company_id.name"/><br/>
                                     <t t-esc="o.company_id.street"/>,
 
@@ -91,11 +91,11 @@
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
-                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
-                                </p>
+<!--                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>-->
+
                             </td>
                             <td style="border:1px solid black;padding-left: 3px" rowspan="4">
-                                <p>
+
                                     <t t-esc="o.dispatch_partner_id.parent_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
@@ -106,7 +106,7 @@
                                     <t t-esc="o.dispatch_partner_id.state_id.name"/>,
                                     <t t-esc="o.dispatch_partner_id.country_id.name"/>
                                     <br/>
-                                </p>
+
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -163,7 +163,7 @@
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
-                                            <p>
+
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
@@ -173,12 +173,12 @@
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/><br/>
                                                 <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/>
-<!--                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>-->
+                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>
 
-                                            </p>
+
                                         </t>
                                         <t t-else="">
-                                            <p>
+
                                                 <t t-esc="o.partner_id.name"/><br/>
                                                 <t t-esc="o.partner_id.street"/>
                                                 <br/>
@@ -191,7 +191,7 @@
                                                 <br/>
                                                 <strong>GST Number</strong> <t t-esc="o.partner_id.vat"/><br/>
                                                 <strong>PAN Number</strong> <t t-esc="o.partner_id.x_studio_pan"/>
-                                            </p>
+
                                         </t>
                                     </t>
                                 </t>
@@ -463,7 +463,7 @@
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Duplicate for Transporter)</strong></th>
                         </tr>
                                                  <tr style="background-color:#87CEEB;border:1px solid black">
-                           <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
+                            <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
                         </tr>
@@ -472,7 +472,7 @@
                                 <t t-esc="o.name"/>
                             </td>
                             <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
-                                <p>
+
                                     <t t-esc="o.company_id.name"/><br/>
                                     <t t-esc="o.company_id.street"/>,
 
@@ -483,11 +483,11 @@
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
-                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
-                                </p>
+<!--                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>-->
+
                             </td>
                             <td style="border:1px solid black;padding-left: 3px" rowspan="4">
-                                <p>
+
                                     <t t-esc="o.dispatch_partner_id.parent_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
@@ -498,7 +498,7 @@
                                     <t t-esc="o.dispatch_partner_id.state_id.name"/>,
                                     <t t-esc="o.dispatch_partner_id.country_id.name"/>
                                     <br/>
-                                </p>
+
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -555,7 +555,7 @@
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
-                                            <p>
+
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
@@ -565,12 +565,12 @@
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/><br/>
                                                 <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/>
-<!--                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>-->
+                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>
 
-                                            </p>
+
                                         </t>
                                         <t t-else="">
-                                            <p>
+
                                                 <t t-esc="o.partner_id.name"/><br/>
                                                 <t t-esc="o.partner_id.street"/>
                                                 <br/>
@@ -583,7 +583,7 @@
                                                 <br/>
                                                 <strong>GST Number</strong> <t t-esc="o.partner_id.vat"/><br/>
                                                 <strong>PAN Number</strong> <t t-esc="o.partner_id.x_studio_pan"/>
-                                            </p>
+
                                         </t>
                                     </t>
                                 </t>
@@ -854,7 +854,7 @@
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Triplicate for Supplier)</strong></th>
                         </tr>
                                                  <tr style="background-color:#87CEEB;border:1px solid black">
-                           <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
+                            <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
                         </tr>
@@ -863,7 +863,7 @@
                                 <t t-esc="o.name"/>
                             </td>
                             <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
-                                <p>
+
                                     <t t-esc="o.company_id.name"/><br/>
                                     <t t-esc="o.company_id.street"/>,
 
@@ -874,11 +874,11 @@
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
-                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
-                                </p>
+<!--                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>-->
+
                             </td>
                             <td style="border:1px solid black;padding-left: 3px" rowspan="4">
-                                <p>
+
                                     <t t-esc="o.dispatch_partner_id.parent_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
@@ -889,7 +889,7 @@
                                     <t t-esc="o.dispatch_partner_id.state_id.name"/>,
                                     <t t-esc="o.dispatch_partner_id.country_id.name"/>
                                     <br/>
-                                </p>
+
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -946,7 +946,7 @@
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
-                                            <p>
+
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
@@ -956,12 +956,12 @@
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/><br/>
                                                 <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/>
-<!--                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>-->
+                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>
 
-                                            </p>
+
                                         </t>
                                         <t t-else="">
-                                            <p>
+
                                                 <t t-esc="o.partner_id.name"/><br/>
                                                 <t t-esc="o.partner_id.street"/>
                                                 <br/>
@@ -974,7 +974,7 @@
                                                 <br/>
                                                 <strong>GST Number</strong> <t t-esc="o.partner_id.vat"/><br/>
                                                 <strong>PAN Number</strong> <t t-esc="o.partner_id.x_studio_pan"/>
-                                            </p>
+
                                         </t>
                                     </t>
                                 </t>

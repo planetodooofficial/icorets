@@ -465,7 +465,7 @@
                                     <t t-esc="o.company_id.state_id.name"/>,
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
-                                    <strong>GST Number</strong> <t t-esc="o.company_id.vat"/>
+                                    <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
 <!--                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>-->
 
                             </td>
@@ -572,7 +572,7 @@
                                 </t>
                             </td>
                             <td style="border:1px solid black;padding-left: 3px" rowspan="4">
-
+                                <p>
                                     <t t-esc="o.partner_shipping_id.name"/><br/>
                                     <t t-esc="o.partner_shipping_id.street"/>
                                     <br/>
@@ -583,6 +583,7 @@
                                     <t t-esc="o.partner_shipping_id.country_id.name"/>
                                     <br/>
 
+                                </p>
                             </td>
                         </tr>
                         <tr>
@@ -842,7 +843,7 @@
                             <th class="text-center" colspan="3"><strong>Tax Invoice (Triplicate for Supplier)</strong></th>
                         </tr>
                         <tr style="background-color:#87CEEB;border:1px solid black">
-                           <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
+                            <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Bill From</strong></th>
                             <th style="border:1px solid black;" class="text-center"><strong>Ship From</strong></th>
                         </tr>
@@ -861,7 +862,7 @@
                                     <t t-esc="o.company_id.state_id.name"/>,
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
-                                    <strong>GST Number</strong> <t t-esc="o.company_id.vat"/>
+                                    <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
 <!--                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>-->
 
                             </td>
@@ -968,6 +969,7 @@
                                 </t>
                             </td>
                             <td style="border:1px solid black;padding-left: 3px" rowspan="4">
+                                <p>
                                     <t t-esc="o.partner_shipping_id.name"/><br/>
                                     <t t-esc="o.partner_shipping_id.street"/>
                                     <br/>
@@ -978,6 +980,7 @@
                                     <t t-esc="o.partner_shipping_id.country_id.name"/>
                                     <br/>
 
+                                </p>
                             </td>
                         </tr>
                         <tr>
