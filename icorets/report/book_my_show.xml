@@ -136,7 +136,7 @@
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/>
                                                 <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/><br/>
-                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.x_studio_pan')[0]"/>
+                                                <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>
                                                 <br/>
                                             </p>
                                         </t>
