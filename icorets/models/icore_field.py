@@ -79,6 +79,7 @@ class ProductInherit(models.Model):
     def set_hsn(self):
         if self.sale_hsn:
             self.l10n_in_hsn_code = self.sale_hsn.hsnsac_code
+            #end
 
 
 class ProductBrand(models.Model):
