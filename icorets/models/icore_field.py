@@ -40,10 +40,10 @@ class ProductVariantInherit(models.Model):
     ]
 
     # For updating standard price by rakng sum of cost(basic) and packaging cost
-    @api.onchange('standard_price', 'packaging_cost')
+    @api.onchange('standard_price', 'variant_packaging_cost')
     def sum_cost(self):
-        if self.standard_price and self.packaging_cost:
-            self.variant_total_cost = self.standard_price + self.packaging_cost
+        if self.standard_price and self.variant_packaging_cost:
+            self.variant_total_cost = self.standard_price + self.variant_packaging_cost
 
 
 class ProductInherit(models.Model):
