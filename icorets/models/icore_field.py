@@ -39,7 +39,7 @@ class ProductVariantInherit(models.Model):
         ('fsn_unique', 'unique(variant_fsn)', "FSN code can only be assigned to one variant product !"),
     ]
 
-    # For updating standard price by rakng sum of cost(basic) and packaging cost
+    # For updating standard price by sum of cost and packaging cost
     @api.onchange('standard_price', 'variant_packaging_cost')
     def sum_cost(self):
         if self.standard_price and self.variant_packaging_cost:
@@ -161,7 +161,7 @@ class SaleOrderInherit(models.Model):
         'stock.location', ' Source Location',
         ondelete='restrict', required=True, index=True, check_company=True)
 
-    # For checking quantity
+    # For checking available  quantity
     @api.onchange('location_id')
     def check_quantity(self):
         if self.location_id:
@@ -193,6 +193,11 @@ class SaleOrderInherit(models.Model):
     #             node.set("modifiers", json.dumps(modifiers))
     #         res['arch'] = etree.tostring(doc)
     #     return res
+
+    # @api.onchange('field_id')
+    # def onchange_field_id(self):
+    #     relation_ids = [x.id for x in self.field_id.relation_ids]
+    #     return {'domain': {'relation_id': [('id', 'in', relation_ids)]}}
 
 
 
