@@ -277,7 +277,8 @@
                 <field name="no_of_cartons"/>
             </xpath>
 
-           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="replace">
+           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="attributes">
+               <attribute name="invisible">1</attribute>
 <!--                <field name="l10n_in_journal_id" domain="[('company_id', '=', company_id), ('type','=','sale')]" options="{'no_create': True}" attrs="{'invisible': [('country_code','!=', 'IN')]}"/>-->
             </xpath>
 
