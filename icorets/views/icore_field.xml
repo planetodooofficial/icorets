@@ -277,9 +277,9 @@
                 <field name="no_of_cartons"/>
             </xpath>
 
-           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="attributes">
-               <attribute name="invisible">1</attribute>
-            </xpath>
+<!--           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="attributes">-->
+<!--               <attribute name="invisible">1</attribute>-->
+<!--            </xpath>-->
 
             <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
                 <field name="stock_quantity" readonly="1" force_save="1"/>
@@ -321,44 +321,44 @@
             </xpath>
 
 <!--            For setting up disturbed view in pay payment misc   start-->
-            <xpath expr="//form[1]/div[not(@name)][15]" position="replace">
-                <div class="alert alert-info mb-0" role="alert" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('auto_post', '!=', 'at_date')]}" name="studio_div_b83150">
-                    This move is configured to be posted automatically at the accounting date:.
-                </div>
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="before">
-                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>
+<!--            <xpath expr="//form[1]/div[not(@name)][15]" position="replace">-->
+<!--                <div class="alert alert-info mb-0" role="alert" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('auto_post', '!=', 'at_date')]}" name="studio_div_b83150">-->
+<!--                    This move is configured to be posted automatically at the accounting date:.-->
+<!--                </div>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="before">-->
+<!--                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>-->
 <!--                <xpath expr="//field[@name='is_checked']" position="move"/>-->
-            </xpath>
-            <xpath expr="//field[@name='tax_cash_basis_origin_move_id']" position="after">
-                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/div[1]" position="before">
-                <xpath expr="//form[1]/div[not(@name)][15]/field[@name='date']" position="move"/>
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="attributes">
-                <attribute name="attrs">{'invisible':[('move_type', 'not in', ('in_invoice', 'in_receipt', 'in_refund'))]}</attribute>
-                <attribute name="nolabel">1</attribute>
-            </xpath>
-            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="after">
-                <xpath expr="//field[@name='dispatch_partner_id'][not(ancestor::field)]" position="move"/>
-            </xpath>
-            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="after">
-                <xpath expr="//field[@name='date'][not(ancestor::field)]" position="move"/>
-            </xpath>
-            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/div[4]" position="after">
-                <xpath expr="//field[@name='fiscal_position_id'][not(ancestor::field)]" position="move"/>
-            </xpath>
-            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[2]" position="after">
-                <xpath expr="//field[@name='l10n_in_transaction_id'][not(ancestor::field)]" position="move"/>
-            </xpath>
-            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[3]" position="after">
-                <xpath expr="//field[@name='fiscal_position_id'][not(ancestor::field)]" position="move"/>
-            </xpath>
-            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="replace"/>
-            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[3]" position="after">
-                <xpath expr="//field[@name='date'][not(ancestor::field)]" position="move"/>
-            </xpath>
+<!--            </xpath>-->
+<!--            <xpath expr="//field[@name='tax_cash_basis_origin_move_id']" position="after">-->
+<!--                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/div[1]" position="before">-->
+<!--                <xpath expr="//form[1]/div[not(@name)][15]/field[@name='date']" position="move"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="attributes">-->
+<!--                <attribute name="attrs">{'invisible':[('move_type', 'not in', ('in_invoice', 'in_receipt', 'in_refund'))]}</attribute>-->
+<!--                <attribute name="nolabel">1</attribute>-->
+<!--            </xpath>-->
+<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="after">-->
+<!--                <xpath expr="//field[@name='dispatch_partner_id'][not(ancestor::field)]" position="move"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="after">-->
+<!--                <xpath expr="//field[@name='date'][not(ancestor::field)]" position="move"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/div[4]" position="after">-->
+<!--                <xpath expr="//field[@name='fiscal_position_id'][not(ancestor::field)]" position="move"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[2]" position="after">-->
+<!--                <xpath expr="//field[@name='l10n_in_transaction_id'][not(ancestor::field)]" position="move"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[3]" position="after">-->
+<!--                <xpath expr="//field[@name='fiscal_position_id'][not(ancestor::field)]" position="move"/>-->
+<!--            </xpath>-->
+<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="replace"/>-->
+<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[3]" position="after">-->
+<!--                <xpath expr="//field[@name='date'][not(ancestor::field)]" position="move"/>-->
+<!--            </xpath>-->
 
 <!--        end-->
         </field>
