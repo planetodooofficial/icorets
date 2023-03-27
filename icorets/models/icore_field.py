@@ -160,6 +160,7 @@ class SaleOrderInherit(models.Model):
     location_id = fields.Many2one(
         'stock.location', ' Source Location',
         ondelete='restrict', required=True, index=True, check_company=True)
+    event = fields.Char('Event')
 
     # For checking available  quantity
     @api.onchange('location_id')
@@ -176,6 +177,7 @@ class SaleOrderInherit(models.Model):
         invoice_vals = super(SaleOrderInherit, self)._prepare_invoice()
         invoice_vals['dispatch_partner_id'] = self.warehouse_id.partner_id.id
         invoice_vals['po_no'] = self.po_no
+        invoice_vals['event'] = self.event
         return invoice_vals
 
     # Function for domain on location according to warehouse
