@@ -277,9 +277,9 @@
                 <field name="no_of_cartons"/>
             </xpath>
 
-<!--           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="attributes">-->
-<!--               <attribute name="invisible">1</attribute>-->
-<!--            </xpath>-->
+           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="attributes">
+               <attribute name="invisible">1</attribute>
+            </xpath>
 
             <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
                 <field name="stock_quantity" readonly="1" force_save="1"/>
@@ -328,7 +328,7 @@
             </xpath>
             <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="before">
                 <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>
-                <xpath expr="//field[@name='is_checked']" position="move"/>
+<!--                <xpath expr="//field[@name='is_checked']" position="move"/>-->
             </xpath>
             <xpath expr="//field[@name='tax_cash_basis_origin_move_id']" position="after">
                 <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>
