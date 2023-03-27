@@ -27,10 +27,28 @@
         <field name="binding_model_id" ref="account.model_account_move"/>
     </record>
 
+    <record id="taxes_invoice_report_bms_sticker" model="ir.actions.report">
+        <field name="name">BMS Sticker</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">icorets.taxes_invoice_forms_bms_sticker</field>
+        <field name="report_file">icorets.taxes_invoice_forms_bms_sticker</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
+        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_invoice"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+    </record>
+
     <template id="taxes_invoice_forms_bms">
         <t t-call="web.html_container">
             <t t-foreach="docs.filtered(lambda x: x.move_type == 'out_invoice')" t-as="doc">
                 <t t-call="icorets.tax_invoice_report_bms_original" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="taxes_invoice_forms_bms_sticker">
+        <t t-call="web.html_container">
+            <t t-foreach="docs.filtered(lambda x: x.move_type == 'out_invoice')" t-as="doc">
                 <t t-call="icorets.tax_invoice_report_bms_sticker" t-lang="doc.partner_id.lang"/>
             </t>
         </t>
