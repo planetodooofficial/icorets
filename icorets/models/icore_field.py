@@ -161,6 +161,8 @@ class SaleOrderInherit(models.Model):
         'stock.location', ' Source Location',
         ondelete='restrict', required=True, index=True, check_company=True)
     event = fields.Char('Event')
+    l10n_in_journal_id = fields.Many2one('account.journal', string="Journal",default= False, required=True, store=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+
 
     # For checking available  quantity
     @api.onchange('location_id')
