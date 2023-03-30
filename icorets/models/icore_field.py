@@ -74,12 +74,13 @@ class ProductInherit(models.Model):
     _sql_constraints = [
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
-# Added func for hsn
+
+    # Added func for hsn
     @api.onchange('sale_hsn')
     def set_hsn(self):
         if self.sale_hsn:
             self.l10n_in_hsn_code = self.sale_hsn.hsnsac_code
-            #end
+            # end
 
 
 class ProductBrand(models.Model):
@@ -161,8 +162,9 @@ class SaleOrderInherit(models.Model):
         'stock.location', ' Source Location',
         ondelete='restrict', required=True, index=True, check_company=True)
     event = fields.Char('Event')
-    l10n_in_journal_id = fields.Many2one('account.journal', string="Journal",default= False, required=True, store=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
-
+    l10n_in_journal_id = fields.Many2one('account.journal', string="Journal", default=False, required=True, store=True,
+                                         readonly=True,
+                                         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
 
     # For checking available  quantity
     @api.onchange('location_id')
@@ -180,6 +182,7 @@ class SaleOrderInherit(models.Model):
         invoice_vals['dispatch_partner_id'] = self.warehouse_id.partner_id.id
         invoice_vals['po_no'] = self.po_no
         invoice_vals['event'] = self.event
+        invoice_vals['journal_id'] = self.l10n_in_journal_id.id
         return invoice_vals
 
     # Function for domain on location according to warehouse
@@ -202,7 +205,6 @@ class SaleOrderInherit(models.Model):
     # def onchange_field_id(self):
     #     relation_ids = [x.id for x in self.field_id.relation_ids]
     #     return {'domain': {'relation_id': [('id', 'in', relation_ids)]}}
-
 
 
 class SaleOrderLineInherit(models.Model):
@@ -307,3 +309,17 @@ class StockPickingInherit(models.Model):
         if stock_transfers_search:
             res.location_id = stock_transfers_search.location_id.id
         return res
+
+# Code for populating stock in stock.move.line
+
+# class StockMoveLineInherit(models.Model):
+#     _inherit = 'stock.move.line'
+#
+#     @api.model
+#     def create(self, vals_list):
+#         res = super().create(vals_list)
+#         stock_transfers_search = self.env['sale.order'].search([('name', '=', res.origin)])
+#         if stock_transfers_search:
+#             res.location_id = res.picking_id.location_id
+#             print(res.location_id, 'res')
+#             return res
