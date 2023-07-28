@@ -206,7 +206,7 @@
 
 <!--    Menuitem for Import script-->
     <menuitem id="menu_attributes_branch" name="Import Attributes"
-              action="action_import_attributes_form" parent="stock.menu_stock_inventory_control" sequence="40"/>
+              action="action_import_attributes_form" parent="stock.menu_stock_inventory_control" sequence="50"/>
 
 
     <!--    Product Brand View-->
@@ -391,7 +391,6 @@
         </field>
     </record>
 
-<<<<<<< HEAD
 <!--        Inherited for deductee type field-->
     <record id="inherit_res_partner" model="ir.ui.view">
         <field name="name">inherit.purchase.order.form</field>
