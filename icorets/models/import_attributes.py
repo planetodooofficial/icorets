@@ -187,7 +187,7 @@ class ImportAttributes(models.TransientModel):
                 #     )
                 if i['Size']:
                     search_attribute_value_size = self.env['product.attribute.value'].search(
-                        [('name', '=', i['Size'])])  # Search Size Attribute value
+                        [('value', '=', i['Size'])])  # Search Size Attribute value
                     if not search_attribute_value_size:
                         raise ValidationError(_(f"{i['Size']} Size not available"))
                 # if not search_attribute_value_size:
