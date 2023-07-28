@@ -160,7 +160,7 @@ class SaleOrderInherit(models.Model):
     no_of_cartons = fields.Char('No of Cartons')
     location_id = fields.Many2one(
         'stock.location', ' Source Location',
-        ondelete='restrict', required=True, index=True, check_company=True)
+        ondelete='restrict', index=True, check_company=True)  # removed the required=True
     event = fields.Char('Event')
     l10n_in_journal_id = fields.Many2one('account.journal', string="Journal", default=False, required=True, store=True,
                                          readonly=True,
@@ -312,14 +312,14 @@ class StockPickingInherit(models.Model):
 
 # Code for populating stock in stock.move.line
 
-# class StockMoveLineInherit(models.Model):
-#     _inherit = 'stock.move.line'
-#
-#     @api.model
-#     def create(self, vals_list):
-#         res = super().create(vals_list)
-#         stock_transfers_search = self.env['sale.order'].search([('name', '=', res.origin)])
-#         if stock_transfers_search:
-#             res.location_id = res.picking_id.location_id
-#             print(res.location_id, 'res')
-#             return res
+class StockMoveLineInherit(models.Model):
+    _inherit = 'stock.move.line'
+
+    @api.model
+    def create(self, vals_list):
+        res = super(StockMoveLineInherit, self).create(vals_list)
+        stock_transfers_search = self.env['sale.order'].search([('name', '=', res.origin)])
+        if stock_transfers_search:
+            res.location_id = res.picking_id.location_id
+            print(res.location_id, 'res')
+            return res

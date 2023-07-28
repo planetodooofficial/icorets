@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="inherit_sale_order_form_view" model="ir.ui.view">
+        <field name="name">inherit_sale_order_form_view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_info']" position="inside">
+                <field name="purchase_order_id" readonly="1" string="Interbranch Purchase Order"/>
+            </xpath>
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                        <button name="open_purchase_order" type="object"
+                                string="Purchase Order" attrs="{'invisible': [('purchase_order_id', '=', False)]}"
+                                class="oe_stat_button" icon="fa-credit-card">
+                        </button>
+
+            </xpath>
+        </field>
+    </record>
+</odoo>
