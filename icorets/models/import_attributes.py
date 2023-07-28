@@ -149,15 +149,15 @@ class ImportAttributes(models.TransientModel):
 
             # search_product = self.env["product.template"].search([("name", "=", keys)])
             for i in values:
+                # Search Taxes
+                search_tax_purchase = self.env['account.tax'].search(
+                    [('name', '=', i['GST']), ('type_tax_use', '=', 'purchase')])
+                search_tax_sale = self.env['account.tax'].search(
+                    [('name', '=', i['GST']), ('type_tax_use', '=', 'sale')])
+
                 # #For product Category
-                # search_prod_category = self.env['product.category'].search(
-                #     [('display_name', '=', i['merge_category'])], limit=1)
-                # if not search_prod_category:
-                #     search_parent_category = self.env['product.category'].search([('name', '=', 'All')])
-                #     search_prod_category = self.env['product.category'].create(
-                #         {'name': i['Sub Category'],
-                #          'parent_id': search_parent_category.id}
-                #     )
+                search_prod_category = self.env['product.category'].search(
+                    [('name', '=', i['SubClass'])], limit=1)
 
                 # Brand Search
                 brand_search = self.env['product.brand'].search([('name','=',i['Brand'])])
@@ -222,6 +222,8 @@ class ImportAttributes(models.TransientModel):
                         'uom_po_id': search_uom.id,
                         'brand_id': brand_search.id,
                         'list_price': i['MRP'],
+                        'taxes_id':search_tax_sale.id,
+                        'supplier_taxes_id':search_tax_purchase.id,
                         'detailed_type': 'product',
                         'standard_price': i['Total Cost'],
                         'attribute_line_ids': lst,
