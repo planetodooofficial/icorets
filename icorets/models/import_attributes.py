@@ -154,6 +154,8 @@ class ImportAttributes(models.TransientModel):
                     [('name', '=', i['GST']), ('type_tax_use', '=', 'purchase')])
                 search_tax_sale = self.env['account.tax'].search(
                     [('name', '=', i['GST']), ('type_tax_use', '=', 'sale')])
+                print(search_tax_purchase)
+                print(search_tax_sale)
 
                 # #For product Category
                 search_prod_category = self.env['product.category'].search(
@@ -222,13 +224,13 @@ class ImportAttributes(models.TransientModel):
                         'uom_po_id': search_uom.id,
                         'brand_id': brand_search.id,
                         'list_price': i['MRP'],
-                        'taxes_id':search_tax_sale.id,
-                        'supplier_taxes_id':search_tax_purchase.id,
+                        'taxes_id': [(4, search_tax_sale.id)] if search_tax_sale.id else False,
+                        'supplier_taxes_id': [(4, search_tax_purchase.id)] if search_tax_purchase.id else False,
                         'detailed_type': 'product',
                         'standard_price': i['Total Cost'],
                         'attribute_line_ids': lst,
                     }
-
+                    print(product_vals)
                     search_product_id = self.env['product.template'].create(product_vals)
 
                     created_product.append(keys)
