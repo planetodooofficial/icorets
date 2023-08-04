@@ -17,10 +17,14 @@ from odoo.tools import json
 class ProductVariantInherit(models.Model):
     _inherit = "product.product"
 
-    variant_ean_code = fields.Char('EAN Code')
+    variant_asin = fields.Char('') #Not used
+    variant_fsn = fields.Char('') #Not used
+    variant_ean_code = fields.Char('') #Not used
+
+    variants_ean_code = fields.Char('EAN Code')
     variant_article_code = fields.Char('Article Code')
-    variant_asin = fields.Char('ASIN')
-    variant_fsn = fields.Char('FSN')
+    variants_asin = fields.Char('ASIN')
+    variants_fsn = fields.Char('FSN')
     variant_cost = fields.Float('Invalid Cost')  # not used
     variant_packaging_cost = fields.Float('Packaging Cost')
     variant_total_cost = fields.Float('Total Cost')
@@ -33,11 +37,11 @@ class ProductVariantInherit(models.Model):
                                                           relation='product_variant_combination',
                                                           string="Variant Values", ondelete='restrict', domain=[])
 
-    _sql_constraints = [
-        ('asin_unique', 'unique(variant_asin)', "ASIN code can only be assigned to one variant product !"),
-        ('ean_code_unique', 'unique(variant_ean_code)', "EAN code can only be assigned to one variant product !"),
-        ('fsn_unique', 'unique(variant_fsn)', "FSN code can only be assigned to one variant product !"),
-    ]
+    # _sql_constraints = [
+    #     ('asin_unique', 'unique(variant_asin)', "ASIN code can only be assigned to one variant product !"),
+    #     ('ean_code_unique', 'unique(variant_ean_code)', "EAN code can only be assigned to one variant product !"),
+    #     ('fsn_unique', 'unique(variant_fsn)', "FSN code can only be assigned to one variant product !"),
+    # ]
 
     # For updating standard price by sum of cost and packaging cost
     @api.onchange('standard_price', 'variant_packaging_cost')

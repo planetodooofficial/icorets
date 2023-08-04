@@ -27,110 +27,6 @@ class ImportAttributes(models.TransientModel):
     def import_product(self):
         df = self.convert_to_df()
         data = df.to_dict('index').values()
-        # print(data)
-        # b = []  # b is list of dictionary with data of each row
-        # for rec in data.values():
-        #     data = {}
-        #     for i, j in rec.items():
-        #         if j is not False:
-        #             data[i] = j
-        #     b.append(data)
-        # c = []  # c is list of column names with data  of each row
-        # list = []
-        # line_items = []
-        # line_items1 = []
-        # line_attrs = []
-        # line_attrs_s = []
-
-        # for rec in b:
-        #     attribute_color = rec.get('Color', False)
-        #     attribute_size = rec.get('Size', False)
-        #     prod_name = rec.get('Title', False)
-        #     style_code = rec.get('Style Code', False)
-        #     brand = rec.get('Brand', False)
-        #     ean_code = rec.get('EAN Code', False)
-        #     material = rec.get('Material', False)
-        #     occasion = rec.get('Occasion', False)
-        #     mrp = rec.get('MRP', False)
-        #
-        #     keys_list = [key for key, val in rec.items() if val]
-        #     c.append(keys_list)
-        # list = c[-1]
-
-        # For attribute Color
-        # search_att_color = self.env['product.attribute'].search([('name', '=', 'Color')])
-        # att_list = search_att_color.value_ids.mapped('name')
-        # if attribute_color not in att_list:
-        #     if attribute_color:
-        #         # if search_att_color:
-        #         #     if attribute_color:
-        #         add_attribute = (0, 0, {
-        #             'name': attribute_color
-        #         })
-        #         line_items.append(add_attribute)
-        #         search_att_color.write({'value_ids': line_items})
-        #         line_items = []
-        #         print(attribute_color)
-        #
-        # # For attribute Size
-        # search_att_size = self.env['product.attribute'].search([('name', '=', 'Size')])
-        # att_list1 = search_att_size.value_ids.mapped('name')
-        # if attribute_size not in att_list1:
-        #     if attribute_size:
-        #         # if search_att_size:
-        #         #     if attribute_size:
-        #         add_attribute_size = (0, 0, {
-        #             'name': attribute_size
-        #         })
-        #         line_items1.append(add_attribute_size)
-        #
-        #         search_att_size.write({'value_ids': line_items1})
-        #         line_items1 = []
-        #         print(attribute_size)
-
-        # For prod name
-
-        # prod_name_search = self.env['product.template'].search(
-        #     [('name', '=', prod_name)])  # search internal reference
-        #
-        # search_attribute_color = self.env['product.attribute'].search(
-        #     [('name', '=', 'Color')])  # search color Attribute
-        # search_attribute_value_color = self.env['product.attribute.value'].search(
-        #     [('name', '=', attribute_color)])  # Search Color Attribute value
-        #
-        # search_attribute_size = self.env['product.attribute'].search(
-        #     [('name', '=', 'Size')])  # search Size Attribute
-        # search_attribute_value_size = self.env['product.attribute.value'].search(
-        #     [('name', '=', attribute_size)])  # Search Size Attribute value
-        #
-        # if not prod_name_search:  # create product if not created
-        #     prod_attrs = (0, 0, {
-        #         'attribute_id': search_attribute_color.id,
-        #         'value_ids': search_attribute_value_color,
-        #     })
-        #     line_attrs.append(prod_attrs)
-        #
-        #     product_vals = {
-        #         'name': prod_name,
-        #         'default_code': style_code,
-        #         'brand': brand,
-        #         'ean_code': ean_code,
-        #         'material': material,
-        #         'occasion': occasion,
-        #         'standard_price': mrp,
-        #         'attribute_line_ids': line_attrs,
-        #     }
-        #     prod_name_search = self.env['product.template'].create(product_vals)
-        #
-        #     # if not prod_name_search.attribute_line_ids:
-        #
-        #     # prod_name_search.write({'attribute_line_ids': line_attrs})
-        #
-        # else:
-        #     for a in prod_name_search.attribute_line_ids:
-        #         print(a.attribute_id,'attribute',search_attribute_value_color,'search color')
-        #         if a.attribute_id == search_attribute_color:
-        #             a.value_ids = [(4, search_attribute_value_color.id)]
 
         lst_data = []
 
@@ -182,21 +78,14 @@ class ImportAttributes(models.TransientModel):
                         [('name', '=', i['Color'])]) # Search Color Attribute value
                     if not search_attribute_value_color:
                         raise ValidationError(_(f"{i['Color']} Color not available"))
-                # if not search_attribute_value_color:
-                #     search_attribute_value_color = self.env['product.attribute.value'].create(
-                #         {'name': i['Color']}
-                #     )
+
                 if i['Size']:
                     search_attribute_value_size = self.env['product.attribute.value'].search(
                         [('name', '=', i['Size'])])  # Search Size Attribute value
                     if not search_attribute_value_size:
                         raise ValidationError(_(f"{i['Size']} Size not available"))
-                # if not search_attribute_value_size:
-                #     search_attribute_value_size = self.env['product.attribute.value'].create(
-                #         {'name': i['Size']}
-                #     )
+
                 if keys not in created_product:
-                    # if not self.env["product.template"].search([("name", "=", keys)]):
                     lst = []
                     if i['Color']:
 
@@ -246,6 +135,69 @@ class ImportAttributes(models.TransientModel):
                         else:
                             if i['Size'] not in attribute.value_ids.ids:
                                 attribute.value_ids = [(4, search_attribute_value_size.id)]
+
+    def update_variants(self):
+
+        csv_data = base64.b64decode(self.upload_attributes_file)
+        csv_data = csv_data.decode('utf-8').split('\n')
+
+        # Assuming the first row contains the header
+        header = csv_data[0].split(',')
+        csv_reader = csv.DictReader(csv_data[1:], fieldnames=header)
+
+        for row in csv_reader:
+            color = row['Color']
+            size = row['Size']
+            title = row['Title']
+            stylecode = row['Style Code']
+            internal_ref = row['SKU Code']
+            ean = row['EAN Code']
+            article = row['Article Code']
+            fsn = row['FSN']
+            asin = row['ASIN']
+
+            product_template = self.env['product.product'].search([('name', '=', title), ('style_code', '=', stylecode),
+                ('product_template_attribute_value_ids.name', '=', size),
+                ('product_template_attribute_value_ids.name', '=', color)
+            ], limit=1)
+
+            product_template_color = self.env['product.product'].search([('name', '=', title), ('style_code', '=', stylecode),
+                                                                   ('product_template_attribute_value_ids.name', '=',
+                                                                    color)
+                                                                   ], limit=1)
+            product_template_size = self.env['product.product'].search([('name', '=', title), ('style_code', '=', stylecode),
+                                                                   ('product_template_attribute_value_ids.name', '=',
+                                                                    size),
+                                                                   ], limit=1)
+
+            if product_template:
+                for product_variant in product_template:
+                    product_variant.update({'default_code': internal_ref})
+                    product_variant.update({'barcode': ean})
+                    if asin:
+                        product_variant.update({'variants_asin': asin})
+                    if fsn:
+                        product_variant.update({'variants_fsn': fsn})
+                    product_variant.update({'variant_article_code': article})
+            elif product_template_size:
+                for product_variant in product_template_size:
+                    product_variant.update({'default_code': internal_ref})
+                    product_variant.update({'barcode': ean})
+                    if asin:
+                        product_variant.update({'variants_asin': asin})
+                    if fsn:
+                        product_variant.update({'variants_fsn': fsn})
+                    product_variant.update({'variant_article_code': article})
+            elif product_template_color:
+                for product_variant in product_template_color:
+                    product_variant.update({'default_code': internal_ref})
+                    product_variant.update({'barcode': ean})
+                    if asin:
+                        product_variant.update({'variants_asin': asin})
+                    if fsn:
+                        product_variant.update({'variants_fsn': fsn})
+                    product_variant.update({'variant_article_code': article})
+
 
 
 

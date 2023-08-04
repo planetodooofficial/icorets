@@ -43,8 +43,8 @@
         <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
         <field name="arch" type="xml">
             <xpath expr="//group/group/field[@name='barcode']" position="after">
-                <field name="variant_asin"/>
-                <field name="variant_fsn"/>
+                <field name="variants_asin"/>
+                <field name="variants_fsn"/>
                 <field name="variant_article_code"/>
                 <field name="brand_id_rel"/>
             </xpath>
@@ -138,8 +138,8 @@
                     <group string="Details">
                         <group>
                             <field name="brand_id_rel"/>
-                            <field name="variant_asin"/>
-                            <field name="variant_fsn"/>
+                            <field name="variants_asin"/>
+                            <field name="variants_fsn"/>
                             <field name="variant_article_code"/>
                         </group>
                         <group>
@@ -169,13 +169,13 @@
                 <field name="brand_id_rel" optional="hide"/>
                 <field name="variant_article_code"/>
                 <!--                <field name="barcode"/>-->
-                <field name="variant_asin"/>
-                <field name="variant_fsn"/>
+                <field name="variants_asin"/>
+                <field name="variants_fsn"/>
             </xpath>
         </field>
     </record>
 
-    <!--    Sample button for import product-->
+    <!--    button for import product-->
     <record model="ir.ui.view" id="view_import_attributes_form">
         <field name="name">Import Attributes</field>
         <field name="model">import.attributes</field>
@@ -208,6 +208,38 @@
     <menuitem id="menu_attributes_branch" name="Import Attributes"
               action="action_import_attributes_form" parent="stock.menu_stock_inventory_control" sequence="50"/>
 
+        <!--  button for update product-->
+    <record model="ir.ui.view" id="view_import_attributes_form">
+        <field name="name">Import Attributes</field>
+        <field name="model">import.attributes</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="upload_attributes_file"/>
+                    </group>
+                    <group>
+                    </group>
+                </group>
+                <footer>
+                    <button name="update_variants" string="Submit" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_update_attributes_form">
+        <field name="name">Update Attributes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">import.attributes</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+<!--    Menuitem for update script-->
+    <menuitem id="menu_update_attributes_branch" name="Update Attributes"
+              action="action_update_attributes_form" parent="stock.menu_stock_inventory_control" sequence="60"/>
 
     <!--    Product Brand View-->
 
