@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_employee_portal_user,hr.employee.portal,model_hr_employee,base.group_portal,1,0,0,0
+access_resource_calendar_attendance,hr.resource.calendar.attendance,resource.model_resource_calendar_attendance,base.group_portal,1,1,1,0
+access_resource_calendar,hr.resource.calendar,resource.model_resource_calendar,base.group_portal,1,1,1,0
+access_resource_calendar_leaves,hr.resource.calendar.leaves,resource.model_resource_calendar_leaves,base.group_portal,1,1,1,0
+access_resource_resource,hr.resource.resource,resource.model_resource_resource,base.group_portal,1,1,1,0

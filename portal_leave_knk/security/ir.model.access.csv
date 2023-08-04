@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_holidays_portal_employee_request,hr.holidays.portal.employee.request,hr_holidays.model_hr_leave,base.group_portal,1,1,1,1
+access_hr_holidays_portal_employee_allocation,hr.holidays.portal.employee.allocation,hr_holidays.model_hr_leave_allocation,base.group_portal,1,1,1,1
+access_hr_holidays_status_portal_employee,hr.holidays.status employee,hr_holidays.model_hr_leave_type,base.group_portal,1,0,0,0
+access_hr_leave_stress_day_portal_employee,hr.leave.stress.day.portal,hr_holidays.model_hr_leave_stress_day,base.group_portal,1,0,0,0
