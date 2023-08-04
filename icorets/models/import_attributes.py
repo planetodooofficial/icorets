@@ -155,7 +155,7 @@ class ImportAttributes(models.TransientModel):
                 search_tax_sale = self.env['account.tax'].search(
                     [('name', '=', i['GST']), ('type_tax_use', '=', 'sale')])
 
-                # #For product Category
+                # #For product Category for subclass (last column)
                 search_prod_category = self.env['product.category'].search(
                     [('name', '=', i['SubClass'])], limit=1)
 
