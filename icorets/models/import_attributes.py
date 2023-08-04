@@ -154,12 +154,13 @@ class ImportAttributes(models.TransientModel):
                     [('name', '=', i['GST']), ('type_tax_use', '=', 'purchase')])
                 search_tax_sale = self.env['account.tax'].search(
                     [('name', '=', i['GST']), ('type_tax_use', '=', 'sale')])
-                print(search_tax_purchase)
-                print(search_tax_sale)
 
                 # #For product Category
                 search_prod_category = self.env['product.category'].search(
                     [('name', '=', i['SubClass'])], limit=1)
+
+                if not search_prod_category:
+                    raise ValidationError(f"'Product Category not available for '{i['SubClass']}")
 
                 # Brand Search
                 brand_search = self.env['product.brand'].search([('name','=',i['Brand'])])
@@ -224,6 +225,7 @@ class ImportAttributes(models.TransientModel):
                         'uom_po_id': search_uom.id,
                         'brand_id': brand_search.id,
                         'list_price': i['MRP'],
+                        'categ_id': search_prod_category.id,
                         'taxes_id': [(4, search_tax_sale.id)] if search_tax_sale.id else False,
                         'supplier_taxes_id': [(4, search_tax_purchase.id)] if search_tax_purchase.id else False,
                         'detailed_type': 'product',
@@ -242,7 +244,7 @@ class ImportAttributes(models.TransientModel):
                             if i['Color'] not in attribute.value_ids:
                                 attribute.value_ids = [(4, search_attribute_value_color.id)]
                         else:
-                            if i['Size'] not in attribute.value_ids:
+                            if i['Size'] not in attribute.value_ids.ids:
                                 attribute.value_ids = [(4, search_attribute_value_size.id)]
 
 
