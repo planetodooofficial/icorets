@@ -100,6 +100,8 @@ class AccountMoveInheritClass(models.Model):
     # warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
     po_no = fields.Char('PO No')
     event = fields.Char('Event')
+    type = fields.Char('Type')
+    sor = fields.Char('SOR')
 
     # Function for amount in indian words
     @api.depends('amount_total')
@@ -118,6 +120,8 @@ class AccountMoveLineInherit(models.Model):
     myntra_sku_code = fields.Char(string="Myntra SKU Code", copy=False)
     remarks = fields.Text('Remarks')
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
+    ean_code = fields.Char(string='Ean Code', related='product_id.barcode')
+    size = fields.Char(string='Size', related='product_id.size')
 
     # For updaing tax amount
     @api.depends('tax_ids')

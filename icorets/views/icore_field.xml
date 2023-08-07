@@ -204,11 +204,11 @@
         <field name="target">new</field>
     </record>
 
-<!--    Menuitem for Import script-->
+    <!--    Menuitem for Import script-->
     <menuitem id="menu_attributes_branch" name="Import Attributes"
               action="action_import_attributes_form" parent="stock.menu_stock_inventory_control" sequence="50"/>
 
-        <!--  button for update product-->
+    <!--  button for update product-->
     <record model="ir.ui.view" id="view_import_attributes_form">
         <field name="name">Import Attributes</field>
         <field name="model">import.attributes</field>
@@ -237,7 +237,7 @@
         <field name="target">new</field>
     </record>
 
-<!--    Menuitem for update script-->
+    <!--    Menuitem for update script-->
     <menuitem id="menu_update_attributes_branch" name="Update Attributes"
               action="action_update_attributes_form" parent="stock.menu_stock_inventory_control" sequence="60"/>
 
@@ -309,9 +309,9 @@
                 <field name="no_of_cartons"/>
             </xpath>
 
-<!--           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="attributes">-->
-<!--               <attribute name="invisible">1</attribute>-->
-<!--            </xpath>-->
+            <!--           <xpath expr="//group[@name='sale_info']//field[@name='l10n_in_journal_id']" position="attributes">-->
+            <!--               <attribute name="invisible">1</attribute>-->
+            <!--            </xpath>-->
 
             <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="before">
                 <field name="stock_quantity" readonly="1" force_save="1"/>
@@ -339,14 +339,16 @@
             <!--                <field name="po_no" attrs="{'invisible':[('move_type', '!=', 'out_invoice')]}"/>-->
             <!--                <field name="event" attrs="{'invisible':[('move_type', '!=', 'out_invoice')]}"/>-->
             <!--            </xpath>-->
-<!--            <xpath expr="//field[@name='partner_id']" position="after">-->
-<!--                <field name="po_no" attrs="{'invisible':[('move_type', '!=', 'out_invoice')]}"/>-->
-<!--                <field name="event" attrs="{'invisible':[('move_type', '!=', 'out_invoice')]}"/>-->
-<!--            </xpath>-->
+            <!--            <xpath expr="//field[@name='partner_id']" position="after">-->
+            <!--                <field name="po_no" attrs="{'invisible':[('move_type', '!=', 'out_invoice')]}"/>-->
+            <!--                <field name="event" attrs="{'invisible':[('move_type', '!=', 'out_invoice')]}"/>-->
+            <!--            </xpath>-->
 
-             <xpath expr="//field[@name='partner_id']" position="after">
+            <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="po_no" attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
                 <field name="event" attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
+                <field name="type" attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
+                <field name="sor" attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
             </xpath>
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="after">
                 <field name="myntra_sku_code" optional="hide"/>
@@ -355,49 +357,38 @@
 
             <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
                 <field name="article_code" optional="hide"/>
+                <field name="ean_code" optional="hide"/>
+                <field name="size" optional="hide"/>
             </xpath>
 
-<!--            For setting up disturbed view in pay payment misc   start-->
-<!--            <xpath expr="//form[1]/div[not(@name)][15]" position="replace">-->
-<!--                <div class="alert alert-info mb-0" role="alert" attrs="{'invisible': ['|', ('state', '!=', 'draft'), ('auto_post', '!=', 'at_date')]}" name="studio_div_b83150">-->
-<!--                    This move is configured to be posted automatically at the accounting date:.-->
-<!--                </div>-->
-<!--            </xpath>-->
-<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="before">-->
-<!--                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>-->
-<!--                <xpath expr="//field[@name='is_checked']" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="//field[@name='tax_cash_basis_origin_move_id']" position="after">-->
-<!--                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/div[1]" position="before">-->
-<!--                <xpath expr="//form[1]/div[not(@name)][15]/field[@name='date']" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='ref'][2]" position="attributes">-->
-<!--                <attribute name="attrs">{'invisible':[('move_type', 'not in', ('in_invoice', 'in_receipt', 'in_refund'))]}</attribute>-->
-<!--                <attribute name="nolabel">1</attribute>-->
-<!--            </xpath>-->
-<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="after">-->
-<!--                <xpath expr="//field[@name='dispatch_partner_id'][not(ancestor::field)]" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="after">-->
-<!--                <xpath expr="//field[@name='date'][not(ancestor::field)]" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/div[4]" position="after">-->
-<!--                <xpath expr="//field[@name='fiscal_position_id'][not(ancestor::field)]" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[2]" position="after">-->
-<!--                <xpath expr="//field[@name='l10n_in_transaction_id'][not(ancestor::field)]" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[3]" position="after">-->
-<!--                <xpath expr="//field[@name='fiscal_position_id'][not(ancestor::field)]" position="move"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[1]" position="replace"/>-->
-<!--            <xpath expr="/form[1]/sheet[1]/group[1]/group[2]/field[3]" position="after">-->
-<!--                <xpath expr="//field[@name='date'][not(ancestor::field)]" position="move"/>-->
-<!--            </xpath>-->
+            <!--            For adding partner address-->
+            <xpath expr="//form/sheet/group/group[2]/div[1]"
+                   position="after">
+                <field name="partner_id" widget="res_partner_many2one" nolabel="1"
+                       context="{
+                                        'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,
+                                        'show_address': 1, 'default_is_company': True, 'show_vat': True}"
+                       domain="[('type', '!=', 'private'), ('company_id', 'in', (False, company_id))]"
+                       options="{'no_create': True, 'no_edit': True, 'no_open': True}"
+                       attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))]}"/>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='partner_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{"no_create":true}</attribute>
+            </xpath>
 
-<!--        end-->
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='fiscal_position_id']" position="attributes">
+                <attribute name="options">{"no_create":true}</attribute>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='product_id']" position="attributes">
+                <attribute name="options">{"no_create":true}</attribute>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='product_uom_id']" position="attributes">
+                <attribute name="options">{"no_create":true}</attribute>
+            </xpath>
+
         </field>
     </record>
 
@@ -423,7 +414,7 @@
         </field>
     </record>
 
-<!--        Inherited for deductee type field-->
+    <!--        Inherited for deductee type field-->
     <record id="inherit_res_partner" model="ir.ui.view">
         <field name="name">inherit.purchase.order.form</field>
         <field name="model">res.partner</field>
@@ -435,15 +426,15 @@
         </field>
     </record>
     <!--    Inherited for deductee type field-->
-<!--    <record id="inherit_res_partner" model="ir.ui.view">-->
-<!--        <field name="name">inherit.purchase.order.form</field>-->
-<!--        <field name="model">res.partner</field>-->
-<!--        <field name="inherit_id" ref="po_accounting_v16.partner_form_inherited"/>-->
-<!--        <field name="arch" type="xml">-->
-<!--            <xpath expr="//field[@name='deductee_type_id']" position="replace">-->
-<!--                <field name="deductee_type_id" required="0" invisible="1"/>-->
-<!--            </xpath>-->
-<!--        </field>-->
-<!--    </record>-->
+    <!--    <record id="inherit_res_partner" model="ir.ui.view">-->
+    <!--        <field name="name">inherit.purchase.order.form</field>-->
+    <!--        <field name="model">res.partner</field>-->
+    <!--        <field name="inherit_id" ref="po_accounting_v16.partner_form_inherited"/>-->
+    <!--        <field name="arch" type="xml">-->
+    <!--            <xpath expr="//field[@name='deductee_type_id']" position="replace">-->
+    <!--                <field name="deductee_type_id" required="0" invisible="1"/>-->
+    <!--            </xpath>-->
+    <!--        </field>-->
+    <!--    </record>-->
 
 </odoo>
