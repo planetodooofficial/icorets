@@ -100,8 +100,11 @@ class AccountMoveInheritClass(models.Model):
     # warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
     po_no = fields.Char('PO No')
     event = fields.Char('Event')
-    type = fields.Char('Type')
-    sor = fields.Char('SOR')
+    type_s = fields.Selection([
+        ('sor', 'SOR'),
+        ('outwrite', 'OutWrite'),
+
+    ])
 
     # Function for amount in indian words
     @api.depends('amount_total')
