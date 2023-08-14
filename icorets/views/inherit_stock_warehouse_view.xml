@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!--    For adding style code on product Kanban view-->
+
+    <record model="ir.ui.view" id="inherit_view_stock_warehouse_form">
+        <field name="name">stock.warehouse</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group/group/field[@name='code']" position="after">
+                <field name="priority"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

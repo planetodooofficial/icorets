@@ -43,6 +43,9 @@ class ProductVariantInherit(models.Model):
     #     ('fsn_unique', 'unique(variant_fsn)', "FSN code can only be assigned to one variant product !"),
     # ]
 
+    def name_get(self):
+        return [(record.id, "%s" % (record.default_code if record.default_code else record.name)) for record in self]
+
     # For updating standard price by sum of cost and packaging cost
     @api.onchange('standard_price', 'variant_packaging_cost')
     def sum_cost(self):
@@ -79,6 +82,9 @@ class ProductInherit(models.Model):
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
 
+    def name_get(self):
+        return [(record.id, "%s" % (record.default_code if record.default_code else record.name)) for record in self]
+
     # Added func for hsn
     @api.onchange('sale_hsn')
     def set_hsn(self):
@@ -105,6 +111,13 @@ class AccountMoveInheritClass(models.Model):
         ('outwrite', 'OutWrite'),
 
     ])
+    cust_partner_alias_id = fields.Many2one("alias.name", "Alias Name", copy=False)
+
+    @api.onchange("cust_partner_alias_id")
+    def action_onchange_partner_alias(self):
+        if self.cust_partner_alias_id:
+            search_partner = self.env["res.partner"].search([('alias_name', '=', self.cust_partner_alias_id.id)], limit=1)
+            self.partner_id = search_partner.id
 
     # Function for amount in indian words
     @api.depends('amount_total')
@@ -125,6 +138,32 @@ class AccountMoveLineInherit(models.Model):
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
     ean_code = fields.Char(string='Ean Code', related='product_id.barcode')
     size = fields.Char(string='Size', related='product_id.size')
+
+    @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'currency_id')
+    def _compute_totals(self):
+        for line in self:
+            line.quantity = abs(line.quantity)
+            line.price_unit = abs(line.price_unit)
+            if line.display_type != 'product':
+                line.price_total = line.price_subtotal = False
+            # Compute 'price_subtotal'.
+            line_discount_price_unit = line.price_unit * (1 - (line.discount / 100.0))
+            subtotal = line.quantity * line_discount_price_unit
+
+            # Compute 'price_total'.
+            if line.tax_ids:
+                taxes_res = line.tax_ids.compute_all(
+                    line_discount_price_unit,
+                    quantity=line.quantity,
+                    currency=line.currency_id,
+                    product=line.product_id,
+                    partner=line.partner_id,
+                    is_refund=line.is_refund,
+                )
+                line.price_subtotal = taxes_res['total_excluded']
+                line.price_total = taxes_res['total_included']
+            else:
+                line.price_total = line.price_subtotal = subtotal
 
     # For updaing tax amount
     @api.depends('tax_ids')
@@ -176,6 +215,34 @@ class SaleOrderInherit(models.Model):
     l10n_in_journal_id = fields.Many2one('account.journal', string="Journal", default=False, required=True, store=True,
                                          readonly=True,
                                          states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    is_fo = fields.Boolean("Is Fo", copy=False, default=False)
+
+    @api.model
+    def default_get(self, fields):
+        res = super(SaleOrderInherit, self).default_get(fields)
+        active_ids = self.env.context.get('default_forecast_order')
+        if active_ids:
+            if 'is_fo' in fields:
+                res['is_fo'] = True
+        return res
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'company_id' in vals:
+                self = self.with_company(vals['company_id'])
+            if vals.get('name', _("New")) == _("New"):
+                seq_date = fields.Datetime.context_timestamp(
+                    self, fields.Datetime.to_datetime(vals['date_order'])
+                ) if 'date_order' in vals else None
+                if vals.get('is_fo'):
+                    vals['name'] = self.env['ir.sequence'].next_by_code('forecast.order',
+                                                                        sequence_date=seq_date) or _("New")
+                else:
+                    vals['name'] = self.env['ir.sequence'].next_by_code(
+                        'sale.order', sequence_date=seq_date) or _("New")
+
+        return super().create(vals_list)
 
     # For checking available  quantity
     @api.onchange('location_id')
@@ -195,6 +262,244 @@ class SaleOrderInherit(models.Model):
         invoice_vals['event'] = self.event
         invoice_vals['journal_id'] = self.l10n_in_journal_id.id
         return invoice_vals
+
+    def fo_action_confirm(self):
+        top_priority_stock = {}
+        medium_priority_stock = {}
+        low_priority_stock = {}
+
+        top_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '1')], limit=1)
+        medium_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '2')], limit=1)
+        low_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '3')], limit=1)
+
+        for so_line in self.order_line:
+            search_top_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)], limit=1)
+            search_medium_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)], limit=1)
+            search_low_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)], limit=1)
+
+            if search_top_stock:
+                if so_line not in top_priority_stock:
+                    top_priority_stock[so_line] = search_top_stock.quantity
+                else:
+                    top_priority_stock[so_line] += search_top_stock.quantity
+
+            if search_medium_stock:
+                if so_line not in medium_priority_stock:
+                    medium_priority_stock[so_line] = search_medium_stock.quantity
+                else:
+                    medium_priority_stock[so_line] += search_medium_stock.quantity
+
+            if search_low_stock:
+                if so_line not in low_priority_stock:
+                    low_priority_stock[so_line] = search_low_stock.quantity
+                else:
+                    low_priority_stock[so_line] += search_low_stock.quantity
+
+        backorder_of_fo_lines = {}
+
+        if len(top_priority_warehouse) > 0:
+            top_priority_so_line_lst = []
+            for so_line_obj, qty in top_priority_stock.items():
+                search_top_priority_stock = self.env["stock.quant"].search(
+                    [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)],
+                    limit=1)
+                prd_qty = 0
+                if qty == so_line_obj.product_uom_qty:
+                    prd_qty = so_line_obj.product_uom_qty
+                    top_priority_stock[so_line_obj] -= prd_qty
+                elif qty > so_line_obj.product_uom_qty:
+                    prd_qty = so_line_obj.product_uom_qty
+                    top_priority_stock[so_line_obj] -= prd_qty
+                elif qty < so_line_obj.product_uom_qty:
+                    prd_qty = qty
+                    top_priority_stock[so_line_obj] -= prd_qty
+
+                if qty < so_line_obj.product_uom_qty:
+                    remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
+                    if remaining_prd_qty > 0:
+                        if so_line_obj not in backorder_of_fo_lines:
+                            backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                        else:
+                            backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+                    so_line_obj.product_uom_qty = prd_qty
+
+                top_priority_so_line_vals = (0, 0, {
+                    'product_id': so_line_obj.product_id.id,
+                    'product_template_id': so_line_obj.product_template_id.id,
+                    'name': so_line_obj.name,
+                    'product_uom_qty': prd_qty,
+                    'product_uom': so_line_obj.product_uom.id,
+                    'price_unit': so_line_obj.price_unit,
+                    'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
+                    'discount': so_line_obj.discount,
+                    'hsn_id': so_line_obj.hsn_id.id,
+                })
+                top_priority_so_line_lst.append(top_priority_so_line_vals)
+            top_priority_so_vals = {
+                'is_fo': False,
+                'partner_id': self.partner_id.id,
+                'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
+                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
+                'pricelist_id': self.pricelist_id.id,
+                'payment_term_id': self.payment_term_id.id,
+                'l10n_in_journal_id': self.l10n_in_journal_id.id,
+                'event': self.event,
+                'no_of_cartons': self.no_of_cartons,
+                'user_id': self.user_id.id,
+                'team_id': self.team_id.id,
+                'warehouse_id': top_priority_warehouse.id,
+                'order_line': top_priority_so_line_lst,
+            }
+            if len(top_priority_so_line_lst) >= 1:
+                self.env["sale.order"].create(top_priority_so_vals)
+        if len(medium_priority_warehouse) > 0:
+            medium_priority_so_line_lst = []
+            for so_line_obj, qty in medium_priority_stock.items():
+                search_medium_priority_stock = self.env["stock.quant"].search(
+                    [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)],
+                    limit=1)
+                prd_qty = 0
+                if qty == so_line_obj.product_uom_qty:
+                    prd_qty = so_line_obj.product_uom_qty
+                    medium_priority_stock[so_line_obj] -= prd_qty
+                elif qty > so_line_obj.product_uom_qty:
+                    prd_qty = so_line_obj.product_uom_qty
+                    medium_priority_stock[so_line_obj] -= prd_qty
+                elif qty < so_line_obj.product_uom_qty:
+                    prd_qty = qty
+                    medium_priority_stock[so_line_obj] -= prd_qty
+
+                if qty < so_line_obj.product_uom_qty:
+                    remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
+                    if remaining_prd_qty > 0:
+                        if so_line_obj not in backorder_of_fo_lines:
+                            backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                        else:
+                            backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+                    so_line_obj.product_uom_qty = prd_qty
+
+                medium_priority_so_line_vals = (0, 0, {
+                    'product_id': so_line_obj.product_id.id,
+                    'product_template_id': so_line_obj.product_template_id.id,
+                    'name': so_line_obj.name,
+                    'product_uom_qty': prd_qty,
+                    'product_uom': so_line_obj.product_uom.id,
+                    'price_unit': so_line_obj.price_unit,
+                    'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
+                    'discount': so_line_obj.discount,
+                    'hsn_id': so_line_obj.hsn_id.id,
+                })
+                medium_priority_so_line_lst.append(medium_priority_so_line_vals)
+            medium_priority_so_vals = {
+                'is_fo': False,
+                'partner_id': self.partner_id.id,
+                'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
+                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
+                'pricelist_id': self.pricelist_id.id,
+                'payment_term_id': self.payment_term_id.id,
+                'l10n_in_journal_id': self.l10n_in_journal_id.id,
+                'event': self.event,
+                'no_of_cartons': self.no_of_cartons,
+                'user_id': self.user_id.id,
+                'team_id': self.team_id.id,
+                'warehouse_id': medium_priority_warehouse.id,
+                'order_line': medium_priority_so_line_lst,
+            }
+            if len(medium_priority_so_line_lst) >= 1:
+                self.env["sale.order"].create(medium_priority_so_vals)
+        if len(low_priority_warehouse) > 0:
+            low_priority_so_line_lst = []
+            for so_line_obj, qty in low_priority_stock.items():
+                search_low_priority_stock = self.env["stock.quant"].search(
+                    [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)],
+                    limit=1)
+                prd_qty = 0
+                if qty == so_line_obj.product_uom_qty:
+                    prd_qty = so_line_obj.product_uom_qty
+                    low_priority_stock[so_line_obj] -= prd_qty
+                elif qty > so_line_obj.product_uom_qty:
+                    prd_qty = so_line_obj.product_uom_qty
+                    low_priority_stock[so_line_obj] -= prd_qty
+                elif qty < so_line_obj.product_uom_qty:
+                    prd_qty = qty
+                    low_priority_stock[so_line_obj] -= prd_qty
+
+                if qty < so_line_obj.product_uom_qty:
+                    remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
+                    if remaining_prd_qty > 0:
+                        if so_line_obj not in backorder_of_fo_lines:
+                            backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                        else:
+                            backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+                    so_line_obj.product_uom_qty = prd_qty
+
+                low_priority_so_line_vals = (0, 0, {
+                    'product_id': so_line_obj.product_id.id,
+                    'product_template_id': so_line_obj.product_template_id.id,
+                    'name': so_line_obj.name,
+                    'product_uom_qty': prd_qty,
+                    'product_uom': so_line_obj.product_uom.id,
+                    'price_unit': so_line_obj.price_unit,
+                    'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
+                    'discount': so_line_obj.discount,
+                    'hsn_id': so_line_obj.hsn_id.id,
+                })
+                low_priority_so_line_lst.append(low_priority_so_line_vals)
+            low_priority_so_vals = {
+                'is_fo': False,
+                'partner_id': self.partner_id.id,
+                'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
+                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
+                'pricelist_id': self.pricelist_id.id,
+                'payment_term_id': self.payment_term_id.id,
+                'l10n_in_journal_id': self.l10n_in_journal_id.id,
+                'event': self.event,
+                'no_of_cartons': self.no_of_cartons,
+                'user_id': self.user_id.id,
+                'team_id': self.team_id.id,
+                'warehouse_id': low_priority_warehouse.id,
+                'order_line': low_priority_so_line_lst,
+            }
+            if len(low_priority_so_line_lst) >= 1:
+                self.env["sale.order"].create(low_priority_so_vals)
+
+        if len(backorder_of_fo_lines) >= 1:
+            backorder_of_fo_lines_lst = []
+            for bo_fo_line, bo_qty in backorder_of_fo_lines.items():
+                bo_so_line_vals = (0, 0, {
+                    'product_id': bo_fo_line.product_id.id,
+                    'product_template_id': bo_fo_line.product_template_id.id,
+                    'name': bo_fo_line.name,
+                    'product_uom_qty': bo_qty,
+                    'product_uom': bo_fo_line.product_uom.id,
+                    'price_unit': bo_fo_line.price_unit,
+                    'tax_id': [(4, tax_id.id) for tax_id in bo_fo_line.tax_id] if bo_fo_line.tax_id else False,
+                    'discount': bo_fo_line.discount,
+                    'hsn_id': bo_fo_line.hsn_id.id,
+                })
+                backorder_of_fo_lines_lst.append(bo_so_line_vals)
+            bo_so_vals = {
+                'is_fo': True,
+                'partner_id': self.partner_id.id,
+                'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
+                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
+                'pricelist_id': self.pricelist_id.id,
+                'payment_term_id': self.payment_term_id.id,
+                'l10n_in_journal_id': self.l10n_in_journal_id.id,
+                'event': self.event,
+                'no_of_cartons': self.no_of_cartons,
+                'user_id': self.user_id.id,
+                'team_id': self.team_id.id,
+                'warehouse_id': low_priority_warehouse.id,
+                'order_line': backorder_of_fo_lines_lst,
+            }
+            if len(backorder_of_fo_lines_lst) >= 1:
+                self.env["sale.order"].create(bo_so_vals)
+        self.write({'state': 'done'})
 
     # Function for domain on location according to warehouse
     # @api.model
@@ -224,6 +529,25 @@ class SaleOrderLineInherit(models.Model):
     stock_quantity = fields.Float('Stock Quantity')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.sale_hsn')
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
+
+    @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
+    def _compute_amount(self):
+        """
+        Compute the amounts of the SO line.
+        """
+        for line in self:
+            line.product_uom_qty = abs(line.product_uom_qty)
+            line.price_unit = abs(line.price_unit)
+            tax_results = self.env['account.tax']._compute_taxes([line._convert_to_tax_base_line_dict()])
+            totals = list(tax_results['totals'].values())[0]
+            amount_untaxed = totals['amount_untaxed']
+            amount_tax = totals['amount_tax']
+
+            line.update({
+                'price_subtotal': amount_untaxed,
+                'price_tax': amount_tax,
+                'price_total': amount_untaxed + amount_tax,
+            })
 
     # Populating HSN Field data in Invoice line item from product HSN
     def _prepare_invoice_line(self, **optional_values):
@@ -262,6 +586,22 @@ class PurchaseOrderLineInherit(models.Model):
     remark = fields.Text('Remarks')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.purchase_hsn')
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
+
+    @api.depends('product_qty', 'price_unit', 'taxes_id')
+    def _compute_amount(self):
+        for line in self:
+            line.product_qty = abs(line.product_qty)
+            line.price_unit = abs(line.price_unit)
+            tax_results = self.env['account.tax']._compute_taxes([line._convert_to_tax_base_line_dict()])
+            totals = list(tax_results['totals'].values())[0]
+            amount_untaxed = totals['amount_untaxed']
+            amount_tax = totals['amount_tax']
+
+            line.update({
+                'price_subtotal': amount_untaxed,
+                'price_tax': amount_tax,
+                'price_total': amount_untaxed + amount_tax,
+            })
 
     # Adding Purchase HSN Code in Bills
 
@@ -333,4 +673,10 @@ class StockMoveLineInherit(models.Model):
         if stock_transfers_search:
             res.location_id = res.picking_id.location_id
             print(res.location_id, 'res')
-            return res
+        return res
+
+
+class InheritResPartner(models.Model):
+    _inherit = "res.partner"
+
+    alias_name = fields.Many2one("alias.name", "Alias Name", copy=False)
