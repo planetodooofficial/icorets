@@ -11,6 +11,7 @@ import pandas as pd
 import datetime
 from datetime import datetime
 
+from odoo.exceptions import ValidationError
 from odoo.tools import json
 
 
@@ -676,7 +677,74 @@ class StockMoveLineInherit(models.Model):
         return res
 
 
+class InheritApprovalRequest(models.Model):
+    _inherit = "approval.request"
+
+    cust_partner_id = fields.Many2one("res.partner")
+    vendor_count = fields.Integer("Vendor Count")
+
+    def action_show_contact(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'res_id': self.cust_partner_id.id,
+            'name': self.cust_partner_id.name,
+            'view_mode': 'form',
+            'views': [(False, "form")],
+        }
+
+    def action_approve(self, approver=None):
+        if self.cust_partner_id:
+            self._ensure_can_approve()
+            if not isinstance(approver, models.BaseModel):
+                approver = self.mapped('approver_ids').filtered(
+                    lambda approver: approver.user_id == self.env.user
+                )
+            approver.write({'status': 'approved'})
+            self.sudo()._update_next_approvers('pending', approver, only_next_approver=True)
+            self.sudo()._get_user_approval_activities(user=self.env.user).action_feedback()
+            self.cust_partner_id.write({'active': True})
+
+
 class InheritResPartner(models.Model):
     _inherit = "res.partner"
 
     alias_name = fields.Many2one("alias.name", "Alias Name", copy=False)
+
+    @api.model_create_multi
+    def create(self, vals):
+        result = super(InheritResPartner, self).create(vals)
+        active_ids = self.env.context.get('default_supplier_rank')
+        if active_ids:
+            result.active = False
+            approval_category_id = self.env['approval.category'].sudo().search([
+                ('name', '=', 'Vendor')
+            ], limit=1)
+            if not approval_category_id:
+                raise ValidationError("'Vendor' Approval Category Is Not Created.")
+
+            approval_vals = {
+                'name': "Vendor Approval",
+                'request_owner_id': self.env.user.id,
+                'cust_partner_id': result.id,
+                "category_id": approval_category_id.id,
+                "vendor_count": 1,
+            }
+            data = self.env['approval.request'].create(approval_vals)
+            data.action_confirm()
+            print(data)
+        return result
+
+    # @api.model
+    # def default_get(self, fields):
+    #     res = super(InheritResPartner, self).default_get(fields)
+    #     active_ids = self.env.context.get('default_supplier_rank')
+    #     if active_ids:
+    #         if 'is_approved' in fields and 'active' in fields:
+    #             res['is_approved'] = False
+    #             res['active'] = False
+    #     else:
+    #         if 'is_approved' in fields and 'active' in fields:
+    #             res['is_approved'] = True
+    #             res['active'] = True
+    #     return res
