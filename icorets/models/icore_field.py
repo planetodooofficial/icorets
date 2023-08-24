@@ -264,78 +264,91 @@ class SaleOrderInherit(models.Model):
         invoice_vals['journal_id'] = self.l10n_in_journal_id.id
         return invoice_vals
 
+    ''' This Func is used for creating forecasted orders. '''
     def fo_action_confirm(self):
         top_priority_stock = {}
         medium_priority_stock = {}
         low_priority_stock = {}
 
+        ''' To Get Priority Wise Warehouses '''
         top_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '1')], limit=1)
         medium_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '2')], limit=1)
         low_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '3')], limit=1)
 
+        ''' To Get The Requirement of the Stock Product Wise '''
+        stock_requirement = {}
+
+        ''' To get the stock availability for that particular product warehouse wise '''
         for so_line in self.order_line:
+            if so_line not in stock_requirement:
+                stock_requirement[so_line] = so_line.product_uom_qty
             search_top_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)], limit=1)
             search_medium_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)], limit=1)
             search_low_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)], limit=1)
 
             if search_top_stock:
                 if so_line not in top_priority_stock:
-                    top_priority_stock[so_line] = search_top_stock.quantity
+                    top_priority_stock[so_line] = search_top_stock.available_quantity
                 else:
-                    top_priority_stock[so_line] += search_top_stock.quantity
+                    top_priority_stock[so_line] += search_top_stock.available_quantity
 
             if search_medium_stock:
                 if so_line not in medium_priority_stock:
-                    medium_priority_stock[so_line] = search_medium_stock.quantity
+                    medium_priority_stock[so_line] = search_medium_stock.available_quantity
                 else:
-                    medium_priority_stock[so_line] += search_medium_stock.quantity
+                    medium_priority_stock[so_line] += search_medium_stock.available_quantity
 
             if search_low_stock:
                 if so_line not in low_priority_stock:
-                    low_priority_stock[so_line] = search_low_stock.quantity
+                    low_priority_stock[so_line] = search_low_stock.available_quantity
                 else:
-                    low_priority_stock[so_line] += search_low_stock.quantity
+                    low_priority_stock[so_line] += search_low_stock.available_quantity
 
         backorder_of_fo_lines = {}
 
-        if len(top_priority_warehouse) > 0:
+        ''' To create 'so' for top priority warehouse based on the availability in the stock '''
+        if len(top_priority_warehouse.ids) > 0:
             top_priority_so_line_lst = []
             for so_line_obj, qty in top_priority_stock.items():
-                search_top_priority_stock = self.env["stock.quant"].search(
-                    [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)],
-                    limit=1)
-                prd_qty = 0
-                if qty == so_line_obj.product_uom_qty:
-                    prd_qty = so_line_obj.product_uom_qty
-                    top_priority_stock[so_line_obj] -= prd_qty
-                elif qty > so_line_obj.product_uom_qty:
-                    prd_qty = so_line_obj.product_uom_qty
-                    top_priority_stock[so_line_obj] -= prd_qty
-                elif qty < so_line_obj.product_uom_qty:
-                    prd_qty = qty
-                    top_priority_stock[so_line_obj] -= prd_qty
+                if stock_requirement[so_line_obj] > 0:
+                    search_top_priority_stock = self.env["stock.quant"].search(
+                        [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)],
+                        limit=1)
+                    prd_qty = 0
+                    if qty == so_line_obj.product_uom_qty:
+                        prd_qty = so_line_obj.product_uom_qty
+                        top_priority_stock[so_line_obj] -= prd_qty
+                    elif qty > so_line_obj.product_uom_qty:
+                        prd_qty = so_line_obj.product_uom_qty
+                        top_priority_stock[so_line_obj] -= prd_qty
+                    elif qty < so_line_obj.product_uom_qty:
+                        prd_qty = qty
+                        top_priority_stock[so_line_obj] -= prd_qty
 
-                if qty < so_line_obj.product_uom_qty:
-                    remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
-                    if remaining_prd_qty > 0:
-                        if so_line_obj not in backorder_of_fo_lines:
-                            backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
-                        else:
-                            backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
-                    so_line_obj.product_uom_qty = prd_qty
+                    if so_line_obj in stock_requirement:
+                        stock_requirement[so_line_obj] -= prd_qty
 
-                top_priority_so_line_vals = (0, 0, {
-                    'product_id': so_line_obj.product_id.id,
-                    'product_template_id': so_line_obj.product_template_id.id,
-                    'name': so_line_obj.name,
-                    'product_uom_qty': prd_qty,
-                    'product_uom': so_line_obj.product_uom.id,
-                    'price_unit': so_line_obj.price_unit,
-                    'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
-                    'discount': so_line_obj.discount,
-                    'hsn_id': so_line_obj.hsn_id.id,
-                })
-                top_priority_so_line_lst.append(top_priority_so_line_vals)
+                    if qty < so_line_obj.product_uom_qty:
+                        remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
+                        if remaining_prd_qty > 0:
+                            if so_line_obj not in backorder_of_fo_lines:
+                                backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                            else:
+                                backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+                        so_line_obj.product_uom_qty = prd_qty
+
+                    top_priority_so_line_vals = (0, 0, {
+                        'product_id': so_line_obj.product_id.id,
+                        'product_template_id': so_line_obj.product_template_id.id,
+                        'name': so_line_obj.name,
+                        'product_uom_qty': prd_qty,
+                        'product_uom': so_line_obj.product_uom.id,
+                        'price_unit': so_line_obj.price_unit,
+                        'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
+                        'discount': so_line_obj.discount,
+                        'hsn_id': so_line_obj.hsn_id.id,
+                    })
+                    top_priority_so_line_lst.append(top_priority_so_line_vals)
             top_priority_so_vals = {
                 'is_fo': False,
                 'partner_id': self.partner_id.id,
@@ -354,44 +367,50 @@ class SaleOrderInherit(models.Model):
             }
             if len(top_priority_so_line_lst) >= 1:
                 self.env["sale.order"].create(top_priority_so_vals)
-        if len(medium_priority_warehouse) > 0:
+
+        ''' To create 'so' for medium priority warehouse based on the availability in the stock '''
+        if len(medium_priority_warehouse.ids) > 0:
             medium_priority_so_line_lst = []
             for so_line_obj, qty in medium_priority_stock.items():
-                search_medium_priority_stock = self.env["stock.quant"].search(
-                    [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)],
-                    limit=1)
-                prd_qty = 0
-                if qty == so_line_obj.product_uom_qty:
-                    prd_qty = so_line_obj.product_uom_qty
-                    medium_priority_stock[so_line_obj] -= prd_qty
-                elif qty > so_line_obj.product_uom_qty:
-                    prd_qty = so_line_obj.product_uom_qty
-                    medium_priority_stock[so_line_obj] -= prd_qty
-                elif qty < so_line_obj.product_uom_qty:
-                    prd_qty = qty
-                    medium_priority_stock[so_line_obj] -= prd_qty
+                if stock_requirement[so_line_obj] > 0:
+                    search_medium_priority_stock = self.env["stock.quant"].search(
+                        [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)],
+                        limit=1)
+                    prd_qty = 0
+                    if qty == so_line_obj.product_uom_qty:
+                        prd_qty = so_line_obj.product_uom_qty
+                        medium_priority_stock[so_line_obj] -= prd_qty
+                    elif qty > so_line_obj.product_uom_qty:
+                        prd_qty = so_line_obj.product_uom_qty
+                        medium_priority_stock[so_line_obj] -= prd_qty
+                    elif qty < so_line_obj.product_uom_qty:
+                        prd_qty = qty
+                        medium_priority_stock[so_line_obj] -= prd_qty
 
-                if qty < so_line_obj.product_uom_qty:
-                    remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
-                    if remaining_prd_qty > 0:
-                        if so_line_obj not in backorder_of_fo_lines:
-                            backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
-                        else:
-                            backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
-                    so_line_obj.product_uom_qty = prd_qty
+                    if so_line_obj in stock_requirement:
+                        stock_requirement[so_line_obj] -= prd_qty
 
-                medium_priority_so_line_vals = (0, 0, {
-                    'product_id': so_line_obj.product_id.id,
-                    'product_template_id': so_line_obj.product_template_id.id,
-                    'name': so_line_obj.name,
-                    'product_uom_qty': prd_qty,
-                    'product_uom': so_line_obj.product_uom.id,
-                    'price_unit': so_line_obj.price_unit,
-                    'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
-                    'discount': so_line_obj.discount,
-                    'hsn_id': so_line_obj.hsn_id.id,
-                })
-                medium_priority_so_line_lst.append(medium_priority_so_line_vals)
+                    if qty < so_line_obj.product_uom_qty:
+                        remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
+                        if remaining_prd_qty > 0:
+                            if so_line_obj not in backorder_of_fo_lines:
+                                backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                            else:
+                                backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+                        so_line_obj.product_uom_qty = prd_qty
+
+                    medium_priority_so_line_vals = (0, 0, {
+                        'product_id': so_line_obj.product_id.id,
+                        'product_template_id': so_line_obj.product_template_id.id,
+                        'name': so_line_obj.name,
+                        'product_uom_qty': prd_qty,
+                        'product_uom': so_line_obj.product_uom.id,
+                        'price_unit': so_line_obj.price_unit,
+                        'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
+                        'discount': so_line_obj.discount,
+                        'hsn_id': so_line_obj.hsn_id.id,
+                    })
+                    medium_priority_so_line_lst.append(medium_priority_so_line_vals)
             medium_priority_so_vals = {
                 'is_fo': False,
                 'partner_id': self.partner_id.id,
@@ -410,44 +429,50 @@ class SaleOrderInherit(models.Model):
             }
             if len(medium_priority_so_line_lst) >= 1:
                 self.env["sale.order"].create(medium_priority_so_vals)
-        if len(low_priority_warehouse) > 0:
+
+        ''' To create 'so' for low priority warehouse based on the availability in the stock '''
+        if len(low_priority_warehouse.ids) > 0:
             low_priority_so_line_lst = []
             for so_line_obj, qty in low_priority_stock.items():
-                search_low_priority_stock = self.env["stock.quant"].search(
-                    [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)],
-                    limit=1)
-                prd_qty = 0
-                if qty == so_line_obj.product_uom_qty:
-                    prd_qty = so_line_obj.product_uom_qty
-                    low_priority_stock[so_line_obj] -= prd_qty
-                elif qty > so_line_obj.product_uom_qty:
-                    prd_qty = so_line_obj.product_uom_qty
-                    low_priority_stock[so_line_obj] -= prd_qty
-                elif qty < so_line_obj.product_uom_qty:
-                    prd_qty = qty
-                    low_priority_stock[so_line_obj] -= prd_qty
+                if stock_requirement[so_line_obj] > 0:
+                    search_low_priority_stock = self.env["stock.quant"].search(
+                        [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)],
+                        limit=1)
+                    prd_qty = 0
+                    if qty == so_line_obj.product_uom_qty:
+                        prd_qty = so_line_obj.product_uom_qty
+                        low_priority_stock[so_line_obj] -= prd_qty
+                    elif qty > so_line_obj.product_uom_qty:
+                        prd_qty = so_line_obj.product_uom_qty
+                        low_priority_stock[so_line_obj] -= prd_qty
+                    elif qty < so_line_obj.product_uom_qty:
+                        prd_qty = qty
+                        low_priority_stock[so_line_obj] -= prd_qty
 
-                if qty < so_line_obj.product_uom_qty:
-                    remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
-                    if remaining_prd_qty > 0:
-                        if so_line_obj not in backorder_of_fo_lines:
-                            backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
-                        else:
-                            backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
-                    so_line_obj.product_uom_qty = prd_qty
+                    if so_line_obj in stock_requirement:
+                        stock_requirement[so_line_obj] -= prd_qty
 
-                low_priority_so_line_vals = (0, 0, {
-                    'product_id': so_line_obj.product_id.id,
-                    'product_template_id': so_line_obj.product_template_id.id,
-                    'name': so_line_obj.name,
-                    'product_uom_qty': prd_qty,
-                    'product_uom': so_line_obj.product_uom.id,
-                    'price_unit': so_line_obj.price_unit,
-                    'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
-                    'discount': so_line_obj.discount,
-                    'hsn_id': so_line_obj.hsn_id.id,
-                })
-                low_priority_so_line_lst.append(low_priority_so_line_vals)
+                    if qty < so_line_obj.product_uom_qty:
+                        remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
+                        if remaining_prd_qty > 0:
+                            if so_line_obj not in backorder_of_fo_lines:
+                                backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                            else:
+                                backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+                        so_line_obj.product_uom_qty = prd_qty
+
+                    low_priority_so_line_vals = (0, 0, {
+                        'product_id': so_line_obj.product_id.id,
+                        'product_template_id': so_line_obj.product_template_id.id,
+                        'name': so_line_obj.name,
+                        'product_uom_qty': prd_qty,
+                        'product_uom': so_line_obj.product_uom.id,
+                        'price_unit': so_line_obj.price_unit,
+                        'tax_id': [(4, tax_id.id) for tax_id in so_line_obj.tax_id] if so_line_obj.tax_id else False,
+                        'discount': so_line_obj.discount,
+                        'hsn_id': so_line_obj.hsn_id.id,
+                    })
+                    low_priority_so_line_lst.append(low_priority_so_line_vals)
             low_priority_so_vals = {
                 'is_fo': False,
                 'partner_id': self.partner_id.id,
