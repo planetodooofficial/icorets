@@ -13,7 +13,6 @@
              'data/forecast_sequence.xml',
              'views/icore_field.xml',
              'views/inherit_res_partner_view.xml',
-             'views/alias_name_master_view.xml',
              'views/inherit_stock_warehouse_view.xml',
              'views/forecast_order_view.xml',
              'views/inherit_approval_request_view.xml',

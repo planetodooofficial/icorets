@@ -10,7 +10,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[2]/field[@name='company_type']" position="after">
                 <group>
-                          <group><field name="alias_name"/></group>
+                          <group><field name="cust_alias_name"/></group>
                           <group></group>
                 </group>
             </xpath>

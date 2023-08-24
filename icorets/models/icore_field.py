@@ -12,7 +12,7 @@ import datetime
 from datetime import datetime
 
 from odoo.exceptions import ValidationError
-from odoo.tools import json
+from odoo.tools import json, float_round, get_lang, DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class ProductVariantInherit(models.Model):
@@ -112,13 +112,6 @@ class AccountMoveInheritClass(models.Model):
         ('outwrite', 'OutWrite'),
 
     ])
-    cust_partner_alias_id = fields.Many2one("alias.name", "Alias Name", copy=False)
-
-    @api.onchange("cust_partner_alias_id")
-    def action_onchange_partner_alias(self):
-        if self.cust_partner_alias_id:
-            search_partner = self.env["res.partner"].search([('alias_name', '=', self.cust_partner_alias_id.id)], limit=1)
-            self.partner_id = search_partner.id
 
     # Function for amount in indian words
     @api.depends('amount_total')
@@ -139,6 +132,41 @@ class AccountMoveLineInherit(models.Model):
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
     ean_code = fields.Char(string='Ean Code', related='product_id.barcode')
     size = fields.Char(string='Size', related='product_id.size')
+
+    @api.depends('product_id', 'journal_id')
+    def _compute_name(self):
+        for line in self:
+            if line.display_type == 'payment_term':
+                if line.move_id.payment_reference:
+                    line.name = line.move_id.payment_reference
+                elif not line.name:
+                    line.name = ''
+                continue
+            if not line.product_id or line.display_type in ('line_section', 'line_note'):
+                continue
+            if line.partner_id.lang:
+                product = line.product_id.with_context(lang=line.partner_id.lang)
+            else:
+                product = line.product_id
+
+            values = []
+            if product.partner_ref:
+                values.append(product.partner_ref)
+            if line.journal_id.type == 'sale':
+                if product.description_sale:
+                    values.append(product.description_sale)
+            elif line.journal_id.type == 'purchase':
+                if product.description_purchase:
+                    values.append(product.description_purchase)
+            line.name = '\n'.join(values)
+
+            if line.product_id.display_name:
+                if line.product_id.default_code:
+                    product_name = f"[{line.product_id.default_code}] {line.product_id.name}"
+                    line.name = product_name
+                else:
+                    product_name = f"{line.product_id.name}"
+                    line.name = product_name
 
     @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'currency_id')
     def _compute_totals(self):
@@ -556,6 +584,32 @@ class SaleOrderLineInherit(models.Model):
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.sale_hsn')
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
 
+    @api.depends('product_id')
+    def _compute_name(self):
+        for line in self:
+            if not line.product_id:
+                continue
+            if not line.order_partner_id.is_public:
+                line = line.with_context(lang=line.order_partner_id.lang)
+            name = line._get_sale_order_line_multiline_description_sale()
+            if line.is_downpayment and not line.display_type:
+                context = {'lang': line.order_partner_id.lang}
+                dp_state = line._get_downpayment_state()
+                if dp_state == 'draft':
+                    name = _("%(line_description)s (Draft)", line_description=name)
+                elif dp_state == 'cancel':
+                    name = _("%(line_description)s (Canceled)", line_description=name)
+                del context
+            line.name = name
+            if line.product_id.display_name:
+                if line.product_id.default_code:
+                    product_name = f"[{line.product_id.default_code}] {line.product_id.name}"
+                    line.name = product_name
+                else:
+                    product_name = f"{line.product_id.name}"
+                    line.name = product_name
+
+
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
     def _compute_amount(self):
         """
@@ -612,6 +666,84 @@ class PurchaseOrderLineInherit(models.Model):
     remark = fields.Text('Remarks')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.purchase_hsn')
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
+
+    @api.depends('product_qty', 'product_uom')
+    def _compute_price_unit_and_date_planned_and_name(self):
+        for line in self:
+            if line.product_id.default_code:
+                product_name = f"[{line.product_id.default_code}] {line.product_id.name}"
+                line.name = product_name
+            else:
+                product_name = f"{line.product_id.name}"
+                line.name = product_name
+            if not line.product_id or line.invoice_lines:
+                continue
+            params = {'order_id': line.order_id}
+            seller = line.product_id._select_seller(
+                partner_id=line.partner_id,
+                quantity=line.product_qty,
+                date=line.order_id.date_order and line.order_id.date_order.date(),
+                uom_id=line.product_uom,
+                params=params)
+
+            if seller or not line.date_planned:
+                line.date_planned = line._get_date_planned(seller).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+            # If not seller, use the standard price. It needs a proper currency conversion.
+            if not seller:
+                unavailable_seller = line.product_id.seller_ids.filtered(
+                    lambda s: s.partner_id == line.order_id.partner_id)
+                if not unavailable_seller and line.price_unit and line.product_uom == line._origin.product_uom:
+                    # Avoid to modify the price unit if there is no price list for this partner and
+                    # the line has already one to avoid to override unit price set manually.
+                    continue
+                po_line_uom = line.product_uom or line.product_id.uom_po_id
+                price_unit = line.env['account.tax']._fix_tax_included_price_company(
+                    line.product_id.uom_id._compute_price(line.product_id.standard_price, po_line_uom),
+                    line.product_id.supplier_taxes_id,
+                    line.taxes_id,
+                    line.company_id,
+                )
+                price_unit = line.product_id.currency_id._convert(
+                    price_unit,
+                    line.currency_id,
+                    line.company_id,
+                    line.date_order,
+                    False
+                )
+                line.price_unit = float_round(price_unit, precision_digits=max(line.currency_id.decimal_places,
+                                                                               self.env[
+                                                                                   'decimal.precision'].precision_get(
+                                                                                   'Product Price')))
+                continue
+
+            price_unit = line.env['account.tax']._fix_tax_included_price_company(seller.price,
+                                                                                 line.product_id.supplier_taxes_id,
+                                                                                 line.taxes_id,
+                                                                                 line.company_id) if seller else 0.0
+            price_unit = seller.currency_id._convert(price_unit, line.currency_id, line.company_id, line.date_order,
+                                                     False)
+            price_unit = float_round(price_unit, precision_digits=max(line.currency_id.decimal_places,
+                                                                      self.env['decimal.precision'].precision_get(
+                                                                          'Product Price')))
+            line.price_unit = seller.product_uom._compute_price(price_unit, line.product_uom)
+
+            # record product names to avoid resetting custom descriptions
+            default_names = []
+            vendors = line.product_id._prepare_sellers({})
+            for vendor in vendors:
+                product_ctx = {'seller_id': vendor.id, 'lang': get_lang(line.env, line.partner_id.lang).code}
+                default_names.append(line._get_product_purchase_description(line.product_id.with_context(product_ctx)))
+            if not line.name or line.name in default_names:
+                product_ctx = {'seller_id': seller.id, 'lang': get_lang(line.env, line.partner_id.lang).code}
+                line.name = line._get_product_purchase_description(line.product_id.with_context(product_ctx))
+
+            if line.product_id.default_code:
+                product_name = f"[{line.product_id.default_code}] {line.product_id.name}"
+                line.name = product_name
+            else:
+                product_name = f"{line.product_id.name}"
+                line.name = product_name
 
     @api.depends('product_qty', 'price_unit', 'taxes_id')
     def _compute_amount(self):
@@ -735,6 +867,17 @@ class InheritResPartner(models.Model):
     _inherit = "res.partner"
 
     alias_name = fields.Many2one("alias.name", "Alias Name", copy=False)
+    cust_alias_name = fields.Char("Alias Name", copy=False)
+
+    @api.model
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        args = list(args or [])
+        if name:
+            args += ['|', '|', ('name', operator, name), ('cust_alias_name', operator, name)]
+        return super()._name_search(name, args, operator, limit, name_get_uid)
+
+    def name_get(self):
+        return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (record.id, "%s" % (record.name)) for record in self]
 
     @api.model_create_multi
     def create(self, vals):
