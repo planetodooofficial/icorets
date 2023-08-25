@@ -114,6 +114,7 @@ class AccountMoveInheritClass(models.Model):
     ])
     cust_code = fields.Char("Code", compute="_compute_cust_code", store=True)
 
+    @api.depends("partner_id")
     def _compute_cust_code(self):
         for rec in self:
             if rec.partner_id:
