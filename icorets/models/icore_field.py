@@ -112,6 +112,12 @@ class AccountMoveInheritClass(models.Model):
         ('outwrite', 'OutWrite'),
 
     ])
+    cust_code = fields.Char("Code", compute="_compute_code", store=True)
+
+    def _compute_cust_code(self):
+        for rec in self:
+            if rec.partner_id:
+                rec.cust_code = rec.partner_id.cust_alias_name
 
     # Function for amount in indian words
     @api.depends('amount_total')
@@ -340,9 +346,6 @@ class SaleOrderInherit(models.Model):
             top_priority_so_line_lst = []
             for so_line_obj, qty in top_priority_stock.items():
                 if stock_requirement[so_line_obj] > 0:
-                    search_top_priority_stock = self.env["stock.quant"].search(
-                        [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)],
-                        limit=1)
                     prd_qty = 0
                     if qty == stock_requirement[so_line_obj]:
                         prd_qty = stock_requirement[so_line_obj]
@@ -366,6 +369,7 @@ class SaleOrderInherit(models.Model):
                                 else:
                                     backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
 
+                    ''' To get the order line after stock assigned '''
                     if so_line_obj not in qty_to_reduce_from_fo_lines:
                         qty_to_reduce_from_fo_lines[so_line_obj] = prd_qty
                     else:
@@ -436,6 +440,8 @@ class SaleOrderInherit(models.Model):
                                     backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
                                 else:
                                     backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+
+                    ''' To get the orderline after stock assigned '''
                     if so_line_obj not in qty_to_reduce_from_fo_lines:
                         qty_to_reduce_from_fo_lines[so_line_obj] = prd_qty
                     else:
@@ -506,6 +512,7 @@ class SaleOrderInherit(models.Model):
                             else:
                                 backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
 
+                    ''' To get the orderline after stock assigned '''
                     if so_line_obj not in qty_to_reduce_from_fo_lines:
                         qty_to_reduce_from_fo_lines[so_line_obj] = prd_qty
                     else:
