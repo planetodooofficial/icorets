@@ -333,6 +333,7 @@ class SaleOrderInherit(models.Model):
                     low_priority_stock[so_line] += search_low_stock.available_quantity
 
         backorder_of_fo_lines = {}
+        qty_to_reduce_from_fo_lines = {}
 
         ''' To create 'so' for top priority warehouse based on the availability in the stock '''
         if len(top_priority_warehouse.ids) > 0:
@@ -343,27 +344,36 @@ class SaleOrderInherit(models.Model):
                         [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)],
                         limit=1)
                     prd_qty = 0
-                    if qty == so_line_obj.product_uom_qty:
-                        prd_qty = so_line_obj.product_uom_qty
+                    if qty == stock_requirement[so_line_obj]:
+                        prd_qty = stock_requirement[so_line_obj]
                         top_priority_stock[so_line_obj] -= prd_qty
-                    elif qty > so_line_obj.product_uom_qty:
-                        prd_qty = so_line_obj.product_uom_qty
+                    elif qty > stock_requirement[so_line_obj]:
+                        prd_qty = stock_requirement[so_line_obj]
                         top_priority_stock[so_line_obj] -= prd_qty
-                    elif qty < so_line_obj.product_uom_qty:
+                    elif qty < stock_requirement[so_line_obj]:
                         prd_qty = qty
                         top_priority_stock[so_line_obj] -= prd_qty
 
+                    # if so_line_obj in stock_requirement:
+                    #     stock_requirement[so_line_obj] -= prd_qty
+                    #
+                    # if qty < stock_requirement[so_line_obj]:
+                        if so_line_obj not in medium_priority_stock and so_line_obj not in low_priority_stock:
+                            remaining_prd_qty = stock_requirement[so_line_obj] - prd_qty
+                            if remaining_prd_qty > 0:
+                                if so_line_obj not in backorder_of_fo_lines:
+                                    backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                                else:
+                                    backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+
+                    if so_line_obj not in qty_to_reduce_from_fo_lines:
+                        qty_to_reduce_from_fo_lines[so_line_obj] = prd_qty
+                    else:
+                        qty_to_reduce_from_fo_lines[so_line_obj] += prd_qty
+                    # so_line_obj.product_uom_qty -= prd_qty
+
                     if so_line_obj in stock_requirement:
                         stock_requirement[so_line_obj] -= prd_qty
-
-                    if qty < so_line_obj.product_uom_qty:
-                        remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
-                        if remaining_prd_qty > 0:
-                            if so_line_obj not in backorder_of_fo_lines:
-                                backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
-                            else:
-                                backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
-                        so_line_obj.product_uom_qty = prd_qty
 
                     top_priority_so_line_vals = (0, 0, {
                         'product_id': so_line_obj.product_id.id,
@@ -405,27 +415,35 @@ class SaleOrderInherit(models.Model):
                         [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)],
                         limit=1)
                     prd_qty = 0
-                    if qty == so_line_obj.product_uom_qty:
-                        prd_qty = so_line_obj.product_uom_qty
+                    if qty == stock_requirement[so_line_obj]:
+                        prd_qty = stock_requirement[so_line_obj]
                         medium_priority_stock[so_line_obj] -= prd_qty
-                    elif qty > so_line_obj.product_uom_qty:
-                        prd_qty = so_line_obj.product_uom_qty
+                    elif qty > stock_requirement[so_line_obj]:
+                        prd_qty = stock_requirement[so_line_obj]
                         medium_priority_stock[so_line_obj] -= prd_qty
-                    elif qty < so_line_obj.product_uom_qty:
+                    elif qty < stock_requirement[so_line_obj]:
                         prd_qty = qty
                         medium_priority_stock[so_line_obj] -= prd_qty
 
+                    # if so_line_obj in stock_requirement:
+                    #     stock_requirement[so_line_obj] -= prd_qty
+                    #
+                    # if qty < stock_requirement[so_line_obj]:
+                        if so_line_obj not in low_priority_stock:
+                            remaining_prd_qty = stock_requirement[so_line_obj] - prd_qty
+                            if remaining_prd_qty > 0:
+                                if so_line_obj not in backorder_of_fo_lines:
+                                    backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
+                                else:
+                                    backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
+                    if so_line_obj not in qty_to_reduce_from_fo_lines:
+                        qty_to_reduce_from_fo_lines[so_line_obj] = prd_qty
+                    else:
+                        qty_to_reduce_from_fo_lines[so_line_obj] += prd_qty
+                    # so_line_obj.product_uom_qty -= prd_qty
+
                     if so_line_obj in stock_requirement:
                         stock_requirement[so_line_obj] -= prd_qty
-
-                    if qty < so_line_obj.product_uom_qty:
-                        remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
-                        if remaining_prd_qty > 0:
-                            if so_line_obj not in backorder_of_fo_lines:
-                                backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
-                            else:
-                                backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
-                        so_line_obj.product_uom_qty = prd_qty
 
                     medium_priority_so_line_vals = (0, 0, {
                         'product_id': so_line_obj.product_id.id,
@@ -467,27 +485,35 @@ class SaleOrderInherit(models.Model):
                         [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)],
                         limit=1)
                     prd_qty = 0
-                    if qty == so_line_obj.product_uom_qty:
-                        prd_qty = so_line_obj.product_uom_qty
+                    if qty == stock_requirement[so_line_obj]:
+                        prd_qty = stock_requirement[so_line_obj]
                         low_priority_stock[so_line_obj] -= prd_qty
-                    elif qty > so_line_obj.product_uom_qty:
-                        prd_qty = so_line_obj.product_uom_qty
+                    elif qty > stock_requirement[so_line_obj]:
+                        prd_qty = stock_requirement[so_line_obj]
                         low_priority_stock[so_line_obj] -= prd_qty
-                    elif qty < so_line_obj.product_uom_qty:
+                    elif qty < stock_requirement[so_line_obj]:
                         prd_qty = qty
                         low_priority_stock[so_line_obj] -= prd_qty
 
-                    if so_line_obj in stock_requirement:
-                        stock_requirement[so_line_obj] -= prd_qty
-
-                    if qty < so_line_obj.product_uom_qty:
-                        remaining_prd_qty = so_line_obj.product_uom_qty - prd_qty
+                    # if so_line_obj in stock_requirement:
+                    #     stock_requirement[so_line_obj] -= prd_qty
+                    #
+                    # if qty < stock_requirement[so_line_obj]:
+                        remaining_prd_qty = stock_requirement[so_line_obj] - prd_qty
                         if remaining_prd_qty > 0:
                             if so_line_obj not in backorder_of_fo_lines:
                                 backorder_of_fo_lines[so_line_obj] = remaining_prd_qty
                             else:
                                 backorder_of_fo_lines[so_line_obj] += remaining_prd_qty
-                        so_line_obj.product_uom_qty = prd_qty
+
+                    if so_line_obj not in qty_to_reduce_from_fo_lines:
+                        qty_to_reduce_from_fo_lines[so_line_obj] = prd_qty
+                    else:
+                        qty_to_reduce_from_fo_lines[so_line_obj] += prd_qty
+                    # so_line_obj.product_uom_qty -= prd_qty
+
+                    if so_line_obj in stock_requirement:
+                        stock_requirement[so_line_obj] -= prd_qty
 
                     low_priority_so_line_vals = (0, 0, {
                         'product_id': so_line_obj.product_id.id,
@@ -519,6 +545,18 @@ class SaleOrderInherit(models.Model):
             }
             if len(low_priority_so_line_lst) >= 1:
                 self.env["sale.order"].create(low_priority_so_vals)
+
+        for fo_line, qty in qty_to_reduce_from_fo_lines.items():
+            if fo_line.product_uom_qty == qty:
+                fo_line.write({"product_uom_qty": qty})
+            else:
+                prd_qty = fo_line.product_uom_qty - qty
+                fo_line.write({"product_uom_qty": prd_qty})
+
+        for so_line, so_line_prd_qty in stock_requirement.items():
+            if so_line not in top_priority_stock and so_line not in medium_priority_stock and so_line not in low_priority_stock:
+                if so_line not in backorder_of_fo_lines:
+                    backorder_of_fo_lines[so_line] = so_line_prd_qty
 
         if len(backorder_of_fo_lines) >= 1:
             backorder_of_fo_lines_lst = []
@@ -553,6 +591,11 @@ class SaleOrderInherit(models.Model):
             }
             if len(backorder_of_fo_lines_lst) >= 1:
                 self.env["sale.order"].create(bo_so_vals)
+
+        for so_line, so_line_prd_qty in stock_requirement.items():
+            if so_line not in top_priority_stock and so_line not in medium_priority_stock and so_line not in low_priority_stock:
+                unlink_record = self.order_line.filtered(lambda x: x if x.id == so_line.id else False)
+                unlink_record.unlink()
         self.write({'state': 'done'})
 
     # Function for domain on location according to warehouse
