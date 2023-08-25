@@ -112,7 +112,7 @@ class AccountMoveInheritClass(models.Model):
         ('outwrite', 'OutWrite'),
 
     ])
-    cust_code = fields.Char("Code", compute="_compute_code", store=True)
+    cust_code = fields.Char("Code", compute="_compute_cust_code", store=True)
 
     def _compute_cust_code(self):
         for rec in self:
