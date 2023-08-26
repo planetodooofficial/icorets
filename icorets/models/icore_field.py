@@ -317,27 +317,30 @@ class SaleOrderInherit(models.Model):
         for so_line in self.order_line:
             if so_line not in stock_requirement:
                 stock_requirement[so_line] = so_line.product_uom_qty
-            search_top_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id), ('available_quantity', '>', 0)], limit=1)
-            search_medium_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id), ('available_quantity', '>', 0)], limit=1)
-            search_low_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id), ('available_quantity', '>', 0)], limit=1)
+            search_top_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)], limit=1)
+            search_medium_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)], limit=1)
+            search_low_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)], limit=1)
 
             if search_top_stock:
-                if so_line not in top_priority_stock:
-                    top_priority_stock[so_line] = search_top_stock.available_quantity
-                else:
-                    top_priority_stock[so_line] += search_top_stock.available_quantity
+                if search_top_stock.available_quantity > 0:
+                    if so_line not in top_priority_stock:
+                        top_priority_stock[so_line] = search_top_stock.available_quantity
+                    else:
+                        top_priority_stock[so_line] += search_top_stock.available_quantity
 
             if search_medium_stock:
-                if so_line not in medium_priority_stock:
-                    medium_priority_stock[so_line] = search_medium_stock.available_quantity
-                else:
-                    medium_priority_stock[so_line] += search_medium_stock.available_quantity
+                if search_medium_stock.available_quantity > 0:
+                    if so_line not in medium_priority_stock:
+                        medium_priority_stock[so_line] = search_medium_stock.available_quantity
+                    else:
+                        medium_priority_stock[so_line] += search_medium_stock.available_quantity
 
             if search_low_stock:
-                if so_line not in low_priority_stock:
-                    low_priority_stock[so_line] = search_low_stock.available_quantity
-                else:
-                    low_priority_stock[so_line] += search_low_stock.available_quantity
+                if search_low_stock.available_quantity > 0:
+                    if so_line not in low_priority_stock:
+                        low_priority_stock[so_line] = search_low_stock.available_quantity
+                    else:
+                        low_priority_stock[so_line] += search_low_stock.available_quantity
 
         backorder_of_fo_lines = {}
         qty_to_reduce_from_fo_lines = {}
@@ -416,9 +419,6 @@ class SaleOrderInherit(models.Model):
             medium_priority_so_line_lst = []
             for so_line_obj, qty in medium_priority_stock.items():
                 if stock_requirement[so_line_obj] > 0:
-                    search_medium_priority_stock = self.env["stock.quant"].search(
-                        [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)],
-                        limit=1)
                     prd_qty = 0
                     if qty == stock_requirement[so_line_obj]:
                         prd_qty = stock_requirement[so_line_obj]
@@ -488,9 +488,6 @@ class SaleOrderInherit(models.Model):
             low_priority_so_line_lst = []
             for so_line_obj, qty in low_priority_stock.items():
                 if stock_requirement[so_line_obj] > 0:
-                    search_low_priority_stock = self.env["stock.quant"].search(
-                        [('product_id', '=', so_line_obj.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)],
-                        limit=1)
                     prd_qty = 0
                     if qty == stock_requirement[so_line_obj]:
                         prd_qty = stock_requirement[so_line_obj]
@@ -555,11 +552,7 @@ class SaleOrderInherit(models.Model):
                 self.env["sale.order"].create(low_priority_so_vals)
 
         for fo_line, qty in qty_to_reduce_from_fo_lines.items():
-            if fo_line.product_uom_qty == qty:
-                fo_line.write({"product_uom_qty": qty})
-            else:
-                prd_qty = fo_line.product_uom_qty - qty
-                fo_line.write({"product_uom_qty": prd_qty})
+            fo_line.write({"product_uom_qty": qty})
 
         for so_line, so_line_prd_qty in stock_requirement.items():
             if so_line not in top_priority_stock and so_line not in medium_priority_stock and so_line not in low_priority_stock:
