@@ -326,7 +326,8 @@
                 <field name="article_code" optional="hide"/>
             </xpath>
             <xpath expr="//header" position="inside">
-                <button name="fo_action_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>
+<!--                <button name="fo_action_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>-->
+                <button name="action_open_fo_wiz" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>
             </xpath>
             <xpath expr="//button[@id='action_confirm']" position="attributes">
                 <attribute name="attrs">{'invisible':['|', ('state', 'not in', ['sent']), ('is_fo', '=', True)]}</attribute>

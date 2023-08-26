@@ -299,6 +299,48 @@ class SaleOrderInherit(models.Model):
         invoice_vals['journal_id'] = self.l10n_in_journal_id.id
         return invoice_vals
 
+    def action_open_fo_wiz(self):
+        fo_line_lst = []
+
+        top_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '1')], limit=1)
+        medium_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '2')], limit=1)
+        low_priority_warehouse = self.env["stock.warehouse"].search([('priority', '=', '3')], limit=1)
+
+        for rec in self.order_line:
+            if rec.product_id:
+                search_top_stock = self.env["stock.quant"].search(
+                    [('product_id', '=', rec.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)],
+                    limit=1)
+                search_medium_stock = self.env["stock.quant"].search(
+                    [('product_id', '=', rec.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)],
+                    limit=1)
+                search_low_stock = self.env["stock.quant"].search(
+                    [('product_id', '=', rec.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)],
+                    limit=1)
+                fo_line_vals = (0, 0, {
+                    'product_id': rec.product_id.id,
+                    'demand_qty': rec.product_uom_qty,
+                    'top_priority_qty_avail': search_top_stock.available_quantity if search_top_stock.available_quantity > 0 else 0,
+                    'medium_priority_qty_avail': search_medium_stock.available_quantity if search_medium_stock.available_quantity > 0 else 0,
+                    'low_priority_qty_avail': search_low_stock.available_quantity if search_low_stock.available_quantity > 0 else 0,
+                    'top_priority_warehouse': search_top_stock.location_id.id,
+                    'medium_priority_warehouse': search_medium_stock.location_id.id,
+                    'low_priority_warehouse': search_low_stock.location_id.id,
+                    'so_line_id': rec.id,
+                })
+                fo_line_lst.append(fo_line_vals)
+        fo_id = self.env["forecast.order"].create({'forecast_order_ids': fo_line_lst})
+        return {
+            'name': "FO Lines",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'forecast.order',
+            'res_id': fo_id.id,
+            'view_id': self.env.ref('icorets.view_forecast_order_wizard_form').id,
+            'target': 'new'
+        }
+
     ''' This Func is used for creating forecasted orders. '''
     def fo_action_confirm(self):
         top_priority_stock = {}
