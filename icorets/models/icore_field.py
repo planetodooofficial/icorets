@@ -317,9 +317,9 @@ class SaleOrderInherit(models.Model):
         for so_line in self.order_line:
             if so_line not in stock_requirement:
                 stock_requirement[so_line] = so_line.product_uom_qty
-            search_top_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)], limit=1)
-            search_medium_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)], limit=1)
-            search_low_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)], limit=1)
+            search_top_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id), ('available_quantity', '>', 0)], limit=1)
+            search_medium_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id), ('available_quantity', '>', 0)], limit=1)
+            search_low_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id), ('available_quantity', '>', 0)], limit=1)
 
             if search_top_stock:
                 if so_line not in top_priority_stock:
