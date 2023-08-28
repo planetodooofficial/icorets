@@ -335,6 +335,11 @@
             <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
                 <attribute name="attrs">{'invisible':['|', ('state', 'not in', ['draft']), ('is_fo', '=', True)]}</attribute>
             </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_fo_so" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('fo_so_count', '=', 0)]}">
+                        <field name="fo_so_count" widget="statinfo" string="SO"/>
+                </button>
+            </xpath>
 
         </field>
     </record>

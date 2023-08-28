@@ -20,6 +20,7 @@ class FOManual(models.TransientModel):
         low_priority_location = []
         received = 0
         unlink_lines = []
+        so_ids = []
 
         for rec in self.forecast_order_ids:
             if rec.total_received_qty <= rec.demand_qty and rec.total_received_qty > 0 and rec.demand_qty > 0:
@@ -114,6 +115,7 @@ class FOManual(models.TransientModel):
                 top_priority_so_line_lst.append(top_priority_so_line_vals)
             top_priority_so_vals = {
                 'is_fo': False,
+                'fo_id': current_fo.id,
                 'partner_id': current_fo.partner_id.id,
                 'l10n_in_gst_treatment': current_fo.l10n_in_gst_treatment,
                 'partner_invoice_id': current_fo.partner_invoice_id.id,
@@ -130,7 +132,8 @@ class FOManual(models.TransientModel):
                 'order_line': top_priority_so_line_lst,
             }
             if len(top_priority_so_line_lst) >= 1:
-                self.env["sale.order"].create(top_priority_so_vals)
+                top_so_id = self.env["sale.order"].create(top_priority_so_vals)
+                so_ids.append(top_so_id.id)
 
         if len(medium_priority_so_vals) > 0:
             medium_priority_so_line_lst = []
@@ -149,6 +152,7 @@ class FOManual(models.TransientModel):
                 medium_priority_so_line_lst.append(medium_priority_so_line_vals)
             medium_priority_so_vals = {
                 'is_fo': False,
+                'fo_id': current_fo.id,
                 'partner_id': current_fo.partner_id.id,
                 'l10n_in_gst_treatment': current_fo.l10n_in_gst_treatment,
                 'partner_invoice_id': current_fo.partner_invoice_id.id,
@@ -165,7 +169,8 @@ class FOManual(models.TransientModel):
                 'order_line': medium_priority_so_line_lst,
             }
             if len(medium_priority_so_line_lst) >= 1:
-                self.env["sale.order"].create(medium_priority_so_vals)
+                medium_so_id = self.env["sale.order"].create(medium_priority_so_vals)
+                so_ids.append(medium_so_id.id)
 
         if len(low_priority_so_vals) > 0:
             low_priority_so_line_lst = []
@@ -184,6 +189,7 @@ class FOManual(models.TransientModel):
                 low_priority_so_line_lst.append(medium_priority_so_line_vals)
             low_priority_so_vals = {
                 'is_fo': False,
+                'fo_id': current_fo.id,
                 'partner_id': current_fo.partner_id.id,
                 'l10n_in_gst_treatment': current_fo.l10n_in_gst_treatment,
                 'partner_invoice_id': current_fo.partner_invoice_id.id,
@@ -200,8 +206,9 @@ class FOManual(models.TransientModel):
                 'order_line': low_priority_so_line_lst,
             }
             if len(low_priority_so_line_lst) >= 1:
-                self.env["sale.order"].create(low_priority_so_vals)
-        current_fo.write({'state': 'done'})
+                low_so_id = self.env["sale.order"].create(low_priority_so_vals)
+                so_ids.append(low_so_id.id)
+        current_fo.write({'fo_so_count': len(so_ids), 'state': 'done'})
 
 
 class FOLineManual(models.TransientModel):

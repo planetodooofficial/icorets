@@ -252,6 +252,20 @@ class SaleOrderInherit(models.Model):
                                          readonly=True,
                                          states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
     is_fo = fields.Boolean("Is Fo", copy=False, default=False)
+    fo_id = fields.Many2one("sale.order", string="FO ID")
+    fo_so_count = fields.Integer()
+
+    def action_view_fo_so(self):
+        search_so = self.env["sale.order"].search([('fo_id', '=', self.id)])
+        return {
+            'name': _("Sale Orders"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'view_mode': 'tree,form',
+            'views': [(False, 'list'), (False, 'form')],
+            'domain': [('id', 'in', search_so.ids)],
+        }
+
 
     @api.model
     def default_get(self, fields):
