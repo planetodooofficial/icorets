@@ -96,7 +96,6 @@ class FOManual(models.TransientModel):
             fo_bo_id = self.env["sale.order"].create(fo_bo_vals)
             for unlink_line in unlink_lines:
                 unlink_line.unlink()
-            current_fo.write({'state': 'done'})
 
         if len(top_priority_so_vals) > 0:
             top_priority_so_line_lst = []
@@ -202,6 +201,7 @@ class FOManual(models.TransientModel):
             }
             if len(low_priority_so_line_lst) >= 1:
                 self.env["sale.order"].create(low_priority_so_vals)
+        current_fo.write({'state': 'done'})
 
 
 class FOLineManual(models.TransientModel):
