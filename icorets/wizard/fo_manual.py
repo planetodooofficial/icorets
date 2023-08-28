@@ -212,19 +212,20 @@ class FOLineManual(models.TransientModel):
     product_id = fields.Many2one("product.product", "Product")
     so_line_id = fields.Many2one("sale.order.line", "SO Line")
     demand_qty = fields.Float("Demand")
-    top_priority_stock = fields.Float("Received", help="Receive Qty From Top Priority Warehouse")
-    medium_priority_stock = fields.Float("Received", help="Receive Qty From Medium Priority Warehouse")
-    low_priority_stock = fields.Float("Received", help="Receive Qty From Low Priority Warehouse")
+    top_priority_stock = fields.Float("Allocate", help="Receive Qty From Bhiwandi Warehouse")
+    medium_priority_stock = fields.Float("Allocate", help="Receive Qty From Delhi Warehouse")
+    low_priority_stock = fields.Float("Allocate", help="Receive Qty From Low Mumbai Warehouse")
     top_priority_warehouse = fields.Many2one("stock.location", "TPW", help="Top Priority Warehouse")
     medium_priority_warehouse = fields.Many2one("stock.location", "MPW", help="Medium Priority Warehouse")
     low_priority_warehouse = fields.Many2one("stock.location", "LPW", help="Low Priority Warehouse")
-    top_priority_qty_avail = fields.Float("TPAQ", help="Top Priority Stock Available")
-    medium_priority_qty_avail = fields.Float("MPAQ", help="Medium Priority Stock Available")
-    low_priority_qty_avail = fields.Float("LPAQ", help="Low Priority Stock Available")
-    total_received_qty = fields.Float("Total Qty Received", compute="_compute_total_qty_received")
+    top_priority_qty_avail = fields.Float("Bhiwandi", help="Bhiwandi Stock Available")
+    medium_priority_qty_avail = fields.Float("Delhi", help="Delhi Stock Available")
+    low_priority_qty_avail = fields.Float("Mumbai", help="Mumbai Stock Available")
+    total_received_qty = fields.Float("Total Qty Received")
+    total_pending_qty = fields.Float("Total Qty Pending", compute="_compute_total_pending_qty", store=True)
 
     @api.depends("top_priority_stock", "medium_priority_stock", "low_priority_stock")
-    def _compute_total_qty_received(self):
+    def _compute_total_pending_qty(self):
         for rec in self:
             rec.top_priority_stock = abs(rec.top_priority_stock)
             rec.medium_priority_stock = abs(rec.medium_priority_stock)
@@ -232,3 +233,6 @@ class FOLineManual(models.TransientModel):
             if (rec.top_priority_stock > rec.top_priority_qty_avail) or (rec.medium_priority_stock > rec.medium_priority_qty_avail) or (rec.low_priority_stock > rec.low_priority_qty_avail):
                 raise ValidationError("You cannot receive more than what is currently in stock.")
             rec.total_received_qty = rec.top_priority_stock + rec.medium_priority_stock + rec.low_priority_stock
+            rec.total_pending_qty = rec.demand_qty - (rec.top_priority_stock + rec.medium_priority_stock + rec.low_priority_stock)
+            if rec.total_pending_qty < 0:
+                raise ValidationError("You cannot receive more than demand.")

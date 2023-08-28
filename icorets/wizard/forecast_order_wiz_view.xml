@@ -10,16 +10,17 @@
                     <tree editable="bottom" create="0" edit="1" delete="0">
                         <field name="product_id" required="1" readonly="1"/>
                         <field name="demand_qty" required="1" readonly="1"/>
-                        <field name="top_priority_warehouse" readonly="1" optional="hide"/>
+<!--                        <field name="top_priority_warehouse" readonly="1" optional="hide"/>-->
                         <field name="top_priority_qty_avail" readonly="1" optional="show"/>
                         <field name="top_priority_stock"/>
-                        <field name="medium_priority_warehouse" readonly="1" optional="hide"/>
+<!--                        <field name="medium_priority_warehouse" readonly="1" optional="hide"/>-->
                         <field name="medium_priority_qty_avail" readonly="1" optional="show"/>
                         <field name="medium_priority_stock"/>
-                        <field name="low_priority_warehouse" readonly="1" optional="hide"/>
+<!--                        <field name="low_priority_warehouse" readonly="1" optional="hide"/>-->
                         <field name="low_priority_qty_avail" readonly="1" optional="show"/>
                         <field name="low_priority_stock"/>
-                        <field name="total_received_qty"/>
+                        <field name="total_pending_qty" readonly="1"/>
+                        <field name="total_received_qty" readonly="1" optional="hide"/>
                     </tree>
                 </field>
                 <footer>
