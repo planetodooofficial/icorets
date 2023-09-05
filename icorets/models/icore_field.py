@@ -102,7 +102,9 @@ class AccountMoveInheritClass(models.Model):
     event = fields.Char('Event')
     type_s = fields.Selection([
         ('sor', 'SOR'),
-        ('outwrite', 'OutWrite'),
+        ('outwrite', 'Outright'),
+        ('sample', 'Sample'),
+        ('sp_player', 'Sponsored Player'),
 
     ])
 
