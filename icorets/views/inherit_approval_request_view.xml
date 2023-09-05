@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="inherit_approval_request_form_view" model="ir.ui.view">
+        <field name="name">inherit.approval.request.form.view</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_show_contact" class="oe_stat_button" icon="fa-pencil-square-o">
+                    <field name="vendor_count" widget="statinfo" string="Vendor" options="{'reload_on_button': true}"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
