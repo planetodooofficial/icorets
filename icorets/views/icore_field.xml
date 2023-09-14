@@ -142,6 +142,9 @@
                         <group>
                             <field name="brand_id_rel"/>
                             <field name="variants_asin"/>
+                            <field name="variants_func_spo"/>
+                            <field name="variants_gender"/>
+                            <field name="variants_tech_feat"/>
                             <field name="variants_fsn"/>
                             <field name="variant_article_code"/>
                         </group>
