@@ -25,6 +25,9 @@ class ProductVariantInherit(models.Model):
     variants_ean_code = fields.Char('EAN Code')
     variant_article_code = fields.Char('Article Code')
     variants_asin = fields.Char('ASIN')
+    variants_func_spo = fields.Char('Function / Sport')
+    variants_gender = fields.Char('Gender')
+    variants_tech_feat = fields.Char('Technology / Features')
     variants_fsn = fields.Char('FSN')
     variant_cost = fields.Float('Invalid Cost')  # not used
     variant_packaging_cost = fields.Float('Packaging Cost')
@@ -59,7 +62,7 @@ class ProductInherit(models.Model):
 
     material = fields.Char('Moc')
     brand_id = fields.Many2one('product.brand', 'Brand')
-    occasion = fields.Char('Occasion')
+    occasion = fields.Char('Event')
     style_code = fields.Char('Style Code')
     buin = fields.Char('BUIN')
     parent_buin = fields.Char('parent_buin')
