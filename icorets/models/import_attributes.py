@@ -136,6 +136,20 @@ class ImportAttributes(models.TransientModel):
                             if i['Size'] not in attribute.value_ids.ids:
                                 attribute.value_ids = [(4, search_attribute_value_size.id)]
 
+class UpdateAttributes(models.TransientModel):
+    _name = 'update.attributes'
+    _description = 'Update Attribute Wizard'
+
+    upload_attributes_file = fields.Binary('File')
+
+    def convert_to_df(self):
+        csv_data = self.upload_attributes_file
+        file_obj = TemporaryFile('wb+')
+        csv_data = base64.decodebytes(csv_data)
+        file_obj.write(csv_data)
+        file_obj.seek(0)
+        return pd.read_csv(file_obj).fillna(False)
+
     def update_variants(self):
 
         csv_data = base64.b64decode(self.upload_attributes_file)

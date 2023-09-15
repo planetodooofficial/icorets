@@ -216,8 +216,8 @@
 
     <!--  button for update product-->
     <record model="ir.ui.view" id="view_update_attributes_form">
-        <field name="name">Import Attributes</field>
-        <field name="model">import.attributes</field>
+        <field name="name">Update Attributes</field>
+        <field name="model">update.attributes</field>
         <field name="arch" type="xml">
             <form>
                 <group>
@@ -238,7 +238,7 @@
     <record model="ir.actions.act_window" id="action_update_attributes_form">
         <field name="name">Update Attributes</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">import.attributes</field>
+        <field name="res_model">update.attributes</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
