@@ -244,7 +244,7 @@ class AccountMoveLineInherit(models.Model):
 class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
 
-    po_no = fields.Char('PO No')
+    # po_no = fields.Char('PO No')
     no_of_cartons = fields.Char('No of Cartons')
     location_id = fields.Many2one(
         'stock.location', ' Source Location',
@@ -310,7 +310,7 @@ class SaleOrderInherit(models.Model):
     def _prepare_invoice(self):
         invoice_vals = super(SaleOrderInherit, self)._prepare_invoice()
         invoice_vals['dispatch_partner_id'] = self.warehouse_id.partner_id.id
-        invoice_vals['po_no'] = self.po_no
+        # invoice_vals['po_no'] = self.po_no
         invoice_vals['event'] = self.event
         invoice_vals['journal_id'] = self.l10n_in_journal_id.id
         return invoice_vals
