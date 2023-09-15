@@ -105,7 +105,7 @@ class ImportAttributes(models.TransientModel):
 
                     product_vals = {
                         'name': i['Title'],
-                        'barcode': i['EAN Code'],
+                        # 'barcode': i['EAN Code'],
                         'material': i['Material'],
                         'occasion': i['Occasion'],
                         'style_code': i['Style Code'],
