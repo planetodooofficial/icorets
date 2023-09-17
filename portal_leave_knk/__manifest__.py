@@ -14,9 +14,9 @@
     """,
     'category': 'Human Resources/Time Off',
     'license': 'OPL-1',
-    'author': 'Kanak Infosystems LLP.',
-    'company': 'Kanak Infosystems LLP.',
-    'website': 'https://www.kanakinfosystems.com',
+    'author': 'PlanetOdoo.',
+    'company': '',
+    'website': '',
     'images': ['static/description/banner.jpg'],
     'depends': ['base', 'website', 'hr_holidays', 'portal', 'portal_hr_knk'],
     'data': [

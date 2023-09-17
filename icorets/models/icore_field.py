@@ -119,6 +119,40 @@ class AccountMoveInheritClass(models.Model):
     ])
     cust_code = fields.Char("Code", compute="_compute_cust_code", store=True)
 
+    # Added default get for false journal
+    @api.model
+    def default_get(self, fields_list):
+        res = super(AccountMoveInheritClass, self).default_get(fields_list)
+        res['journal_id'] = False
+        return res
+
+    # Onchange for journal through gstin
+    @api.onchange('gstin_id')
+    def onchange_gstin_id(self):
+        domain = []
+        if self.move_type == "out_invoice":
+            domain = [('l10n_in_gstin_partner_id.vat', '=', self.gstin_id.vat), ('type', '=', 'sale')]
+            journal_ids = self.env['account.journal'].search([("l10n_in_gstin_partner_id", '=', self.gstin_id.id),
+                                                              ('type', '=', 'sale')])
+            self.journal_id = False
+            if len(journal_ids) == 1:
+                self.journal_id = journal_ids.id
+        elif self.move_type == "in_invoice":
+            domain = [('l10n_in_gstin_partner_id.vat', '=', self.gstin_id.vat), ('type', '=', 'purchase')]
+            journal_ids = self.env['account.journal'].search([("l10n_in_gstin_partner_id", '=', self.gstin_id.id),
+                                                              ('type', '=', 'purchase')])
+            self.journal_id = False
+            if len(journal_ids) == 1:
+                self.journal_id = journal_ids.id
+        else:
+            if self._context.get('default_custom_payment_type'):
+                domain = [('type', '=', 'bank')]
+            else:
+                domain = [('company_id', '=', self.env.company.id)]
+
+        # domain.append(('id', 'in', self.suitable_journal_ids.ids))
+        return {'domain': {'journal_id': domain}}
+
     @api.depends("partner_id")
     def _compute_cust_code(self):
         for rec in self:
