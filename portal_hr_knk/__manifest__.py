@@ -11,8 +11,8 @@
 => Make Employee Portal User
 => Allow all portal features""",
     'license': 'OPL-1',
-    'author': 'Kanak Infosystems LLP.',
-    'website': 'https://www.kanakinfosystems.com',
+    'author': 'Planet Odoo.',
+    'website': 'https://www.planet-odoo.com/',
     'category': 'Hidden',
     'depends': ['base', 'website', 'hr', 'portal'],
     'data': [
