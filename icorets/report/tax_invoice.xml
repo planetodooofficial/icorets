@@ -102,7 +102,7 @@
                                 <!--                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>-->
                                 <!--                                    </t>-->
                                 <!--                                </t>-->
-                                <span t-esc="o.po_no"/>
+                                <span t-esc="o.ref"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -499,7 +499,7 @@
                                 <!--                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>-->
                                 <!--                                    </t>-->
                                 <!--                                </t>-->
-                                <span t-esc="o.po_no"/>
+                                <span t-esc="o.ref"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -898,7 +898,7 @@
                                 <!--                                            <span t-esc="acc.sale_line_ids.order_id.mapped('po_no')[0]"/></t>-->
                                 <!--                                    </t>-->
                                 <!--                                </t>-->
-                                <span t-esc="o.po_no"/>
+                                <span t-esc="o.ref"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">

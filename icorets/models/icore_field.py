@@ -108,7 +108,7 @@ class AccountMoveInheritClass(models.Model):
 
     check_amount_in_words = fields.Char(compute='_amt_in_words', string='Amount in Words')
     # warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
-    po_no = fields.Char('PO No')
+    # po_no = fields.Char('PO No')
     event = fields.Char('Event')
     type_s = fields.Selection([
         ('sor', 'SOR'),
