@@ -1018,29 +1018,30 @@ class InheritResPartner(models.Model):
     def name_get(self):
         return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (record.id, "%s" % (record.name)) for record in self]
 
-    @api.model_create_multi
-    def create(self, vals):
-        result = super(InheritResPartner, self).create(vals)
-        active_ids = self.env.context.get('default_supplier_rank')
-        if active_ids:
-            result.active = False
-            approval_category_id = self.env['approval.category'].sudo().search([
-                ('name', '=', 'Vendor')
-            ], limit=1)
-            if not approval_category_id:
-                raise ValidationError("'Vendor' Approval Category Is Not Created.")
-
-            approval_vals = {
-                'name': "Vendor Approval",
-                'request_owner_id': self.env.user.id,
-                'cust_partner_id': result.id,
-                "category_id": approval_category_id.id,
-                "vendor_count": 1,
-            }
-            data = self.env['approval.request'].create(approval_vals)
-            data.action_confirm()
-            print(data)
-        return result
+    # Commented Approval cateory on creating vendor
+    # @api.model_create_multi
+    # def create(self, vals):
+    #     result = super(InheritResPartner, self).create(vals)
+    #     active_ids = self.env.context.get('default_supplier_rank')
+    #     if active_ids:
+    #         result.active = False
+    #         approval_category_id = self.env['approval.category'].sudo().search([
+    #             ('name', '=', 'Vendor')
+    #         ], limit=1)
+    #         if not approval_category_id:
+    #             raise ValidationError("'Vendor' Approval Category Is Not Created.")
+    #
+    #         approval_vals = {
+    #             'name': "Vendor Approval",
+    #             'request_owner_id': self.env.user.id,
+    #             'cust_partner_id': result.id,
+    #             "category_id": approval_category_id.id,
+    #             "vendor_count": 1,
+    #         }
+    #         data = self.env['approval.request'].create(approval_vals)
+    #         data.action_confirm()
+    #         print(data)
+    #     return result
 
     # @api.model
     # def default_get(self, fields):
