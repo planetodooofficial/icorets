@@ -5,3 +5,4 @@ product_brand,product.brand,model_product_brand,,1,1,1,1
 alias_name,alias_name,model_alias_name,,1,1,1,1
 forecast_order,forecast_order,model_forecast_order,,1,1,1,1
 forecast_order_line,forecast_order_line,model_forecast_order_line,,1,1,1,1
+update_picking_list,packing.list.manual,model_packing_list_manual,,1,1,1,1

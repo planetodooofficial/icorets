@@ -10,6 +10,7 @@ from tempfile import TemporaryFile
 import pandas as pd
 import datetime
 from datetime import datetime
+from io import BytesIO
 
 from odoo.exceptions import ValidationError
 from odoo.tools import json, float_round, get_lang, DEFAULT_SERVER_DATETIME_FORMAT
@@ -18,16 +19,14 @@ from odoo.tools import json, float_round, get_lang, DEFAULT_SERVER_DATETIME_FORM
 class ProductVariantInherit(models.Model):
     _inherit = "product.product"
 
-    variant_asin = fields.Char('') #Not used
-    variant_fsn = fields.Char('') #Not used
-    variant_ean_code = fields.Char('') #Not used
+
 
     variants_ean_code = fields.Char('EAN Code')
-    variant_article_code = fields.Char('Article Code')
+    variant_article_code = fields.Char(related='product_tmpl_id.article_code', string='Article Code')
     variants_asin = fields.Char('ASIN')
-    variants_func_spo = fields.Char('Function / Sport')
-    variants_gender = fields.Char('Gender')
-    variants_tech_feat = fields.Char('Technology / Features')
+    variants_func_spo = fields.Char(related='product_tmpl_id.func_spo', string='Function / Sport')
+    variants_gender = fields.Char(related='product_tmpl_id.gender', string='Gender')
+    variants_tech_feat = fields.Char(related='product_tmpl_id.tech_feat', string='Technology / Features')
     variants_fsn = fields.Char('FSN')
     variant_cost = fields.Float('Invalid Cost')  # not used
     variant_packaging_cost = fields.Float('Packaging Cost')
@@ -35,6 +34,8 @@ class ProductVariantInherit(models.Model):
     brand_id_rel = fields.Many2one(related='product_tmpl_id.brand_id', string="Brand")
     color = fields.Char('Color')
     size = fields.Char('Size')
+    buin = fields.Char('BUIN')
+
 
     # Inherited and removed domain
     product_template_variant_value_ids = fields.Many2many('product.template.attribute.value',
@@ -64,8 +65,7 @@ class ProductInherit(models.Model):
     brand_id = fields.Many2one('product.brand', 'Brand')
     occasion = fields.Char('Event')
     style_code = fields.Char('Style Code')
-    buin = fields.Char('BUIN')
-    parent_buin = fields.Char('parent_buin')
+    parent_buin = fields.Char('Parent buin')
     user_defined_miscallaneous1 = fields.Char('User Defined Miscallaneous1')
     user_defined_miscallaneous2 = fields.Char('User Defined Miscallaneous2')
     user_defined_miscallaneous3 = fields.Char('User Defined Miscallaneous3')
@@ -81,6 +81,11 @@ class ProductInherit(models.Model):
     weight = fields.Float('Weight (Dimensions)')
     cntry_of_origin = fields.Char('Country of Origin')
     manufacture_year = fields.Date('Manufacture Year')
+
+    article_code = fields.Char('Article Code')
+    func_spo = fields.Char('Function / Sport')
+    gender = fields.Char('Gender')
+    tech_feat = fields.Char('Technology / Features')
 
     _sql_constraints = [
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
@@ -958,6 +963,17 @@ class StockPickingInherit(models.Model):
             res.location_id = stock_transfers_search.location_id.id
         return res
 
+    # For uploading detailed transfers by importing file
+    def update_picking_list_wizard(self):
+        return {
+            'name': 'Upload File',
+            'type': 'ir.actions.act_window',
+            'res_model': 'packing.list.manual',
+            'view_mode': 'form',
+            'view_id': self.env.ref('icorets.view_bag_entry_manual_wizard_form').id,
+            'target': 'new',
+        }
+
 # Code for populating stock in stock.move.line
 
 class StockMoveLineInherit(models.Model):
@@ -1018,6 +1034,7 @@ class InheritResPartner(models.Model):
     def name_get(self):
         return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (record.id, "%s" % (record.name)) for record in self]
 
+
     # Commented Approval cateory on creating vendor
     # @api.model_create_multi
     # def create(self, vals):
@@ -1056,3 +1073,52 @@ class InheritResPartner(models.Model):
     #             res['is_approved'] = True
     #             res['active'] = True
     #     return res
+
+# Created for Packing List
+class PackingListManual(models.TransientModel):
+    _name = "packing.list.manual"
+    _description = "Manual Packing List"
+
+    upload_file = fields.Binary("Upload File", required=True, help="Upload your .csv file here.")
+    file_name = fields.Char('File Name')
+    alert_notification = fields.Html(
+        default="<h6 style='color:red;text-align:center;'>Please Upload .CSV File Only.</h6>", readonly=True)
+
+    def action_confirm(self):
+        active_id = self.env.context.get('active_id')
+        picking_id = self.env["stock.picking"].browse(active_id)
+        excel_data = self.upload_file
+        filename = BytesIO(base64.b64decode(excel_data))
+        data = pd.read_csv(filename)
+
+        cols_to_check = ['Product', 'Unit of Measure', 'Source Package','Done Quantity']
+        empty_column = data[cols_to_check].isnull().any()
+        cols_with_null_names = empty_column[empty_column == True].index.tolist()
+
+        if cols_with_null_names:
+            raise ValidationError("Empty cells in %s columns." % cols_with_null_names)
+
+        st_move_line_lst = []
+        for index, rows in data.iterrows():
+            search_product = self.env["product.product"].search([('default_code', '=', rows['Product'])], limit=1)
+            if not search_product:
+                raise ValidationError(f"Product {rows['Product']} Not Found.")
+
+            search_uom = self.env["uom.uom"].search([('name', '=', rows['Unit of Measure'])], limit=1)
+            if not search_uom:
+                raise ValidationError(f"Unit of Measure {rows['Unit of Measure']} Not Found.")
+
+
+            package_obj = self.env['stock.quant.package']
+            if rows['Source Package']:
+                pck = package_obj.create({'name': rows['Source Package'] + " " + '('+ picking_id.origin +')'})
+
+            st_move_line_vals = (0, 0, {
+                'product_id': search_product.id,
+                'product_uom_id': search_uom.id,
+                'package_id': pck.id,
+                'qty_done': rows['Done Quantity'],
+
+            })
+            st_move_line_lst.append(st_move_line_vals)
+        picking_id.write({'move_line_ids_without_package': st_move_line_lst})

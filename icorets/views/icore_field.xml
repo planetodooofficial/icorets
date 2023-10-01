@@ -36,6 +36,19 @@
         </field>
     </record>
 
+<!--    Picking form inherited-->
+    <record model="ir.ui.view" id="stock_picking_inherited_view_transfers">
+        <field name="name">stock.picking.inherited.transfers</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button string="Updating Picking List" name="update_picking_list_wizard" type="object" class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <!--    For adding codes in product.product smart button view-->
     <record id="product_variant_form_view_inherit" model="ir.ui.view">
         <field name="name">product.variant.only.form.view.inherit</field>
@@ -57,6 +70,7 @@
                 <field name="variant_total_cost" />
                 <field name="color"/>
                 <field name="size"/>
+                <field name="buin"/>
             </xpath>
 
         </field>
@@ -101,8 +115,11 @@
                             <field name="occasion"/>
                             <field name="material"/>
                             <field name="style_code"/>
+                            <field name="article_code"/>
+                            <field name="func_spo"/>
+                            <field name="gender"/>
+                            <field name="tech_feat"/>
                             <field name="brand_id"/>
-                            <field name="buin"/>
                             <field name="parent_buin"/>
                         </group>
                         <group>
@@ -147,6 +164,7 @@
                             <field name="variants_tech_feat"/>
                             <field name="variants_fsn"/>
                             <field name="variant_article_code"/>
+                            <field name="buin"/>
                         </group>
                         <group>
                             <field name="variant_total_cost"/>
@@ -447,6 +465,29 @@
             <xpath expr="//field[@name='deductee_type_id']" position="replace">
                 <field name="deductee_type_id" required="0" invisible="1"/>
             </xpath>
+        </field>
+    </record>
+
+<!--    Upload Packing list-->
+    <record id="view_bag_entry_manual_wizard_form" model="ir.ui.view">
+        <field name="name">packing.list.manual.wizard.form</field>
+        <field name="model">packing.list.manual</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="alert_notification"/>
+                <group>
+                    <group>
+                        <field name="file_name" invisible="1"/>
+                        <field name="upload_file" options="{'accepted_file_extensions':'.csv'}" filename="file_name"/>
+                    </group>
+                    <group>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn btn-outline-success"/>
+                    <button string="Cancel" class="btn btn-outline-danger" special="cancel"/>
+                </footer>
+            </form>
         </field>
     </record>
 
