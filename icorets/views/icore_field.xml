@@ -115,7 +115,6 @@
                             <field name="occasion"/>
                             <field name="material"/>
                             <field name="style_code"/>
-                            <field name="article_code"/>
                             <field name="func_spo"/>
                             <field name="gender"/>
                             <field name="tech_feat"/>

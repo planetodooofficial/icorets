@@ -109,7 +109,6 @@ class ImportAttributes(models.TransientModel):
                         'material': i['Material'],
                         'occasion': i['Occasion'],
                         'style_code': i['Style Code'],
-                        'article_code': i['Article Code'],
                         'l10n_in_hsn_code': i['HSN Code'],
                         'func_spo': i['Function/Sport'],
                         'gender': i['Gender'],
@@ -170,6 +169,7 @@ class UpdateAttributes(models.TransientModel):
             stylecode = row['Style Code']
             internal_ref = row['SKU Code']
             ean = row['EAN Code']
+            article = row['Article Code']
             fsn = row['FSN']
             asin = row['ASIN']
 
@@ -195,6 +195,7 @@ class UpdateAttributes(models.TransientModel):
                         product_variant.update({'variants_asin': asin})
                     if fsn:
                         product_variant.update({'variants_fsn': fsn})
+                    product_variant.update({'variant_article_code': article})
             elif product_template_size:
                 for product_variant in product_template_size:
                     product_variant.update({'default_code': internal_ref})
@@ -203,6 +204,7 @@ class UpdateAttributes(models.TransientModel):
                         product_variant.update({'variants_asin': asin})
                     if fsn:
                         product_variant.update({'variants_fsn': fsn})
+                    product_variant.update({'variant_article_code': article})
             elif product_template_color:
                 for product_variant in product_template_color:
                     product_variant.update({'default_code': internal_ref})
@@ -211,6 +213,7 @@ class UpdateAttributes(models.TransientModel):
                         product_variant.update({'variants_asin': asin})
                     if fsn:
                         product_variant.update({'variants_fsn': fsn})
+                    product_variant.update({'variant_article_code': article})
 
 
 

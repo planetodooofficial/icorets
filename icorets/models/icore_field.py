@@ -22,7 +22,7 @@ class ProductVariantInherit(models.Model):
 
 
     variants_ean_code = fields.Char('EAN Code')
-    variant_article_code = fields.Char(related='product_tmpl_id.article_code', string='Article Code')
+    variant_article_code = fields.Char(string='Article Code')
     variants_asin = fields.Char('ASIN')
     variants_func_spo = fields.Char(related='product_tmpl_id.func_spo', string='Function / Sport')
     variants_gender = fields.Char(related='product_tmpl_id.gender', string='Gender')
@@ -82,7 +82,6 @@ class ProductInherit(models.Model):
     cntry_of_origin = fields.Char('Country of Origin')
     manufacture_year = fields.Date('Manufacture Year')
 
-    article_code = fields.Char('Article Code')
     func_spo = fields.Char('Function / Sport')
     gender = fields.Char('Gender')
     tech_feat = fields.Char('Technology / Features')
