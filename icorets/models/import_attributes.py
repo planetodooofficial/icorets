@@ -163,7 +163,7 @@ class UpdateAttributes(models.TransientModel):
         csv_reader = csv.DictReader(csv_data[1:], fieldnames=header)
 
         for row in csv_reader:
-            internal_ref = row['SKU_Code']
+            internal_ref = row['SKU Code']
             color = row['Color']
             size = row['Size']
             title = row['Title']
