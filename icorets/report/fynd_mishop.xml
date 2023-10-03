@@ -270,7 +270,7 @@
                                     <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
                                     <t t-esc="line.product_id.brand_id_rel.name"/><br/>
                                     <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color: </b></span><t t-esc="line.fetch_color()"/>
+                                    <span><b>Color: </b></span><t t-esc="line.color"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.l10n_in_hsn_code"/>
