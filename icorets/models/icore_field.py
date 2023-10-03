@@ -1148,6 +1148,7 @@ class InvoiceServiceInherit(models.Model):
             url_path="/iap/einvoice/setup", params=params
         )
         print("SEEE PARAMETER",params)
+        _logger.info('Parameteres for Einvoice Bill setup: %s', params)
         self.token_validity = fields.Datetime.to_datetime(
             response["data"]["TokenExpiry"]
         ) - timedelta(hours=5, minutes=30, seconds=00)
