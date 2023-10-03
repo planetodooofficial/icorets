@@ -326,6 +326,7 @@
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="warehouse_id" readonly="0" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
                 <field name="location_id" attrs="{'readonly': [('state', 'not in', 'draft')]}" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
+                <field name="gstin_id" domain="[('is_gstin', '=', 'True')]" options="{'no_open': True, 'no_edit': True, 'no_create': True}" attrs="{'readonly': [('state', '=', 'posted')]}"/>
                 <field name="l10n_in_journal_id" domain="[('company_id', '=', company_id), ('type','=','sale')]" options="{'no_create': True}" attrs="{'invisible': [('country_code','!=', 'IN')]}"/>
                 <field name="client_order_ref" string="PO No"/>
                 <field name="event"/>
@@ -343,10 +344,11 @@
 
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
                 <field name="hsn_c" optional="hide"/>
-                <field name="article_code" optional="hide"/>
+
             </xpath>
-            <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="after">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="before">
                 <field name="article_code" optional="hide"/>
+                <field name="size" optional="hide"/>
             </xpath>
             <xpath expr="//header" position="inside">
                 <!--                <button name="fo_action_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>-->

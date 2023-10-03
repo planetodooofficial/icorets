@@ -297,6 +297,7 @@ class SaleOrderInherit(models.Model):
     is_fo = fields.Boolean("Is Fo", copy=False, default=False)
     fo_id = fields.Many2one("sale.order", string="FO ID")
     fo_so_count = fields.Integer()
+    gstin_id = fields.Many2one('res.partner', 'GSTIN')
 
     def action_view_fo_so(self):
         search_so = self.env["sale.order"].search([('fo_id', '=', self.id)])
@@ -354,6 +355,7 @@ class SaleOrderInherit(models.Model):
         # invoice_vals['po_no'] = self.po_no
         invoice_vals['event'] = self.event
         invoice_vals['journal_id'] = self.l10n_in_journal_id.id
+        invoice_vals['gstin_id'] = self.gstin_id.id
         return invoice_vals
 
     def action_open_fo_wiz(self):
@@ -726,6 +728,7 @@ class SaleOrderLineInherit(models.Model):
     stock_quantity = fields.Float('Stock Quantity')
     hsn_c = fields.Many2one(string='HSN Code', related='product_id.product_tmpl_id.sale_hsn')
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
+    size = fields.Char(string='Size', related='product_id.size')
 
     @api.depends('product_id')
     def _compute_name(self):
