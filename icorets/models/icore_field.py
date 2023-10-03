@@ -1,7 +1,8 @@
 from lxml import etree
 
 from num2words import num2words
-
+from datetime import timedelta
+import logging
 from odoo import models, api, fields, _
 import base64
 import csv
@@ -11,6 +12,8 @@ import pandas as pd
 import datetime
 from datetime import datetime
 from io import BytesIO
+from odoo.addons.iap import jsonrpc
+
 
 from odoo.exceptions import ValidationError
 from odoo.tools import json, float_round, get_lang, DEFAULT_SERVER_DATETIME_FORMAT
@@ -1128,3 +1131,50 @@ class PackingListManual(models.TransientModel):
             })
             st_move_line_lst.append(st_move_line_vals)
         picking_id.write({'move_line_ids_without_package': st_move_line_lst})
+
+_logger = logging.getLogger(__name__)
+DEFAULT_ENDPOINT = "https://einvoice.odoo.co.in"
+
+class InvoiceServiceInherit(models.Model):
+    _inherit = "l10n.in.einvoice.service"
+
+    #inherited for logger
+
+    def setup(self, gstn_password=None):
+        self.ensure_one()
+        password = gstn_password or self.gstn_password
+        params = {"password": password}
+        response = self._connect_to_server(
+            url_path="/iap/einvoice/setup", params=params
+        )
+        print("SEEE PARAMETER",params)
+        _logger.info('Parameteres for Einvoice Bill setup: %s', params)
+        self.token_validity = fields.Datetime.to_datetime(
+            response["data"]["TokenExpiry"]
+        ) - timedelta(hours=5, minutes=30, seconds=00)
+        self.token = response["data"]["AuthToken"]
+
+
+    def _connect_to_server(self, url_path, params):
+        self.ensure_one()
+        user_token = self.env["iap.account"].get("einvoice_india")
+        params.update(
+            {
+                "account_token": user_token.account_token,
+                "username": self.gstn_username,
+                "gstin": self.gstin,
+            }
+        )
+        _logger.info('Parameteres for Einvoice Bill: %s', params)
+        endpoint = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("einvoice_india.endpoint", DEFAULT_ENDPOINT)
+        )
+        url = "%s%s" % (endpoint, url_path)
+
+        json_resp = jsonrpc(url, params=params)
+        _logger.info('Einvoice Json Response: %s', json_resp)
+        return json_resp
+
+
