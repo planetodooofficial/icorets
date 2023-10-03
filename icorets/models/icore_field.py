@@ -759,9 +759,9 @@ class SaleOrderLineInherit(models.Model):
         Compute the amounts of the SO line.
         """
         for line in self:
-            if self.product_uom_qty < 0:
+            if line.product_uom_qty < 0:
                 line.product_uom_qty = (line.product_uom_qty) * -1
-            if self.price_unit < 0:
+            if line.price_unit < 0:
                 line.price_unit = (line.price_unit) * -1
             tax_results = self.env['account.tax']._compute_taxes([line._convert_to_tax_base_line_dict()])
             totals = list(tax_results['totals'].values())[0]
@@ -893,9 +893,9 @@ class PurchaseOrderLineInherit(models.Model):
     @api.depends('product_qty', 'price_unit', 'taxes_id')
     def _compute_amount(self):
         for line in self:
-            if self.product_qty < 0:
+            if line.product_qty < 0:
                 line.product_qty = (line.product_qty) * -1
-            if self.price_unit < 0:
+            if line.price_unit < 0:
                 line.price_unit = (line.price_unit) * -1
             tax_results = self.env['account.tax']._compute_taxes([line._convert_to_tax_base_line_dict()])
             totals = list(tax_results['totals'].values())[0]
