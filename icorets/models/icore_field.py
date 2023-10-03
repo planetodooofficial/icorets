@@ -1165,14 +1165,15 @@ class InvoiceServiceInherit(models.Model):
                 "gstin": self.gstin,
             }
         )
-        _logger.info('Parameteres for Einvoice Bill: %s', params)
         endpoint = (
             self.env["ir.config_parameter"]
             .sudo()
             .get_param("einvoice_india.endpoint", DEFAULT_ENDPOINT)
         )
         url = "%s%s" % (endpoint, url_path)
+        raise ValidationError(url)
 
+        _logger.info('Parameteres for Einvoice Bill: %s', params)
         json_resp = jsonrpc(url, params=params)
         _logger.info('Einvoice Json Response: %s', json_resp)
         return json_resp
