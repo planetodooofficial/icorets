@@ -209,7 +209,7 @@
                     </table>
                     <br/>
                     <table class="table table-sm o_main_table" style="width: 100%">
-                        <thead>
+                                            <thead>
 
 
                             <tr style="background-color:#87CEEB">
@@ -279,7 +279,7 @@
                                 </td>
 
                                 <td>
-                                    <t t-esc="line.quantity"/>&#160;<t t-esc="line.product_uom_id.name"/>
+                                    <t t-esc="line.quantity"/> <t t-esc="line.product_uom_id.name"/>
                                 </td>
                                 <td>
                                     <t t-esc="'%.2f'% line.price_unit"/>
@@ -308,7 +308,7 @@
                                         </t>
                                     </t>
                                 </td>
-                                <td style="text-align: right">
+                                <td style="text-align: center">
                                     <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td>
@@ -325,17 +325,17 @@
                                     <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
                                 </td>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.price_unit for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.price_subtotal for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2) "/>
                             </td>
-                            <td></td>
+                            <td/>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.tax_amount_line for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.tax_amount_line for l in o.invoice_line_ids), 2)"/>
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.price_total for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.price_total for l in o.invoice_line_ids), 2) "/>
                             </td>
                         </tr>
 

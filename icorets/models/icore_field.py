@@ -807,6 +807,12 @@ class PurchaseOrderInherit(models.Model):
         self.is_approve = True
         return res
 
+    def _prepare_invoice(self):
+        invoice_vals = super(PurchaseOrderInherit, self)._prepare_invoice()
+        invoice_vals['gstin_id'] = self.gstin_id.id
+        invoice_vals['journal_id'] = self.l10n_in_journal_id.id
+        return invoice_vals
+
 
 class PurchaseOrderLineInherit(models.Model):
     _inherit = 'purchase.order.line'

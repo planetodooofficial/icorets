@@ -7,7 +7,7 @@
         <field name="format">A4</field>
         <field name="page_height">0</field>
         <field name="page_width">0</field>
-        <field name="orientation">Portrait</field>
+        <field name="orientation">Landscape</field>
         <field name="margin_top">30</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">5</field>
@@ -115,22 +115,36 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>PO#</strong>
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.ref">
-                                            <span t-esc="acc.sale_line_ids.order_id.mapped('ref')[0]"/></t>
-                                    </t>
-                                </t>
+                                <!--<t t-if="o.invoice_line_ids">-->
+                                <!--    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+                                <!--        <t t-if="acc.sale_line_ids.order_id.ref">-->
+                                            <span t-esc="o.ref"/>
+                                <!--    </t>-->
+                                <!--</t>-->
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
-                                <strong>Ack. No:</strong><br/>
-                                <strong>IRN No :</strong> </td> <!--# IRN No break on letter 46-->
+                            <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span t-esc="o.ref"/> <br/>
+                                <strong>Ack. No:</strong> <span t-esc="o.transaction_id.ack_no"/><br/>
+                                <strong>IRN No :</strong> <span t-esc="o.transaction_id.name"/> </td> <!--# IRN No break on letter 46-->
 
                         </tr>
                         <tr>
-                            <td style="border:1px solid black" rowspan="8">QR</td>
+                            <!--<td style="border:1px solid black" rowspan="8">QR</td>-->
+                            <t t-if="doc.transaction_id.qr_code">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="8">
+                                    <t t-if="doc.transaction_id.qr_code">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %                 ('QR', doc.transaction_id.qr_code, 200, 200)"/></t>
+
+                                </td>
+                            </t>
+                            <t t-else="">
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="8">
+                                    <t t-if="doc.transaction_id.qr_code">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %                 ('QR', doc.transaction_id.qr_code, 200, 200)"/></t>
+
+                                </td>
+                            </t>
                         </tr>
 
 
@@ -197,7 +211,7 @@
                             <td colspan="3" style="border:1px solid black;"><strong>Reverse Charge (Y/N) : N</strong></td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="text-align:right" colspan="3"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
+                            <td style="text-align:right" colspan="3"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"/> </td>
                         </tr>
                     </table>
                     <br/>

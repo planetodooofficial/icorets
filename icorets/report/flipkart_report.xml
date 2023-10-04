@@ -340,7 +340,7 @@
                                 </td>
                             </tr>
                         </t>
-                        <tr>
+                                                <tr>
                             <td colspan="6">
                                 Total
                             </td>
@@ -348,17 +348,17 @@
                                     <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
                                 </td>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.price_unit for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.price_subtotal for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2) "/>
                             </td>
-                            <td></td>
+                            <td/>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.tax_amount_line for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.tax_amount_line for l in o.invoice_line_ids), 2)"/>
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.price_total for l in o.invoice_line_ids) "/>
+                                <t t-esc="round(sum(l.price_total for l in o.invoice_line_ids), 2) "/>
                             </td>
                         </tr>
 
