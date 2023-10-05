@@ -254,6 +254,7 @@ class AccountMoveLineInherit(models.Model):
             if rec.tax_ids:
                 for tax in rec.tax_ids:
                     rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
+                    rec.tax_amount_line = rec.quantity * rec.tax_amount_line
             else:
                 rec.tax_amount_line = 0
 
