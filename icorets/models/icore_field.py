@@ -125,6 +125,12 @@ class AccountMoveInheritClass(models.Model):
 
     ])
     cust_code = fields.Char("Code", compute="_compute_cust_code", store=True)
+    tot_line_qty = fields.Integer(string="Total Line Qty",compute="_tot_line_qty")
+
+    @api.depends('invoice_line_ids.quantity')
+    def _tot_line_qty(self):
+        for move in self:
+            move.tot_line_qty = sum(move.invoice_line_ids.mapped('quantity'))
 
     # Added default get for false journal
     @api.model
@@ -302,6 +308,22 @@ class SaleOrderInherit(models.Model):
     fo_id = fields.Many2one("sale.order", string="FO ID")
     fo_so_count = fields.Integer()
     gstin_id = fields.Many2one('res.partner', 'GSTIN')
+
+    # Related fields for address
+    partner_invoice_id_street = fields.Char('Inv Street', related='partner_invoice_id.street')
+    partner_invoice_id_street2 = fields.Char('Inv Street2', related='partner_invoice_id.street2')
+    partner_invoice_id_city = fields.Char('Inv City', related='partner_invoice_id.city')
+    partner_invoice_id_state = fields.Many2one('res.country.state','Inv State', related='partner_invoice_id.state_id')
+    partner_invoice_id_zip = fields.Char('Inv Zip', related='partner_invoice_id.zip')
+    partner_invoice_id_country = fields.Many2one('res.country','Inv Country', related='partner_invoice_id.country_id')
+    
+    partner_shipping_id_street = fields.Char('Del Street', related='partner_shipping_id.street')
+    partner_shipping_id_street2 = fields.Char('Del Street2', related='partner_shipping_id.street2')
+    partner_shipping_id_city = fields.Char('Del City', related='partner_shipping_id.city')
+    partner_shipping_id_state = fields.Many2one('res.country.state','Del State', related='partner_shipping_id.state_id')
+    partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
+    partner_shipping_id_country = fields.Many2one('res.country','Del Country', related='partner_shipping_id.country_id')
+
 
     def action_view_fo_so(self):
         search_so = self.env["sale.order"].search([('fo_id', '=', self.id)])
@@ -504,7 +526,7 @@ class SaleOrderInherit(models.Model):
                 'is_fo': False,
                 'partner_id': self.partner_id.id,
                 'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
-                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
                 'partner_shipping_id': self.partner_shipping_id.id,
                 'pricelist_id': self.pricelist_id.id,
                 'payment_term_id': self.payment_term_id.id,
@@ -573,7 +595,7 @@ class SaleOrderInherit(models.Model):
                 'is_fo': False,
                 'partner_id': self.partner_id.id,
                 'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
-                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
                 'partner_shipping_id': self.partner_shipping_id.id,
                 'pricelist_id': self.pricelist_id.id,
                 'payment_term_id': self.payment_term_id.id,
@@ -641,7 +663,7 @@ class SaleOrderInherit(models.Model):
                 'is_fo': False,
                 'partner_id': self.partner_id.id,
                 'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
-                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
                 'partner_shipping_id': self.partner_shipping_id.id,
                 'pricelist_id': self.pricelist_id.id,
                 'payment_term_id': self.payment_term_id.id,
@@ -683,7 +705,7 @@ class SaleOrderInherit(models.Model):
                 'is_fo': True,
                 'partner_id': self.partner_id.id,
                 'l10n_in_gst_treatment': self.l10n_in_gst_treatment,
-                'partner_invoice_id': self.partner_invoice_id.id,
+                'partner_shipping_id': self.partner_shipping_id.id,
                 'partner_shipping_id': self.partner_shipping_id.id,
                 'pricelist_id': self.pricelist_id.id,
                 'payment_term_id': self.payment_term_id.id,
