@@ -24,7 +24,7 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Landscape</field>
-        <field name="margin_top">30</field>
+        <field name="margin_top">25</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">5</field>
         <field name="margin_right">5</field>
@@ -63,7 +63,7 @@
                 <div class="page">
                     <table style="width:100%;margin-top: 0px">
                         <tr style="border:1px solid black;">
-                            <th class="text-center" colspan="3"><strong>Credit Note (Original for Receipient)</strong></th>
+                            <th class="text-center" colspan="3"><strong>Credit Note</strong></th>
                         </tr>
                         <tr style="background-color:#87CEEB;border:1px solid black">
                             <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
