@@ -341,32 +341,56 @@
 
 
                     </table>
-                    <div class="clearfix mb-4">
-                        <div id="total" class="row">
-                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
-                                <table class="table table-sm" style="page-break-inside: avoid;">
+<!--                    <div class="clearfix mb-4">-->
+<!--                        <div id="total" class="row">-->
+<!--                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">-->
+<!--                                <table class="table table-sm" style="page-break-inside: avoid;">-->
 
-                                    <!--Tax totals-->
+<!--                                    &lt;!&ndash;Tax totals&ndash;&gt;-->
+<!--                                    <t t-set="tax_totals" t-value="o.tax_totals"/>-->
+<!--                                    <t t-call="account.document_tax_totals"/>-->
+
+<!--                                    &lt;!&ndash;Payments&ndash;&gt;-->
+<!--                                </table>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :- -->
+<!--                        <t t-if="doc.currency_id.name == 'INR'">-->
+<!--                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only-->
+<!--                        </t>-->
+<!--                        <t t-else="">-->
+<!--                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only-->
+<!--                        </t>-->
+<!--                    </strong>-->
+                      <div class="clearfix mb-4">
+                        <div id="total" class="row">
+
+
+                            <!-- Amt. Chargeable (In Words) (right column) -->
+                            <div class="col-6">
+                                <strong style="text-align: left; font-size: 12px">Amt. Chargeable (In Words) :-
+                                    <t t-if="doc.currency_id.name == 'INR'">
+                                        <span style="text-transform: capitalize; font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
+                                    </t>
+                                    <t t-else="">
+                                        <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                                    </t>
+                                </strong>
+                            </div>
+                                                        <!-- Tax totals (left column) -->
+
+                            <div class="col-6">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+                                    <!-- Tax totals -->
                                     <t t-set="tax_totals" t-value="o.tax_totals"/>
                                     <t t-call="account.document_tax_totals"/>
-
-                                    <!--Payments-->
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
-                        <t t-if="doc.currency_id.name == 'INR'">
-                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
-                        </t>
-                        <t t-else="">
-                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                        </t>
-                    </strong>
-                    <!--                            </td>-->
-                    <!--                        </tr>-->
-                    <!--                    </table>-->
 
 
                     <br/>

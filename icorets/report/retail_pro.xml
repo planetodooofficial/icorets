@@ -425,7 +425,7 @@
                             <td style="border:1px solid black;valign:top;padding-bottom: 70px" width="20%">For iCorets Private Limited</td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td></td>
+                            <th colspan="10"></th>
                             <td colspan="2" style="text-align:right;border:1px solid black">Authorized Signatory</td>
                         </tr>
                         <tr style="border:1px solid black;">
