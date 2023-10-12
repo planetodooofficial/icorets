@@ -27,6 +27,7 @@
              'report/purchase_order_report.xml',
              'report/book_my_show.xml',
              'report/fynd_mishop.xml',
+             'report/retail_pro.xml',
              ],
     'website': 'https://planet-odoo.com/',
     'installable': True,
