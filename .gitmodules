@@ -1,9 +1,0 @@
-[submodule "planetodooofficial/accounting_planetodoo_v16"]
-	path = planetodooofficial/accounting_planetodoo_v16
-	url = git@github.com:planetodooofficial/accounting_planetodoo_v16.git
-	branch = master
-
-[submodule "planetodooofficial/accounting_planetodoo_v16"]
-	path = planetodooofficial/accounting_planetodoo_v16
-	url = git@github.com:planetodooofficial/accounting_planetodoo_v16.git
-	branch = master
