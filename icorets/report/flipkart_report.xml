@@ -341,14 +341,14 @@
                             </tr>
                         </t>
                                                 <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 Total
                             </td>
                             <td style="text-align: center">
                                     <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
                                 </td>
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>
+<!--                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>-->
                             </td>
                             <td style="text-align: center">
                                 <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2) "/>
@@ -364,16 +364,28 @@
 
 
                     </table>
-                          <div class="clearfix mb-4">
+                           <div class="clearfix mb-4">
                         <div id="total" class="row">
-                            <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
-                                <table class="table table-sm" style="page-break-inside: avoid;">
 
-                                    <!--Tax totals-->
+
+                            <!-- Amt. Chargeable (In Words) (right column) -->
+                            <div class="col-6">
+                                <strong style="text-align: left; font-size: 12px">Amt. Chargeable (In Words) :-
+                                    <t t-if="doc.currency_id.name == 'INR'">
+                                        <span style="text-transform: capitalize; font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
+                                    </t>
+                                    <t t-else="">
+                                        <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
+                                    </t>
+                                </strong>
+                            </div>
+                                                        <!-- Tax totals (left column) -->
+
+                            <div class="col-6">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+                                    <!-- Tax totals -->
                                     <t t-set="tax_totals" t-value="o.tax_totals"/>
                                     <t t-call="account.document_tax_totals"/>
-
-                                    <!--Payments-->
                                 </table>
                             </div>
                         </div>
@@ -741,7 +753,7 @@
                                     <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
                                 </td>
                             <td style="text-align: center">
-                                <t t-esc="sum(l.price_unit for l in o.invoice_line_ids) "/>
+<!--                                <t t-esc="sum(l.price_unit for l in o.invoice_line_ids) "/>-->
                             </td>
                             <td style="text-align: center">
                                 <t t-esc="sum(l.price_subtotal for l in o.invoice_line_ids) "/>

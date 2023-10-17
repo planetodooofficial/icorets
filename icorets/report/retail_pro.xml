@@ -310,7 +310,7 @@
                                 <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>
+<!--                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>-->
                             </td>
                             <td style="text-align: center">
                                 <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2) "/>

@@ -1179,25 +1179,3 @@ class PackingListManual(models.TransientModel):
             })
             st_move_line_lst.append(st_move_line_vals)
         picking_id.write({'move_line_ids_without_package': st_move_line_lst})
-
-# Inherited for einvoice error
-
-# class L10nInInvoiceTransactionInherirt(models.Model):
-#     _inherit = 'l10n.in.einvoice.transaction'
-#
-#     @api.depends('move_id')
-#     def _compute_generate_request_json(self):
-#         for transaction in self.filtered(lambda t: t.move_id.state == 'posted'):
-#             values = {
-#                 'invoice': transaction
-#             }
-#             ####################################################################################
-#             generate_request_json = self.env['ir.ui.view']._render_template("l10n_in_einvoice_v16.l10n_in_invoice_request_payload_json", values)
-#             generate_request_json = generate_request_json.encode().decode("utf-8")
-#             generate_request_json = generate_request_json.replace('&quot;', '\\"')
-#             raise UserError(generate_request_json)
-#             #
-#             json_dumps = json.dumps(safe_eval(generate_request_json))
-#             json_dumps = html2text.html2text(json_dumps)
-#             json_dumps = json_dumps.replace("\n", "")
-#             transaction.generate_request_json = json_dumps

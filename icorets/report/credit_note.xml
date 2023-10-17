@@ -29,7 +29,7 @@
         <field name="margin_left">5</field>
         <field name="margin_right">5</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">25</field>
+        <field name="header_spacing">15</field>
         <field name="dpi">90</field>
     </record>
 
@@ -76,6 +76,7 @@
                             </td>
                             <td style="border:1px solid black;width: 30%" rowspan="4">
                                 <p>
+                                     <t t-esc="o.company_id.name"/><br/>
                                     <t t-esc="o.company_id.street"/>
                                     <br/>
                                     <t t-esc="o.company_id.street2"/>
@@ -114,7 +115,7 @@
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="border:1px solid black;"><strong>PO#</strong>
+                            <td style="border:1px solid black;"><strong>REF#</strong>
                                 <!--<t t-if="o.invoice_line_ids">-->
                                 <!--    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
                                 <!--        <t t-if="acc.sale_line_ids.order_id.ref">-->
@@ -157,6 +158,7 @@
 
                             <td style="border:1px solid black;width: 30%" rowspan="4">
                                 <p>
+                                    <t t-esc="o.partner_shipping_id.name"/><br/>
                                     <t t-esc="o.partner_shipping_id.street"/>
                                     <br/>
                                     <t t-esc="o.partner_shipping_id.street2"/>
