@@ -1078,7 +1078,7 @@ class InheritApprovalRequest(models.Model):
 class InheritResPartner(models.Model):
     _inherit = "res.partner"
 
-    alias_name = fields.Many2one("alias.name", "Alias Name", copy=False)
+    # alias_name = fields.Many2one("alias.name", "Alias Name", copy=False)
     cust_alias_name = fields.Char("Alias Name", copy=False)
 
     @api.model
@@ -1088,8 +1088,14 @@ class InheritResPartner(models.Model):
             args += ['|', '|', ('name', operator, name), ('cust_alias_name', operator, name)]
         return super()._name_search(name, args, operator, limit, name_get_uid)
 
+    @api.depends('cust_alias_name','name')
     def name_get(self):
         return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (record.id, "%s" % (record.name)) for record in self]
+
+    # @api.onchange('cust_alias_name')
+    # def onchange_alias(self):
+    #     name = self.name
+    #     self.name = name
 
 
     # Commented Approval cateory on creating vendor
