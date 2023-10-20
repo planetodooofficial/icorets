@@ -1092,11 +1092,6 @@ class InheritResPartner(models.Model):
     def name_get(self):
         return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (record.id, "%s" % (record.name)) for record in self]
 
-    # @api.onchange('cust_alias_name')
-    # def onchange_alias(self):
-    #     name = self.name
-    #     self.name = name
-
 
     # Commented Approval cateory on creating vendor
     # @api.model_create_multi

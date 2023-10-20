@@ -23,6 +23,7 @@
         <field name="report_name">icorets.purchase_order_report_forms</field>
         <field name="report_file">icorets.purchase_order_report_forms</field>
         <field name="print_report_name">'Purchase Order Report'</field>
+        <field name="print_report_name">'Purchase Order -PO# %s' % (object.name)</field>
         <field name="paperformat_id" ref="icorets.paperformat_batch_deposit"/>
         <field name="binding_model_id" ref="purchase.model_purchase_order"/>
     </record>
@@ -173,7 +174,7 @@
                                         <t t-esc="line.fetch_size()"/>
                                     </td>
                                     <td>
-                                        <t t-esc="line.product_qty"/> <t t-esc="line.product_uom.name"/>
+                                        <t t-esc="int(line.product_qty)"/> <t t-esc="line.product_uom.name"/>
                                     </td>
                                     <td>
                                         <t t-esc="'%.2f'% line.price_unit"/>
@@ -200,38 +201,60 @@
                                     <t t-esc="sum(l.product_qty for l in o.order_line) "/>
                                 </td>
                                 <td style="text-align: center">
-                                    <t t-esc="sum(l.price_unit for l in o.order_line) "/>
+<!--                                    <t t-esc="sum(l.price_unit for l in o.order_line) "/>-->
                                 </td>
                                 <td style="text-align: center">
-                                    <t t-esc="sum(l.price_subtotal for l in o.order_line) "/>
+                                    <t t-esc="round(sum(l.price_subtotal for l in o.order_line),2)"/>
                                 </td>
                                 <td></td>
                                 <td style="text-align: center">
-                                    <t t-esc="sum(l.tax_amount_line for l in o.order_line) "/>
+                                    <t t-esc="round(sum(l.tax_amount_line for l in o.order_line),2) "/>
                                 </td>
                                 <td style="text-align: center">
-                                    <t t-esc="sum(l.price_total for l in o.order_line) "/>
+                                    <t t-esc="round(sum(l.price_total for l in o.order_line),2) "/>
                                 </td>
                             </tr>
                         </table>
-                        <div class="clearfix mb-4">
-                            <div id="total" class="row">
-                                <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">
-                                    <table class="table table-sm" style="page-break-inside: avoid;">
+<!--                        <div class="clearfix mb-4">-->
+<!--                            <div id="total" class="row">-->
+<!--                                <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">-->
+<!--                                    <table class="table table-sm" style="page-break-inside: avoid;">-->
 
-                                        <!--Tax totals-->
-                                        <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                        <t t-call="account.document_tax_totals"/>
+<!--                                        &lt;!&ndash;Tax totals&ndash;&gt;-->
+<!--                                        <t t-set="tax_totals" t-value="o.tax_totals"/>-->
+<!--                                        <t t-call="account.document_tax_totals"/>-->
 
-                                        <!--Payments-->
-                                    </table>
-                                </div>
+<!--                                        &lt;!&ndash;Payments&ndash;&gt;-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :- -->
+
+<!--                                <span style="font-size: 12px" t-esc="o.currency_id.amount_to_text(o.amount_total)"/> only-->
+<!--                        </strong>-->
+
+                                              <div class="clearfix mb-4">
+                        <div id="total" class="row">
+
+
+                            <!-- Amt. Chargeable (In Words) (right column) -->
+                            <div class="col-6">
+                                <strong style="text-align: left; font-size: 12px">Amt. Chargeable (In Words) :-
+                                        <span style="font-size: 12px" t-esc="o.currency_id.amount_to_text(o.amount_total)"/> only
+                                </strong>
+                            </div>
+                                                        <!-- Tax totals (left column) -->
+
+                            <div class="col-6">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+                                    <!-- Tax totals -->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-call="account.document_tax_totals"/>
+                                </table>
                             </div>
                         </div>
-                        <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
-
-                                <span style="font-size: 12px" t-esc="o.currency_id.amount_to_text(o.amount_total)"/> only
-                        </strong>
+                    </div>
 
 
                         <br/>
