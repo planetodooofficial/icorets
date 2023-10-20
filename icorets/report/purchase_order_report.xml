@@ -22,7 +22,6 @@
         <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.purchase_order_report_forms</field>
         <field name="report_file">icorets.purchase_order_report_forms</field>
-        <field name="print_report_name">'Purchase Order Report'</field>
         <field name="print_report_name">'Purchase Order -PO# %s' % (object.name)</field>
         <field name="paperformat_id" ref="icorets.paperformat_batch_deposit"/>
         <field name="binding_model_id" ref="purchase.model_purchase_order"/>
