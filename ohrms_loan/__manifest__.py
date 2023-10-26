@@ -27,11 +27,11 @@
         Helps you to manage Loan Requests of your company's staff.
         """,
     'category': 'Generic Modules/Human Resources',
-    'author': "Cybrosys Techno Solutions,Open HRMS",
-    'company': 'Cybrosys Techno Solutions',
-    'maintainer': 'Cybrosys Techno Solutions',
-    'live_test_url': 'https://youtu.be/lAT5cqVZTZI',
-    'website': "https://www.openhrms.com",
+    'author': "Teckzilla,Open HRMS",
+    'company': 'Teckzilla  Solutions',
+    'maintainer': 'Teckzilla Solutions',
+    'live_test_url': '',
+    'website': "",
     'depends': [
         'base', 'hr_payroll_community', 'hr', 'account',
     ],

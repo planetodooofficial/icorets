@@ -8,10 +8,10 @@
         Contract type in contracts
     """,
     'description': """Odoo16 Employee Contracts Types,Odoo16 Employee, Employee Contracts, Odoo 16""",
-    'author': 'Odoo SA,Cybrosys Techno Solutions',
-    'company': 'Cybrosys Techno Solutions',
-    'maintainer': 'Cybrosys Techno Solutions',
-    'website': 'https://www.cybrosys.com',
+    'author': 'Odoo SA,',
+    'company': 'Teckzilla Solutions',
+    'maintainer': 'Teckzilla Solutions',
+    'website': '',
     'depends': ['hr', 'hr_contract'],
     'data': [
         'security/ir.model.access.csv',
