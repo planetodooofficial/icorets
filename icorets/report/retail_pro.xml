@@ -212,7 +212,7 @@
                                 <!--                                    <strong>EAN</strong>-->
                                 <!--                                </th>-->
                                 <th class="text-center" width="21%">
-                                    <strong>Description</strong>
+                                    <strong>Label</strong>
                                 </th>
                                 <th class="text-center">
                                     <strong>HSN</strong>
@@ -239,7 +239,7 @@
                         </thead>
                         <t t-set="sr_no" t-value="1"/>
                         <t t-foreach="o.invoice_line_ids" t-as="line">
-                            <tr style="height:20px;text-align:center">
+                             <tr style="height:20px;text-align:center">
                                 <td>
                                     <t t-esc="sr_no"/>
                                     <t t-set="sr_no" t-value="sr_no+1"/>
@@ -255,9 +255,9 @@
                                 <!--                                </td>-->
                                 <td>
                                     <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
-                                    <t t-esc="line.product_id.brand_id_rel.name"/><br/>
+                                    <!--<t t-esc="line.product_id.brand_id_rel.name"/><br/>-->
                                     <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color: </b></span><t t-esc="line.fetch_color()"/>
+                                    <!--<span><b>Color: </b></span><t t-esc="line.fetch_color()"/>-->
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.l10n_in_hsn_code"/>
@@ -270,7 +270,7 @@
                                     <t t-esc="'%.2f'% line.price_unit"/>
                                 </td>
                                 <td>
-                                    <t t-esc="'%.2f'% line.price_subtotal"/>
+                                    <t t-esc="line.price_subtotal" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td>
                                     <!--                                        <t t-esc="line.tax_ids.name"/>-->
@@ -297,7 +297,7 @@
                                     <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
                                 </td>
                                 <td>
-                                    <t t-esc="'%.2f'% line.price_total"/>
+                                    <t t-esc="line.price_total" t-options="{'widget': 'float', 'precision': 2}"/>
 
                                 </td>
                             </tr>
@@ -313,14 +313,14 @@
 <!--                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>-->
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2) "/>
+                                <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2)" t-options="{'widget': 'float', 'precision': 2}"/>
                             </td>
                             <td/>
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.tax_amount_line for l in o.invoice_line_ids), 2)"/>
+                                <t t-esc="round(sum(l.tax_amount_line for l in o.invoice_line_ids), 2)" t-options="{'widget': 'float', 'precision': 2}"/>
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.price_total for l in o.invoice_line_ids), 2) "/>
+                                <t t-esc="round(sum(l.price_total for l in o.invoice_line_ids), 2)" t-options="{'widget': 'float', 'precision': 2}"/>
                             </td>
                         </tr>
 

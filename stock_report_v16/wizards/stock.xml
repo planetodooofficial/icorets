@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Stock Register Form View -->
+    <record id="stock_register_form_view" model="ir.ui.view">
+        <field name="name">Stock Register Form View</field>
+        <field name="model">stock.register</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+<!--                    <label for="date" string="Start Date"/>-->
+                    <field name="date" required="1"/>
+                    <field name="end_date" required="1"/>
+                    <field name="product_category" />
+                    <field name="accounting_category"/>
+                </group>
+                <footer>
+                    <button name="action_download_report" string="Download" class="btn btn-primary" type="object"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!--  Stock Register Action to open Form View Wizard  -->
+    <record id="action_stock_register" model="ir.actions.act_window">
+        <field name="name">Select Date</field>
+        <field name="res_model">stock.register</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Stock Register Menu Item   -->
+    <menuitem  id="menu_stock_register" name="Stock Consumption" action="action_stock_register" sequence="185"
+            parent="stock.menu_warehouse_report"/>
+</odoo>
