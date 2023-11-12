@@ -98,12 +98,15 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>PO#</strong>
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.ref">
-                                            <span t-esc="acc.sale_line_ids.order_id.mapped('ref')[0]"/></t>
-                                    </t>
-                                </t>
+<!--                                <t t-if="o.invoice_line_ids">-->
+<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+<!--                                        <t t-if="acc.sale_line_ids.order_id.ref">-->
+<!--                                            <span t-esc="acc.sale_line_ids.order_id.mapped('ref')[0]"/></t>-->
+<!--                                    </t>-->
+<!--                                </t>-->
+                                     <td style="border:1px solid black;"><strong>REF#</strong>
+                                <span t-esc="o.ref"/>
+                                    </td>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">

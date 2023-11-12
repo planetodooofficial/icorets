@@ -12,7 +12,6 @@
                     <field name="date" required="1"/>
                     <field name="end_date" required="1"/>
                     <field name="product_category" />
-                    <field name="accounting_category"/>
                 </group>
                 <footer>
                     <button name="action_download_report" string="Download" class="btn btn-primary" type="object"/>
@@ -30,6 +29,6 @@
     </record>
 
     <!-- Stock Register Menu Item   -->
-    <menuitem  id="menu_stock_register" name="Stock Consumption" action="action_stock_register" sequence="185"
+    <menuitem  id="menu_stock_register" name="Stock Register" action="action_stock_register" sequence="185"
             parent="stock.menu_warehouse_report"/>
 </odoo>

@@ -256,7 +256,7 @@
                                 <td>
                                     <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
                                     <!--<t t-esc="line.product_id.brand_id_rel.name"/><br/>-->
-                                    <t t-esc="line.product_id.name"/><br/>
+                                    <t t-esc="line.name"/><br/>
                                     <!--<span><b>Color: </b></span><t t-esc="line.fetch_color()"/>-->
                                 </td>
                                 <td>
