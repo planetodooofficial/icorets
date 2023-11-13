@@ -74,7 +74,7 @@
                             </td>
                             <td style="border:1px solid black;padding-left: 3px" rowspan="4">
 
-                                    <t t-esc="o.dispatch_partner_id.parent_id.name"/><br/>
+                                    <t t-esc="o.dispatch_partner_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
                                     <t t-esc="o.dispatch_partner_id.street2"/>
@@ -141,7 +141,7 @@
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
                                             <p>
 
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.parent_id.name')[0]"/><br/>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
                                                 <br/>
@@ -156,7 +156,7 @@
                                         </t>
                                         <t t-else="">
                                                 <p>
-                                                <t t-esc="o.partner_id.parent_id.name"/><br/>
+                                                <t t-esc="o.partner_id.name"/><br/>
                                                 <t t-esc="o.partner_id.street"/>
                                                 <br/>
                                                 <t t-esc="o.partner_id.street2"/>
