@@ -129,7 +129,7 @@ class DownloadReport(Controller):
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
                         'Bill Net Amt': invoice_line.price_unit * invoice_line.quantity,
                         'Price Total': invoice_line.price_total, 'Invoice Untaxed Amt': un_tax_amt,
-                        'Invoice Tax Amount': invoice_line.move_id.amount_tax, 'Invoice Total Amt': total_amt}
+                        'Invoice Tax Amount': invoice_line.tax_amount_line, 'Invoice Total Amt': total_amt}
                 data.update({f"Total {tax.get('tax_group_name')}": tax.get('tax_group_amount')
                              for tax in taxes.get('groups_by_subtotal', {}).get('Untaxed Amount', {})})
                 data.update(DownloadReport.compute_taxes(invoice_line))
@@ -340,7 +340,7 @@ class DownloadReport(Controller):
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
                         'Bill Net Amt': invoice_line.price_unit * invoice_line.quantity,
                         'Bill Untaxed Amt': un_tax_amt,
-                        'Bill Tax Amount': tax_tot, 'Bill Total Amt': final_total}
+                        'Bill Tax Amount': invoice_line.tax_amount_line, 'Bill Total Amt': final_total}
 
                 if invoice_line.analytic_distribution:
                     analytic_account = request.env['account.analytic.account'].sudo().search(

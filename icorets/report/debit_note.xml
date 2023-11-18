@@ -97,7 +97,7 @@
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
-                            <td style="border:1px solid black;"><strong>PO#</strong>
+<!--                            <td style="border:1px solid black;"><strong>PO#</strong>-->
 <!--                                <t t-if="o.invoice_line_ids">-->
 <!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
 <!--                                        <t t-if="acc.sale_line_ids.order_id.ref">-->
@@ -107,7 +107,7 @@
                                      <td style="border:1px solid black;"><strong>REF#</strong>
                                 <span t-esc="o.ref"/>
                                     </td>
-                            </td>
+<!--                            </td>-->
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Reference Invoice : </strong> <span  t-esc="o.ref"/> <br/>
