@@ -59,6 +59,7 @@
                             </td>
                             <td style="border:1px solid black;width: 30%" rowspan="4">
                                 <p>
+                                    <t t-esc="o.company_id.name"/><br/>
                                     <t t-esc="o.company_id.street"/>
                                     <br/>
                                     <t t-esc="o.company_id.street2"/>
@@ -129,6 +130,7 @@
 
                             <td style="border:1px solid black;width: 30%" rowspan="4">
                                 <p>
+                                    <t t-esc="o.partner_shipping_id.name"/><br/>
                                     <t t-esc="o.partner_shipping_id.street"/>
                                     <br/>
                                     <t t-esc="o.partner_shipping_id.street2"/>
