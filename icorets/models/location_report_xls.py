@@ -201,9 +201,9 @@ class LocationReport(models.AbstractModel):
         for line in stock_q:
             sheet.write(row, col, line.product_id.brand_id_rel.name or '')
 
-            sheet.write(row, col + 1, line.product_id.product_tmpl_id.categ_id.name or '')
-            sheet.write(row, col + 2, '')
-            sheet.write(row, col + 3, '')
+            sheet.write(row, col + 1, line.product_id.categ_id.name or '')
+            sheet.write(row, col + 2, line.product_id.categ_id.parent_id.name or '')
+            sheet.write(row, col + 3, line.product_id.categ_id.parent_id.parent_id.name or '')
             sheet.write(row, col + 4, line.product_id.variants_func_spo or '')
             sheet.write(row, col + 5, line.product_id.gender or '')
             sheet.write(row, col + 6, line.product_id.name or '')
@@ -219,7 +219,7 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 16, line.product_id.color or '')
             sheet.write(row, col + 17, line.product_id.size or '')
             sheet.write(row, col + 18, line.product_id.lst_price or '')
-            sheet.write(row, col + 19, (','.join([str(x) for x in line.product_id.taxes_id.name])) or '')
+            sheet.write(row, col + 19, (''.join([str(x) for x in line.product_id.taxes_id.name])) or '')
             sheet.write(row, col + 20, line.inventory_quantity_auto_apply if line.location_id.location_id.name == 'IHO' else '')
             sheet.write(row, col + 21, line.inventory_quantity_auto_apply if line.location_id.location_id.name == 'BHW' else '')
             sheet.write(row, col + 22, line.inventory_quantity_auto_apply if line.location_id.location_id.name == 'DEL' else '')
