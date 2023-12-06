@@ -263,7 +263,7 @@
                                     <t t-esc="line.product_id.variant_article_code"/>
                                 </td>
                                 <td>
-                                    <t t-esc="line.fetch_size()"/>
+                                         <t t-esc="line.size"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.barcode"/>
@@ -272,7 +272,7 @@
                                     <!--                                        <t t-esc="line.product_id.brand_id.name"/><br/>-->
                                     <t t-esc="line.product_id.brand_id_rel.name"/><br/>
                                     <t t-esc="line.product_id.name"/><br/>
-                                    <span><b>Color: </b></span><t t-esc="line.fetch_color()"/>
+                                    <t t-esc="line.product_id.color"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.l10n_in_hsn_code"/>

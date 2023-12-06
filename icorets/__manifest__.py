@@ -16,6 +16,7 @@
              'views/inherit_stock_warehouse_view.xml',
              'views/forecast_order_view.xml',
              'views/inherit_approval_request_view.xml',
+             'views/location_report_view.xml',
              'wizard/forecast_order_wiz_view.xml',
              'report/credit_note.xml',
              'report/debit_note.xml',

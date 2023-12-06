@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+<record id="location_report_form_view" model="ir.ui.view">
+        <field name="name">location_report_form_view</field>
+        <field name="model">locations.report</field>
+        <field name="arch" type="xml">
+            <form string="Location Report" create="0" edit="0" delete="0">
+                <sheet>
+                    <separator string="Location Report" style="font-size:20px;color: black;" col="6"/>
+                    <group col="6">
+                        <group col="2">
+<!--                            <field name="from_date"/>-->
+<!--                            <field name="to_date"/>-->
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Excel Report" class="oe_highlight" type="object" name="location_report_xlsx"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="location_report_form_action" model="ir.actions.act_window">
+        <field name="name">Location Report</field>
+        <field name="res_model">locations.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="location_report_form_view"/>
+    </record>
+
+<!--    Action-->
+    <record id="location_report_action_xls" model="ir.actions.report">
+    <field name="name">Location Report</field>
+    <field name="model">stock.quant</field>
+    <field name="report_type">xlsx</field>
+    <field name="report_name">crm_timesheet.location_report_xls</field>
+    <field name="report_file">Location Report</field>
+</record>
+
+    <menuitem id="location_report_menu" name="Location Report" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls" sequence="20"/>
+
+</odoo>

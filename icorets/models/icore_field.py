@@ -20,6 +20,11 @@ from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import ValidationError
 from odoo.tools import json, float_round, get_lang, DEFAULT_SERVER_DATETIME_FORMAT
 
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, format_amount, format_date, formatLang, get_lang, groupby
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools.float_utils import float_compare, float_is_zero, float_round
+
+
 
 class ProductVariantInherit(models.Model):
     _inherit = "product.product"
@@ -115,6 +120,7 @@ class ProductBrand(models.Model):
 class AccountMoveInheritClass(models.Model):
     _inherit = 'account.move'
 
+    grn_names = fields.Char(string='GRN Names', help='Names of associated GRNs')
     check_amount_in_words = fields.Char(compute='_amt_in_words', string='Amount in Words')
     # warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
     # po_no = fields.Char('PO No')
@@ -836,12 +842,152 @@ class SaleOrderLineInherit(models.Model):
         if self.product_id:
             self.stock_quantity = prd_qty.available_quantity
 
+#CREATED FOR SAPAT REQUIREMENT
+class VendorbillWizard(models.TransientModel):
+    _name = "vendorbill.wizard"
+    _description = "Vendor Bill Wizard"
+
+    grn_name = fields.Many2many('stock.picking',"name", string='Select GRN', required=True)
+
+
+    @api.onchange('grn_name')
+    def onchange_grn_name(self):
+        active_purchase_id = self.env['purchase.order'].browse(self.env.context.get('active_ids', []))
+        return {'domain': {'grn_name': [('id', 'in', active_purchase_id.picking_ids.ids)]}}
+
+    def action_create_invoice(self):
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        moves = self.env['account.move']
+        AccountMove = self.env['account.move'].with_context(default_move_type='in_invoice')
+
+        # Group selected GRNs by associated purchase order
+        purchase_orders = {}
+        grn_names = []
+
+        for picking in self.grn_name:
+            if not picking.purchase_id:
+                raise UserError(_('Selected GRN must be associated with a purchase order.'))
+            if picking.purchase_id not in purchase_orders:
+                purchase_orders[picking.purchase_id] = []
+            purchase_orders[picking.purchase_id].append(picking)
+            grn_names.append(picking.name)
+
+        # Create vendor bills for each purchase order
+        for purchase_order, grouped_grns in purchase_orders.items():
+            # 1) Prepare invoice vals and clean-up the section lines
+            invoice_vals = self._prepare_invoice(purchase_order, grn_names)
+            sequence = 10
+            pending_section = None
+
+            for picking in grouped_grns:
+                for line in picking.purchase_id.order_line.filtered(
+                        lambda line: line.product_id in picking.move_ids.product_id):
+                    if line.display_type == 'line_section':
+                        pending_section = line
+                        continue
+                    if not float_is_zero(line.qty_to_invoice, precision_digits=precision):
+                        if pending_section:
+                            line_vals = pending_section._prepare_account_move_line()
+                            line_vals.update({'sequence': sequence})
+                            invoice_vals['invoice_line_ids'].append((0, 0, line_vals))
+                            sequence += 1
+                            pending_section = None
+                        line_vals = line._prepare_account_move_line()
+                        line_vals.update({'sequence': sequence})
+                        invoice_vals['invoice_line_ids'].append((0, 0, line_vals))
+                        sequence += 1
+
+            if invoice_vals['invoice_line_ids']:
+                # 2) Create the invoice
+                move = AccountMove.with_company(invoice_vals['company_id']).create(invoice_vals)
+                moves |= move
+
+                # 3) Some moves might actually be refunds: convert them if the total amount is negative
+                # We do this after the moves have been created since we need taxes, etc. to know if the total
+                # is actually negative or not
+                if move.currency_id.round(move.amount_total) < 0:
+                    move.action_switch_invoice_into_refund_credit_note()
+
+        if not moves:
+            raise UserError(
+                _('There is no invoiceable line. If a product has a control policy based on received quantity, please make sure that a quantity has been received.'))
+
+        return self.action_view_invoice(moves)
+
+    def action_view_invoice(self, invoices=False):
+        """This function returns an action that displays existing vendor bills.
+        """
+        if not invoices:
+            invoices = self.env['account.move'].search([('purchase_id', 'in', self.grn_name.purchase_ids.ids)])
+
+        result = self.env['ir.actions.act_window']._for_xml_id('account.action_move_in_invoice_type')
+        # choose the view_mode accordingly
+        if len(invoices) > 1:
+            result['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            res = self.env.ref('account.view_move_form', False)
+            form_view = [(res and res.id or False, 'form')]
+            if 'views' in result:
+                result['views'] = form_view + [(state, view) for state, view in result['views'] if view != 'form']
+            else:
+                result['views'] = form_view
+            result['res_id'] = invoices.id
+        else:
+            result = {'type': 'ir.actions.act_window_close'}
+
+        return result
+
+    def _prepare_invoice(self, purchase_order, grn_names):
+        """Prepare the dict of values to create the new invoice for a purchase order.
+        """
+        self.ensure_one()
+        move_type = self._context.get('default_move_type', 'in_invoice')
+
+        partner_invoice = self.env['res.partner'].browse(purchase_order.partner_id.address_get(['invoice'])['invoice'])
+        partner_bank_id = purchase_order.partner_id.commercial_partner_id.bank_ids.filtered_domain(
+            ['|', ('company_id', '=', False), ('company_id', '=', purchase_order.company_id.id)])[:1]
+
+        invoice_vals = {
+            'ref': purchase_order.partner_ref or '',
+            'move_type': move_type,
+            'narration': purchase_order.notes,
+            'currency_id': purchase_order.currency_id.id,
+            'invoice_user_id': purchase_order.user_id and purchase_order.user_id.id or self.env.user.id,
+            'partner_id': partner_invoice.id,
+            'fiscal_position_id': (
+                    purchase_order.fiscal_position_id or purchase_order.fiscal_position_id._get_fiscal_position(
+                partner_invoice)).id,
+            'payment_reference': purchase_order.partner_ref or '',
+            'partner_bank_id': partner_bank_id.id,
+            'invoice_origin': purchase_order.name,
+            'invoice_payment_term_id': purchase_order.payment_term_id.id,
+            'invoice_line_ids': [],
+            'company_id': purchase_order.company_id.id,
+            'journal_id': purchase_order.l10n_in_journal_id.id,
+            'grn_names': ', '.join(grn_names)
+        }
+        return invoice_vals
+
 
 class PurchaseOrderInherit(models.Model):
     _inherit = 'purchase.order'
 
     warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
     is_approve = fields.Boolean('Is Approve')
+
+    #CREATED WIZARD FOR SAPAT REQUIREMENT
+    def open_vendorbill_wizard(self):
+        # Call the wizard action to open the wizard
+        return {
+            'name': 'Vendor Bill Wizard',
+            'type': 'ir.actions.act_window',
+            'res_model': 'vendorbill.wizard',
+            'view_mode': 'form',
+            'view_id': self.env.ref('icorets.view_vendorbill_wizard_form').id,
+            'target': 'new',
+        }
+
+
 
     # For getting user which used approve button in purchase order in pdf
     def button_approve(self, force=False):
