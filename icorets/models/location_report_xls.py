@@ -136,7 +136,8 @@ class LocationReport(models.AbstractModel):
             {'font_size': 11, 'align': 'vcenter', 'bold': True, 'bg_color': '#b7b7b7', 'font': 'Calibri Light',
              'text_wrap': True, 'border': 1})
         bold_red = workbook.add_format(
-            {'font_size': 11,'color':'#FF0000', 'align': 'vcenter', 'bold': True, 'bg_color': '#b7b7b7', 'font': 'Calibri Light',
+            {'font_size': 11, 'color': '#FF0000', 'align': 'vcenter', 'bold': True, 'bg_color': '#b7b7b7',
+             'font': 'Calibri Light',
              'text_wrap': True, 'border': 1})
         bold_one = workbook.add_format({'font_size': 12, 'align': 'vcenter', 'bg_color': '#b7b7b7'})
         sheet = workbook.add_worksheet('Location Report')
@@ -165,7 +166,7 @@ class LocationReport(models.AbstractModel):
         sheet.set_column(0, 22, 25)
         sheet.set_column(0, 23, 25)
 
-        # # **************************************************
+        # **************************************************
         sheet.write(0, 0, 'Brand', bold)
         sheet.write(0, 1, 'Category 1', bold)
         sheet.write(0, 2, 'Category 2', bold)
@@ -173,57 +174,110 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 4, 'Function Sport', bold)
         sheet.write(0, 5, 'Gender', bold)
         sheet.write(0, 6, 'Title', bold)
-        sheet.write(0, 7, 'Composition / Material', bold)
-        sheet.write(0, 8, 'Technology / Features', bold)
-        sheet.write(0, 9, 'Event', bold)
-        sheet.write(0, 10, 'HSN Code', bold)
-        sheet.write(0, 11, 'Style Code', bold)
-        sheet.write(0, 12, 'Article Code', bold)
-        sheet.write(0, 13, 'EAN Code', bold)
-        sheet.write(0, 14, 'ASIN', bold)
-        sheet.write(0, 15, 'FSIN', bold)
-        sheet.write(0, 16, 'Colour', bold)
-        sheet.write(0, 17, 'Size', bold)
-        sheet.write(0, 18, 'MRP', bold)
-        sheet.write(0, 19, 'GST', bold)
-        sheet.write(0, 20, 'IHO Stock', bold)
-        sheet.write(0, 21, 'Bhiwandi Stock', bold)
-        sheet.write(0, 22, 'Delhi Stock', bold)
-        sheet.write(0, 23, 'Forecasted Qty', bold)
+        sheet.write(0, 7, 'SKU', bold)
+        sheet.write(0, 8, 'Composition / Material', bold)
+        sheet.write(0, 9, 'Technology / Features', bold)
+        sheet.write(0, 10, 'Event', bold)
+        sheet.write(0, 11, 'HSN Code', bold)
+        sheet.write(0, 12, 'Style Code', bold)
+        sheet.write(0, 13, 'Article Code', bold)
+        sheet.write(0, 14, 'EAN Code', bold)
+        sheet.write(0, 15, 'ASIN', bold)
+        sheet.write(0, 16, 'FSIN', bold)
+        sheet.write(0, 17, 'Colour', bold)
+        sheet.write(0, 18, 'Size', bold)
+        sheet.write(0, 19, 'MRP', bold)
+        sheet.write(0, 20, 'GST', bold)
+        sheet.write(0, 21, 'IHO Stock', bold)
+        sheet.write(0, 22, 'Bhiwandi Stock', bold)
+        sheet.write(0, 23, 'Delhi Stock', bold)
+        sheet.write(0, 24, 'Available Qty', bold)
+        sheet.write(0, 25, 'Reserved Qty', bold)
 
         row = 1
         col = 0
-        search_domain = []
-        search_domain.append(('location_id.usage', '=', 'internal'))
+        product_data = {}
 
+        search_domain = [('location_id.usage', '=', 'internal')]
         stock_q = self.env['stock.quant'].search(search_domain)
 
         for line in stock_q:
-            sheet.write(row, col, line.product_id.brand_id_rel.name or '')
+            product_id = line.product_id.id
 
-            sheet.write(row, col + 1, line.product_id.categ_id.name or '')
-            sheet.write(row, col + 2, line.product_id.categ_id.parent_id.name or '')
-            sheet.write(row, col + 3, line.product_id.categ_id.parent_id.parent_id.name or '')
-            sheet.write(row, col + 4, line.product_id.variants_func_spo or '')
-            sheet.write(row, col + 5, line.product_id.gender or '')
-            sheet.write(row, col + 6, line.product_id.name or '')
-            sheet.write(row, col + 7, line.product_id.material or '')
-            sheet.write(row, col + 8, line.product_id.variants_tech_feat)
-            sheet.write(row, col + 9, line.product_id.occasion or '')
-            sheet.write(row, col + 10, line.product_id.l10n_in_hsn_code or line.product_id.sale_hsn.hsnsac_code or '')
-            sheet.write(row, col + 11, line.product_id.style_code or '')
-            sheet.write(row, col + 12, line.product_id.variant_article_code or '')
-            sheet.write(row, col + 13, line.product_id.barcode or '')
-            sheet.write(row, col + 14, line.product_id.variants_asin or '')
-            sheet.write(row, col + 15, line.product_id.variants_fsn or '')
-            sheet.write(row, col + 16, line.product_id.color or '')
-            sheet.write(row, col + 17, line.product_id.size or '')
-            sheet.write(row, col + 18, line.product_id.lst_price or '')
-            sheet.write(row, col + 19, (''.join([str(x) for x in line.product_id.taxes_id.name])) or '')
-            sheet.write(row, col + 20, line.inventory_quantity_auto_apply if line.location_id.location_id.name == 'IHO' else '')
-            sheet.write(row, col + 21, line.inventory_quantity_auto_apply if line.location_id.location_id.name == 'BHW' else '')
-            sheet.write(row, col + 22, line.inventory_quantity_auto_apply if line.location_id.location_id.name == 'DEL' else '')
-            sheet.write(row, col + 23, line.product_id.virtual_available or '')
+            if product_id not in product_data:
+                product_data[product_id] = {
+                    'Brand': line.product_id.brand_id_rel.name or '',
+                    'Category 1': line.product_id.categ_id.parent_id.parent_id.name or '',
+                    'Category 2': line.product_id.categ_id.parent_id.name or '',
+                    'Category 3': line.product_id.categ_id.name or '',
+                    'Function Sport': line.product_id.variants_func_spo or '',
+                    'Gender': line.product_id.gender or '',
+                    'Title': line.product_id.name or '',
+                    'SKU Code': line.product_id.default_code or '',
+                    'Composition / Material': line.product_id.material or '',
+                    'Technology / Features': line.product_id.variants_tech_feat or '',
+                    'Event': line.product_id.occasion or '',
+                    'HSN Code': line.product_id.l10n_in_hsn_code or line.product_id.sale_hsn.hsnsac_code or '',
+                    'Style Code': line.product_id.style_code or '',
+                    'Article Code': line.product_id.variant_article_code or '',
+                    'EAN Code': line.product_id.barcode or '',
+                    'ASIN': line.product_id.variants_asin or '',
+                    'FSIN': line.product_id.variants_fsn or '',
+                    'Colour': line.product_id.color or '',
+                    'Size': line.product_id.size or '',
+                    'MRP': line.product_id.lst_price or '',
+                    'GST': ''.join([str(x) for x in line.product_id.taxes_id.name]) or '',
+                    'IHO Stock': '',
+                    'Bhiwandi Stock': '',
+                    'Delhi Stock': '',
+                    'Available Qty': line.product_id.virtual_available or ''
+                }
 
-            row = row + 1
+            # Fill in stock quantities based on location
+            if line.location_id.location_id.name == 'IHO':
+                product_data[product_id]['IHO Stock'] = line.inventory_quantity_auto_apply
+            elif line.location_id.location_id.name == 'BHW':
+                product_data[product_id]['Bhiwandi Stock'] = line.inventory_quantity_auto_apply
+            elif line.location_id.location_id.name == 'DEL':
+                product_data[product_id]['Delhi Stock'] = line.inventory_quantity_auto_apply
+
+        for product_id, data in product_data.items():
+            sheet.write(row, col, data['Brand'])
+            sheet.write(row, col + 1, data['Category 1'])
+            sheet.write(row, col + 2, data['Category 2'])
+            sheet.write(row, col + 3, data['Category 3'])
+            sheet.write(row, col + 4, data['Function Sport'])
+            sheet.write(row, col + 5, data['Gender'])
+            sheet.write(row, col + 6, data['Title'])
+            sheet.write(row, col + 7, data['SKU Code'])
+            sheet.write(row, col + 8, data['Composition / Material'])
+            sheet.write(row, col + 9, data['Technology / Features'])
+            sheet.write(row, col + 10, data['Event'])
+            sheet.write(row, col + 11, data['HSN Code'])
+            sheet.write(row, col + 12, data['Style Code'])
+            sheet.write(row, col + 13, data['Article Code'])
+            sheet.write(row, col + 14, data['EAN Code'])
+            sheet.write(row, col + 15, data['ASIN'])
+            sheet.write(row, col + 16, data['FSIN'])
+            sheet.write(row, col + 17, data['Colour'])
+            sheet.write(row, col + 18, data['Size'])
+            sheet.write(row, col + 19, data['MRP'])
+            sheet.write(row, col + 20, data['GST'])
+            sheet.write(row, col + 21, data['IHO Stock'])
+            sheet.write(row, col + 22, data['Bhiwandi Stock'])
+            sheet.write(row, col + 23, data['Delhi Stock'])
+            sheet.write(row, col + 24, data['Available Qty'])
+
+            # Find sales orders related to the product
+            sale_orders = self.env['sale.order'].search([('order_line.product_id', '=', product_id)])
+
+            # Calculate 'Qty to Deliver' based on unprocessed sales order quantities
+            qty_to_deliver = sum(
+                order_line.product_uom_qty for order in sale_orders for order_line in order.order_line if
+                not order_line.qty_delivered)
+
+            # Write 'Qty to Deliver'
+            sheet.write(row, col + 25, qty_to_deliver)
+
+            row += 1
 
