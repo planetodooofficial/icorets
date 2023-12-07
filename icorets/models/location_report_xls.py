@@ -191,8 +191,8 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 21, 'IHO Stock', bold)
         sheet.write(0, 22, 'Bhiwandi Stock', bold)
         sheet.write(0, 23, 'Delhi Stock', bold)
-        sheet.write(0, 25, 'Available Qty', bold)
-        sheet.write(0, 24, 'Reserved Qty', bold)
+        sheet.write(0, 24, 'Available Qty', bold)
+        sheet.write(0, 25, 'Reserved Qty', bold)
 
         row = 1
         col = 0
@@ -241,7 +241,7 @@ class LocationReport(models.AbstractModel):
             elif line.location_id.location_id.name == 'DEL':
                 product_data[product_id]['Delhi Stock'] = line.inventory_quantity_auto_apply
 
-        for product_id, data in sorted(product_data.items(), key=lambda x: (x[1]['Brand'].lower(), x[1]['Category 1'].lower(), x[1]['Category 2'].lower(), x[1]['Category 3'].lower())):
+        for product_id, data in product_data.items():
             sheet.write(row, col, data['Brand'])
             sheet.write(row, col + 1, data['Category 1'])
             sheet.write(row, col + 2, data['Category 2'])
@@ -249,13 +249,13 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 4, data['Function Sport'])
             sheet.write(row, col + 5, data['Gender'])
             sheet.write(row, col + 6, data['Title'])
-            sheet.write(row, col + 7, data['Composition / Material'])
-            sheet.write(row, col + 8, data['Technology / Features'])
-            sheet.write(row, col + 9, data['Event'])
-            sheet.write(row, col + 10, data['HSN Code'])
-            sheet.write(row, col + 11, data['Style Code'])
-            sheet.write(row, col + 12, data['Article Code'])
-            sheet.write(row, col + 13, data['SKU Code'])
+            sheet.write(row, col + 7, data['SKU Code'])
+            sheet.write(row, col + 8, data['Composition / Material'])
+            sheet.write(row, col + 9, data['Technology / Features'])
+            sheet.write(row, col + 10, data['Event'])
+            sheet.write(row, col + 11, data['HSN Code'])
+            sheet.write(row, col + 12, data['Style Code'])
+            sheet.write(row, col + 13, data['Article Code'])
             sheet.write(row, col + 14, data['EAN Code'])
             sheet.write(row, col + 15, data['ASIN'])
             sheet.write(row, col + 16, data['FSIN'])
@@ -266,7 +266,7 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 21, data['IHO Stock'])
             sheet.write(row, col + 22, data['Bhiwandi Stock'])
             sheet.write(row, col + 23, data['Delhi Stock'])
-            sheet.write(row, col + 25, data['Available Qty'])
+            sheet.write(row, col + 24, data['Available Qty'])
 
             # Find sales orders related to the product
             sale_orders = self.env['sale.order'].search([('order_line.product_id', '=', product_id)])
@@ -277,7 +277,7 @@ class LocationReport(models.AbstractModel):
                 not order_line.qty_delivered)
 
             # Write 'Qty to Deliver'
-            sheet.write(row, col + 24, qty_to_deliver)
+            sheet.write(row, col + 25, qty_to_deliver)
 
             row += 1
 
