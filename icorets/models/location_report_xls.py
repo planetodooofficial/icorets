@@ -353,7 +353,7 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 24, 'Reserved Qty', bold)
         sheet.write(0, 25, 'Available Qty', bold)
         sheet.write(0, 26, 'PO qty (Pending Receipt)', bold)
-
+        sheet.freeze_panes(1, 0)
 
         row = 1
         col = 0
