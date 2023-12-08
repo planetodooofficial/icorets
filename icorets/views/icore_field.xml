@@ -3,29 +3,29 @@
 
 <!--    #CREATED FOR SAPAT REQUIREMENT-->
 
-      <record id="view_vendorbill_wizard_form" model="ir.ui.view">
-            <field name="name">vendorbill.wizard.form</field>
-            <field name="model">vendorbill.wizard</field>
-            <field name="arch" type="xml">
-                <form>
-                    <group>
-                        <field name="grn_name" widget="many2many_tags" options="{'no_create': True}" />
-                    </group>
-                    <footer>
-                        <button string="Create Vendor Bill" type="object" class="oe_highlight" name="action_create_invoice"/>
-                        <button string="Cancel" class="oe_link" special="cancel"/>
-                    </footer>
-                </form>
-            </field>
-        </record>
+<!--      <record id="view_vendorbill_wizard_form" model="ir.ui.view">-->
+<!--            <field name="name">vendorbill.wizard.form</field>-->
+<!--            <field name="model">vendorbill.wizard</field>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <form>-->
+<!--                    <group>-->
+<!--                        <field name="grn_name" widget="many2many_tags" options="{'no_create': True}" />-->
+<!--                    </group>-->
+<!--                    <footer>-->
+<!--                        <button string="Create Vendor Bill" type="object" class="oe_highlight" name="action_create_invoice"/>-->
+<!--                        <button string="Cancel" class="oe_link" special="cancel"/>-->
+<!--                    </footer>-->
+<!--                </form>-->
+<!--            </field>-->
+<!--        </record>-->
 
-        <record id="action_vendorbill_wizard" model="ir.actions.act_window">
-            <field name="name">Vendor Bill Wizard</field>
-            <field name="res_model">vendorbill.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="icorets.view_vendorbill_wizard_form"/>
-            <field name="target">new</field>
-        </record>
+<!--        <record id="action_vendorbill_wizard" model="ir.actions.act_window">-->
+<!--            <field name="name">Vendor Bill Wizard</field>-->
+<!--            <field name="res_model">vendorbill.wizard</field>-->
+<!--            <field name="view_mode">form</field>-->
+<!--            <field name="view_id" ref="icorets.view_vendorbill_wizard_form"/>-->
+<!--            <field name="target">new</field>-->
+<!--        </record>-->
 
     <!--    For adding style code on product Kanban view-->
 
@@ -379,8 +379,8 @@
                 </div>
 <!--                <field name="client_order_ref"/>-->
 <!--                <field name="event"/>-->
-                <field name="warehouse_id" readonly="0" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
-                <field name="location_id" attrs="{'readonly': [('state', 'not in', 'draft')]}" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
+                <field name="warehouse_id"  readonly="0" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
+                <field name="location_id" domain="[('warehouse_id','=',warehouse_id)]" attrs="{'readonly': [('state', 'not in', 'draft')]}" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
                 <field name="gstin_id" domain="[('is_gstin', '=', 'True')]" options="{'no_open': True, 'no_edit': True, 'no_create': True}" attrs="{'readonly': [('state', '=', 'sale')]}"/>
                 <field name="l10n_in_journal_id" domain="[('company_id', '=', company_id), ('type','=','sale')]" options="{'no_create': True}" attrs="{'invisible': [('country_code','!=', 'IN')]}"/>
             </xpath>
@@ -426,6 +426,7 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="before">
                 <field name="article_code" optional="hide"/>
                 <field name="size" optional="hide"/>
+                <field name="color" optional="hide"/>
             </xpath>
             <xpath expr="//header" position="inside">
                 <!--                <button name="fo_action_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>-->
@@ -492,6 +493,8 @@
                 <field name="article_code" optional="hide"/>
                 <field name="ean_code" optional="hide"/>
                 <field name="size" optional="hide"/>
+                <field name="color" optional="hide"/>
+
             </xpath>
 
             <!--            For adding partner address-->
@@ -538,7 +541,7 @@
 
 <!--            FOR SAPAT-->
                 <xpath expr="//header/button[@name='action_create_invoice']" position="replace">
-                <button string="Create Bill" type="object" class="oe_highlight" name="open_vendorbill_wizard"/>
+<!--                <button string="Create Bill" type="object" class="oe_highlight" name="open_vendorbill_wizard"/>-->
                 </xpath>
 
 
