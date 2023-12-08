@@ -33,9 +33,9 @@
 <!--    Action-->
     <record id="location_report_action_xls" model="ir.actions.report">
     <field name="name">Location Report</field>
-    <field name="model">stock.quant</field>
+    <field name="model">product.product</field>
     <field name="report_type">xlsx</field>
-    <field name="report_name">crm_timesheet.location_report_xls</field>
+    <field name="report_name">icorets.location_report_xls</field>
     <field name="report_file">Location Report</field>
 </record>
 
