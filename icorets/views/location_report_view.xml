@@ -48,7 +48,7 @@
         <field name="report_file">Location Report Qtn</field>
     </record>
 
-    <menuitem id="location_report_menu" name="Location Report" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls" sequence="20"/>
-    <menuitem id="location_report_menu_wq" name="Location Report With Qtn" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls_qtn" sequence="22"/>
+    <menuitem id="location_report_menu" name="Stock Report (Confirmed SO)" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls" sequence="20"/>
+    <menuitem id="location_report_menu_wq" name="Stock Report (With Qtn)" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls_qtn" sequence="22"/>
 
 </odoo>
