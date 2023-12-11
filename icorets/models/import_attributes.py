@@ -163,15 +163,15 @@ class UpdateAttributes(models.TransientModel):
         csv_reader = csv.DictReader(csv_data[1:], fieldnames=header)
 
         for row in csv_reader:
-            internal_ref = row['SKU Code']
-            color = row['Color']
-            size = row['Size']
-            title = row['Title']
-            stylecode = row['Style Code']
-            ean = row['EAN Code']
-            article = row['Article Code']
-            fsn = row['FSN']
-            asin = row['ASIN']
+            internal_ref = row['SKU Code'].strip() if 'SKU Code' in row else ''
+            color = row['Color'].strip() if 'Color' in row else ''
+            size = row['Size'].strip() if 'Size' in row else ''
+            title = row['Title'].strip() if 'Title' in row else ''
+            stylecode = row['Style Code'].strip() if 'Style Code' in row else ''
+            ean = row['EAN Code'].strip() if 'EAN Code' in row else ''
+            article = row['Article Code'].strip() if 'Article Code' in row else ''
+            fsn = row['FSN'].strip() if 'FSN' in row else ''
+            asin = row['ASIN'].strip() if 'ASIN' in row else ''
 
             product_template = self.env['product.product'].search([('name', '=', title), ('style_code', '=', stylecode),
                 ('product_template_attribute_value_ids.name', '=', size),
