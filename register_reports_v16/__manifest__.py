@@ -13,7 +13,7 @@
     'demo': [],
     'data': [
             'views/partner_ledger_views.xml',
-            'views/ledger_confirmation.xml',
+            # 'views/ledger_confirmation.xml',
             'security/ir.model.access.csv',
 
              ],

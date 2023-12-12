@@ -16,7 +16,6 @@ class LocationReport(models.AbstractModel):
     _inherit = "report.report_xlsx.abstract"
 
     def generate_xlsx_report(self, workbook, data, lines):
-
         bold = workbook.add_format(
             {'font_size': 11, 'align': 'vcenter', 'bold': True, 'bg_color': '#b7b7b7', 'font': 'Calibri Light',
              'text_wrap': True, 'border': 1})
@@ -52,22 +51,9 @@ class LocationReport(models.AbstractModel):
         sheet.set_column(0, 24, 17)
         sheet.set_column(0, 25, 25)
         sheet.set_column(0, 26, 25)
+        sheet.set_column(0, 27, 25)
+        sheet.set_column(0, 28, 25)
 
-        # worksheet.set_column('A:A', 17)
-        # worksheet.set_column('B:B', 15)
-        # worksheet.set_column('C:C', 17)
-        # worksheet.set_column('D:D', 17)
-        # worksheet.set_column('E:E', 15)
-        # worksheet.set_column('F:F', 20)
-        # worksheet.set_column('G:G', 30)
-        # worksheet.set_column('H:H', 30)
-        # worksheet.set_column('I:I', 20)
-        # worksheet.set_column('J:J', 20)
-        # worksheet.set_column('K:K', 17)
-        # worksheet.set_column('L:L', 25)
-        # worksheet.set_column('M:M', 20)
-        # worksheet.set_column('N:N', 17)
-        # worksheet.set_column('O:R', 15)
         # **************************************************
         sheet.write(0, 0, 'Brand', bold)
         sheet.write(0, 1, 'Category 1', bold)
@@ -93,9 +79,11 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 21, 'IHO Stock', bold)
         sheet.write(0, 22, 'Bhiwandi Stock', bold)
         sheet.write(0, 23, 'Delhi Stock', bold)
-        sheet.write(0, 24, 'Reserved Qty', bold)
-        sheet.write(0, 25, 'Available Qty', bold)
-        sheet.write(0, 26, '(Onhand + incoming) - outgoing', bold)
+        sheet.write(0, 24, 'Total Qty', bold)
+        sheet.write(0, 25, 'Reserved Qty', bold)
+        sheet.write(0, 26, 'FREE TO USE', bold)
+        sheet.write(0, 27, 'PO Receipt Pending', bold)
+        sheet.write(0, 28, '(Onhand + incoming) - outgoing', bold)
         sheet.freeze_panes(1, 0)
 
         row = 1
@@ -132,9 +120,11 @@ class LocationReport(models.AbstractModel):
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
+                'Total': product.qty_available or '',
                 '(Onhand + incoming) - outgoing': product.virtual_available or '',
                 'Reserved Qty': 0, # Initialize reserved quantity to 0
-                'Available Qty': 0
+                'FREE TO USE': 0,
+                'PO Receipt Pending': 0
             }
 
             # Fill in stock quantities based on location
@@ -152,21 +142,30 @@ class LocationReport(models.AbstractModel):
                     product_data[product_id]['Delhi Stock'] = quant.quantity
 
             # Find sales orders related to the product
-            sale_orders = self.env['sale.order'].search([('order_line.product_id', '=', product_id),('state', 'not in', ['draft','cancel','sent'])])
-
+            sale_orders = self.env['sale.order'].search([('order_line.product_id', '=', product_id), ('state', 'not in', ['draft', 'cancel', 'sent'])])
             # Calculate 'Qty to Deliver' based on unprocessed sales order quantities
             qty_to_deliver = sum(
                 order_line.product_uom_qty - order_line.qty_delivered for order in sale_orders for order_line in
                 order.order_line
                 if order_line.product_id.id == product_id)
-
             # Update 'Reserved Qty'
             product_data[product_id]['Reserved Qty'] = qty_to_deliver
 
-            # available =
+            # Update 'FREE TO USE'
+            product_data[product_id]['FREE TO USE'] = product.qty_available - qty_to_deliver
 
-            # Update 'Available Qty'
-            product_data[product_id]['Available Qty'] = product.qty_available - qty_to_deliver
+            # Fetch purchase orders related to the product
+            purchase_orders = self.env['purchase.order'].search([('order_line.product_id', '=', product_id), ('state', 'not in', ['draft','to approve', 'cancel', 'sent'])])
+
+            # Calculate 'Ordered - Received' based on unprocessed purchase order quantities
+            ordered_received_qty = sum(
+                order_line.product_qty - order_line.qty_received for order in purchase_orders for order_line in
+                order.order_line
+                if order_line.product_id.id == product_id)
+
+            # Update 'Ordered - Received'
+            product_data[product_id]['PO Receipt Pending'] = ordered_received_qty
+
 
         # Write data to the sheet
         for product_id, data in sorted(product_data.items(), key=lambda x: (x[1]['Brand'].lower(), x[1]['Category 1'].lower(), x[1]['Category 2'].lower(), x[1]['Category 3'].lower())):
@@ -194,11 +193,15 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 21, data['IHO Stock'])
             sheet.write(row, col + 22, data['Bhiwandi Stock'])
             sheet.write(row, col + 23, data['Delhi Stock'])
-            sheet.write(row, col + 26, data['(Onhand + incoming) - outgoing'])
-            sheet.write(row, col + 24, data['Reserved Qty'])
-            sheet.write(row, col + 25, data['Available Qty'])
+            sheet.write(row, col + 24, data['Total'])
+            sheet.write(row, col + 25, data['Reserved Qty'])
+            sheet.write(row, col + 26, data['FREE TO USE'])
+            sheet.write(row, col + 27, data['PO Receipt Pending'])
+            sheet.write(row, col + 28, data['(Onhand + incoming) - outgoing'])
 
             row += 1
+
+
 
 class LocationReportQtn(models.AbstractModel):
     _name = "report.icorets.location_report_xlsx_qtn"
@@ -239,6 +242,9 @@ class LocationReportQtn(models.AbstractModel):
         sheet.set_column(0, 23, 17)
         sheet.set_column(0, 24, 17)
         sheet.set_column(0, 25, 25)
+        sheet.set_column(0, 26, 25)
+        sheet.set_column(0, 27, 25)
+        sheet.set_column(0, 28, 25)
 
         # **************************************************
         sheet.write(0, 0, 'Brand', bold)
@@ -265,9 +271,11 @@ class LocationReportQtn(models.AbstractModel):
         sheet.write(0, 21, 'IHO Stock', bold)
         sheet.write(0, 22, 'Bhiwandi Stock', bold)
         sheet.write(0, 23, 'Delhi Stock', bold)
-        sheet.write(0, 24, 'Reserved Qty', bold)
-        sheet.write(0, 25, 'Available Qty', bold)
-        sheet.write(0, 26, '(Onhand + incoming) - outgoing', bold)
+        sheet.write(0, 24, 'Total Qty', bold)
+        sheet.write(0, 25, 'Reserved Qty', bold)
+        sheet.write(0, 26, 'FREE TO USE', bold)
+        sheet.write(0, 27, 'PO Receipt Pending', bold)
+        sheet.write(0, 28, '(Onhand + incoming) - outgoing', bold)
         sheet.freeze_panes(1, 0)
 
         row = 1
@@ -304,9 +312,11 @@ class LocationReportQtn(models.AbstractModel):
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
+                'Total': product.qty_available or '',
                 '(Onhand + incoming) - outgoing': product.virtual_available or '',
                 'Reserved Qty': 0, # Initialize reserved quantity to 0
-                'Available Qty': 0
+                'FREE TO USE': 0,
+                'PO Receipt Pending': 0
             }
 
             # Fill in stock quantities based on location
@@ -325,20 +335,29 @@ class LocationReportQtn(models.AbstractModel):
 
             # Find sales orders related to the product
             sale_orders = self.env['sale.order'].search([('order_line.product_id', '=', product_id), ])
-
             # Calculate 'Qty to Deliver' based on unprocessed sales order quantities
             qty_to_deliver = sum(
                 order_line.product_uom_qty - order_line.qty_delivered for order in sale_orders for order_line in
                 order.order_line
                 if order_line.product_id.id == product_id)
-
             # Update 'Reserved Qty'
             product_data[product_id]['Reserved Qty'] = qty_to_deliver
 
-            # available =
+            # Update 'FREE TO USE'
+            product_data[product_id]['FREE TO USE'] = product.qty_available - qty_to_deliver
 
-            # Update 'Available Qty'
-            product_data[product_id]['Available Qty'] = product.qty_available - qty_to_deliver
+            # Fetch purchase orders related to the product
+            purchase_orders = self.env['purchase.order'].search([('order_line.product_id', '=', product_id)])
+
+            # Calculate 'Ordered - Received' based on unprocessed purchase order quantities
+            ordered_received_qty = sum(
+                order_line.product_qty - order_line.qty_received for order in purchase_orders for order_line in
+                order.order_line
+                if order_line.product_id.id == product_id)
+
+            # Update 'Ordered - Received'
+            product_data[product_id]['PO Receipt Pending'] = ordered_received_qty
+
 
         # Write data to the sheet
         for product_id, data in sorted(product_data.items(), key=lambda x: (x[1]['Brand'].lower(), x[1]['Category 1'].lower(), x[1]['Category 2'].lower(), x[1]['Category 3'].lower())):
@@ -366,9 +385,11 @@ class LocationReportQtn(models.AbstractModel):
             sheet.write(row, col + 21, data['IHO Stock'])
             sheet.write(row, col + 22, data['Bhiwandi Stock'])
             sheet.write(row, col + 23, data['Delhi Stock'])
-            sheet.write(row, col + 26, data['(Onhand + incoming) - outgoing'])
-            sheet.write(row, col + 24, data['Reserved Qty'])
-            sheet.write(row, col + 25, data['Available Qty'])
+            sheet.write(row, col + 24, data['Total'])
+            sheet.write(row, col + 25, data['Reserved Qty'])
+            sheet.write(row, col + 26, data['FREE TO USE'])
+            sheet.write(row, col + 27, data['PO Receipt Pending'])
+            sheet.write(row, col + 28, data['(Onhand + incoming) - outgoing'])
 
             row += 1
 
