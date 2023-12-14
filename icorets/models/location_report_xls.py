@@ -351,8 +351,7 @@ class LocationReportQtn(models.AbstractModel):
             #                     if order_line.product_id.id == product_id)
             outgoing_qty = (sum(
                 order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
-                if order_line.product_id.id == product_id) + sum(order_line.qty_delivered for order in sale_orders for order_line in order.order_line
-                                if order_line.product_id.id == product_id))
+                if order_line.product_id.id == product_id) + product.virtual_available)
 
             onhand_incoming_minus_outgoing = product.qty_available + incoming_qty - outgoing_qty
 
