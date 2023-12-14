@@ -344,7 +344,7 @@ class LocationReportQtn(models.AbstractModel):
                 [('order_line.product_id', '=', product_id), ('state', '=', 'sale')])
             # Fetch quotation orders related to the product
             quotation_orders = self.env['sale.order'].search(
-                [('order_line.product_id', '=', product_id), ('state', '=', 'draft')])
+                [('order_line.product_id', '=', product_id), ('state', '=', 'draft'),('state', '!=', 'cancel')])
 
             # Calculate outgoing quantity based on sale orders and quotation orders
             outgoing_qty += sum(order_line.qty_delivered for order in sale_orders for order_line in order.order_line
