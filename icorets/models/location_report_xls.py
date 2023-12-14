@@ -351,8 +351,8 @@ class LocationReportQtn(models.AbstractModel):
                 order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
                 if order_line.product_id.id == product_id)
 
-            # Total outgoing quantity formula
-            outgoing_qty =  quotation_outgoing_qty
+            # Total outgoing quantity
+            outgoing_qty = product.outgoing_qty + quotation_outgoing_qty
 
             onhand_incoming_minus_outgoing = product.qty_available + incoming_qty - outgoing_qty
 
