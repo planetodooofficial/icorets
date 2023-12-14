@@ -347,9 +347,12 @@ class LocationReportQtn(models.AbstractModel):
                 [('order_line.product_id', '=', product_id), ('state', '=', 'draft'),('state', '!=', 'cancel')])
 
             # Calculate outgoing quantity based on sale orders and quotation orders
-            qty_sum = sum(order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
-                            if order_line.product_id.id == product_id)
-            outgoing_qty = (qty_sum + (product.virtual_available))
+            quotation_outgoing_qty = sum(
+                order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
+                if order_line.product_id.id == product_id)
+
+            # Total outgoing quantity
+            outgoing_qty = product.virtual_available + (quotation_outgoing_qty)
 
             onhand_incoming_minus_outgoing = product.qty_available + incoming_qty - outgoing_qty
 
