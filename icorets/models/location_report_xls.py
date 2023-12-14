@@ -313,7 +313,7 @@ class LocationReportQtn(models.AbstractModel):
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
                 'Total': product.qty_available or '',
-                '(Onhand + incoming) - outgoing': product.qty_available + product.incoming_qty - product.outgoing_qty or '',
+                '(Onhand + incoming) - outgoing': 0,
                 # '(Onhand + incoming) - outgoing': product.virtual_available or '',
                 'Reserved Qty': 0, # Initialize reserved quantity to 0
                 'FREE TO USE': 0,
@@ -334,6 +334,32 @@ class LocationReportQtn(models.AbstractModel):
                 elif quant.location_id.location_id.name == 'DEL':
                     product_data[product_id]['Delhi Stock'] = quant.quantity
 
+# *********************************************
+
+            incoming_qty = product.incoming_qty
+            outgoing_qty = product.outgoing_qty
+
+            # Fetch sale orders related to the product
+            sale_orders = self.env['sale.order'].search(
+                [('order_line.product_id', '=', product_id), ('state', '=', 'sale')])
+            # Fetch quotation orders related to the product
+            quotation_orders = self.env['sale.order'].search(
+                [('order_line.product_id', '=', product_id), ('state', '=', 'draft')])
+
+            # Calculate outgoing quantity based on sale orders and quotation orders
+            outgoing_qty += sum(order_line.qty_delivered for order in sale_orders for order_line in order.order_line
+                                if order_line.product_id.id == product_id)
+            outgoing_qty += sum(
+                order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
+                if order_line.product_id.id == product_id)
+
+            onhand_incoming_minus_outgoing = product.qty_available + incoming_qty - outgoing_qty
+
+            # Update '(Onhand + incoming) - outgoing'
+            product_data[product_id]['(Onhand + incoming) - outgoing'] = onhand_incoming_minus_outgoing
+
+
+        # ***************************************
             # Find sales orders related to the product
             sale_orders = self.env['sale.order'].search([('order_line.product_id', '=', product_id), ])
             # Calculate 'Qty to Deliver' based on unprocessed sales order quantities
@@ -346,7 +372,7 @@ class LocationReportQtn(models.AbstractModel):
 
             # Update 'FREE TO USE'
             product_data[product_id]['FREE TO USE'] = product.qty_available - qty_to_deliver
-
+# ************************************************
             # Fetch purchase orders related to the product
             purchase_orders = self.env['purchase.order'].search([('order_line.product_id', '=', product_id)])
 
