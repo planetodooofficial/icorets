@@ -313,7 +313,8 @@ class LocationReportQtn(models.AbstractModel):
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
                 'Total': product.qty_available or '',
-                '(Onhand + incoming) - outgoing': product.virtual_available or '',
+                '(Onhand + incoming) - outgoing': product.qty_available + product.incoming_qty - product.outgoing_qty or '',
+                # '(Onhand + incoming) - outgoing': product.virtual_available or '',
                 'Reserved Qty': 0, # Initialize reserved quantity to 0
                 'FREE TO USE': 0,
                 'PO Receipt Pending': 0
