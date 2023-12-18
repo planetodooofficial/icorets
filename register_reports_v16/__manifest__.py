@@ -12,9 +12,10 @@
     'category': 'Accounting',
     'demo': [],
     'data': [
+            'security/ir.model.access.csv',
             'views/partner_ledger_views.xml',
             # 'views/ledger_confirmation.xml',
-            'security/ir.model.access.csv',
+
 
              ],
     'installable': True,
