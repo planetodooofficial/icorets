@@ -33,22 +33,22 @@
 
 <!--    Action-->
     <record id="location_report_action_xls" model="ir.actions.report">
-    <field name="name">Location Summary Without Quotation</field>
+    <field name="name">Location Summary</field>
     <field name="model">product.product</field>
     <field name="report_type">xlsx</field>
     <field name="report_name">icorets.location_report_xls</field>
     <field name="report_file">Location Report</field>
 </record>
 
-    <record id="location_report_action_xls_qtn" model="ir.actions.report">
-        <field name="name">Location Summary With Quotation</field>
-        <field name="model">product.product</field>
-        <field name="report_type">xlsx</field>
-        <field name="report_name">icorets.location_report_xlsx_qtn</field>
-        <field name="report_file">Location Report Qtn</field>
-    </record>
+<!--    <record id="location_report_action_xls_qtn" model="ir.actions.report">-->
+<!--        <field name="name">Location Summary With Quotation</field>-->
+<!--        <field name="model">product.product</field>-->
+<!--        <field name="report_type">xlsx</field>-->
+<!--        <field name="report_name">icorets.location_report_xlsx_qtn</field>-->
+<!--        <field name="report_file">Location Report Qtn</field>-->
+<!--    </record>-->
 
-    <menuitem id="location_report_menu" name="Stock Report (Confirmed SO)" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls" sequence="20"/>
-    <menuitem id="location_report_menu_wq" name="Stock Report (With Qtn)" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls_qtn" sequence="22"/>
+    <menuitem id="location_report_menu" name="Stock Report" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls" sequence="20"/>
+<!--    <menuitem id="location_report_menu_wq" name="Stock Report (With Qtn)" parent="stock.menu_warehouse_report" action="icorets.location_report_action_xls_qtn" sequence="22"/>-->
 
 </odoo>
