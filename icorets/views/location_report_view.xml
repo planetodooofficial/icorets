@@ -17,7 +17,7 @@
                 </sheet>
                 <footer>
                     <button string="Excel Report" class="oe_highlight" type="object" name="location_report_xlsx"/>
-                    <button string="Excel Report" class="oe_highlight" type="object" name="location_report_xlsx_qtn"/>
+<!--                    <button string="Excel Report" class="oe_highlight" type="object" name="location_report_xlsx_qtn"/>-->
                 </footer>
             </form>
         </field>
