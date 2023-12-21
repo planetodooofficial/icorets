@@ -344,7 +344,7 @@ class SaleOrderInherit(models.Model):
     partner_invoice_id_state = fields.Many2one('res.country.state','Inv State', related='partner_invoice_id.state_id')
     partner_invoice_id_zip = fields.Char('Inv Zip', related='partner_invoice_id.zip')
     partner_invoice_id_country = fields.Many2one('res.country','Inv Country', related='partner_invoice_id.country_id')
-    
+
     partner_shipping_id_street = fields.Char('Del Street', related='partner_shipping_id.street')
     partner_shipping_id_street2 = fields.Char('Del Street2', related='partner_shipping_id.street2')
     partner_shipping_id_city = fields.Char('Del City', related='partner_shipping_id.city')
@@ -1192,6 +1192,9 @@ class PurchaseOrderLineInherit(models.Model):
 class StockPickingInherit(models.Model):
     _inherit = 'stock.picking'
 
+    def get_report_xlsx(self):
+        return self.env.ref('icorets.get_sale_order_xls').report_action(self)
+
     @api.model
     def create(self, values):
         res = super(StockPickingInherit, self).create(values)
@@ -1210,6 +1213,7 @@ class StockPickingInherit(models.Model):
             'view_id': self.env.ref('icorets.view_bag_entry_manual_wizard_form').id,
             'target': 'new',
         }
+
 
 # Code for populating stock in stock.move.line
 
@@ -1278,7 +1282,7 @@ class PackingListManual(models.TransientModel):
     _name = "packing.list.manual"
     _description = "Manual Packing List"
 
-    upload_file = fields.Binary("Upload File", required=True, help="Upload your .csv file here.")
+    upload_file = fields.Binary("Upload File", required=True, help="Upload your .xlsx file here.")
     file_name = fields.Char('File Name')
     alert_notification = fields.Html(
         default="<h6 style='color:red;text-align:center;'>Please Upload .CSV File Only.</h6>", readonly=True)
@@ -1286,11 +1290,18 @@ class PackingListManual(models.TransientModel):
     def action_confirm(self):
         active_id = self.env.context.get('active_id')
         picking_id = self.env["stock.picking"].browse(active_id)
+
+        # Check if the file is in Excel format
+        if not self.file_name.lower().endswith(('.xls', '.xlsx')):
+            raise ValidationError("Invalid file format. Please upload a .xls or .xlsx file.")
+
         excel_data = self.upload_file
         filename = BytesIO(base64.b64decode(excel_data))
-        data = pd.read_csv(filename)
 
-        cols_to_check = ['Product', 'Unit of Measure', 'Destination Package', 'Done Quantity', 'Destination Package']
+        # Read the Excel file
+        data = pd.read_excel(filename)
+
+        cols_to_check = ['SKU', 'Destination Location', 'Packed Qty']
         empty_column = data[cols_to_check].isnull().any()
         cols_with_null_names = empty_column[empty_column == True].index.tolist()
 
@@ -1298,41 +1309,128 @@ class PackingListManual(models.TransientModel):
             raise ValidationError("Empty cells in %s columns." % cols_with_null_names)
 
         for index, rows in data.iterrows():
-            search_product = self.env["product.product"].search([('default_code', '=', rows['Product'])], limit=1)
+            search_product = self.env["product.product"].search([('default_code', '=', rows['SKU'])], limit=1)
             if not search_product:
-                raise ValidationError(f"Product {rows['Product']} Not Found.")
+                raise ValidationError(f"Product {rows['SKU']} Not Found.")
 
-            search_uom = self.env["uom.uom"].search([('name', '=', rows['Unit of Measure'])], limit=1)
-            if not search_uom:
-                raise ValidationError(f"Unit of Measure {rows['Unit of Measure']} Not Found.")
+            destination_package_name = rows['Destination Location']
 
-            destination_package = rows['Destination Package']
+            # Check if the package with the given name already exists
+            existing_package = self.env['stock.quant.package'].search([('name', '=', destination_package_name)],
+                                                                      limit=1)
 
-            # Create a package if the destination_package is present
-            package = False
-            if destination_package:
+            if existing_package:
+                package = existing_package
+            else:
+                # Create a new package if the destination_package is not present
                 package_obj = self.env['stock.quant.package']
-                package_vals = {'name': destination_package}
+                package_vals = {'name': destination_package_name}
                 package = package_obj.create(package_vals)
 
             existing_move_lines = picking_id.move_line_ids_without_package.filtered(
-                lambda move_line: move_line.product_id == search_product and
-                                  move_line.product_uom_id == search_uom
+                lambda move_line: move_line.product_id == search_product
             )
 
             if existing_move_lines:
                 for existing_move_line in existing_move_lines:
                     existing_move_line.update({
-                        'qty_done': rows['Done Quantity'],
-                        'result_package_id': package.id if package else False
+                        'qty_done': rows['Packed Qty'],
+                        'result_package_id': package.id
                     })
             else:
                 # Product not found in move_line_ids_without_package, create a new record
                 new_move_line_vals = {
                     'product_id': search_product.id,
-                    'product_uom_id': search_uom.id,
-                    'qty_done': rows['Done Quantity'],
-                    'result_package_id': package.id if package else False
+                    'qty_done': rows['Packed Qty'],
+                    'result_package_id': package.id
                 }
                 picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
 
+
+# Code for creating excel report in csv then updating it on stock.picking itself
+
+class SaleOrderReport(models.AbstractModel):
+    _name = "report.icorets.saleorder_report_xls"
+    _inherit = "report.report_xlsx.abstract"
+
+    def generate_xlsx_report(self, workbook, data, lines):
+        bold = workbook.add_format(
+            {'font_size': 11, 'align': 'vcenter', 'bold': True, 'bg_color': '#b7b7b7', 'font': 'Calibri Light',
+             'text_wrap': True, 'border': 1})
+        bold_red = workbook.add_format(
+            {'font_size': 11, 'color': '#FF0000', 'align': 'vcenter', 'bold': True, 'bg_color': '#b7b7b7',
+             'font': 'Calibri Light',
+             'text_wrap': True, 'border': 1})
+        sheet = workbook.add_worksheet('Location Summary')
+        sheet.set_column(0, 0, 20)
+        sheet.set_column(0, 1, 25)
+        sheet.set_column(0, 2, 25)
+        sheet.set_column(0, 3, 25)
+        sheet.set_column(0, 4, 25)
+        sheet.set_column(0, 5, 25)
+        sheet.set_column(0, 6, 25)
+        sheet.set_column(0, 7, 25)
+        sheet.set_column(0, 8, 25)
+        sheet.set_column(0, 9, 25)
+        sheet.set_column(0, 10, 25)
+        sheet.set_column(0, 11, 25)
+        sheet.set_column(0, 12, 25)
+        sheet.set_column(0, 13, 25)
+        sheet.set_column(0, 14, 25)
+        sheet.set_column(0, 15, 25)
+        sheet.set_column(0, 16, 25)
+        sheet.set_column(0, 17, 25)
+        sheet.set_column(0, 18, 25)
+        sheet.set_column(0, 19, 25)
+        sheet.set_column(0, 20, 25)
+        sheet.set_column(0, 21, 17)
+        sheet.set_column(0, 22, 17)
+        sheet.set_column(0, 23, 17)
+        sheet.set_column(0, 24, 17)
+        sheet.set_column(0, 25, 25)
+        sheet.set_column(0, 26, 25)
+        sheet.set_column(0, 27, 25)
+        sheet.set_column(0, 28, 25)
+        sheet.set_column(0, 29, 25)
+
+        # **************************************************
+        sheet.write(0, 0, 'Brand', bold)
+        sheet.write(0, 1, 'ASIN', bold)
+        sheet.write(0, 2, 'FSN', bold)
+        sheet.write(0, 3, 'SKU', bold)
+        sheet.write(0, 4, 'Description', bold)
+        sheet.write(0, 5, 'Article Code', bold)
+        sheet.write(0, 6, 'Barcode', bold)
+        sheet.write(0, 7, 'Color', bold)
+        sheet.write(0, 8, 'Size', bold)
+        sheet.write(0, 9, 'MRP', bold)
+        sheet.write(0, 10, 'Quantity', bold)
+        sheet.write(0, 11, 'Invoiced Quantity', bold)
+        sheet.write(0, 12, 'Balance to Pack', bold)
+        sheet.write(0, 13, 'Packed Qty', bold)
+        sheet.write(0, 14, 'Destination Location', bold)
+
+        sheet.freeze_panes(1, 0)
+
+        row = 1
+        col = 0
+
+
+        sale_order= self.env['sale.order'].search([])
+
+        for record in sale_order:
+            if record.name == lines.origin:
+                for rec in record.order_line:
+                    sheet.write(row, col, str(rec.product_id.brand_id_rel.name))
+                    sheet.write(row, col + 1, rec.product_id.variants_asin)
+                    sheet.write(row, col + 2, rec.product_id.variants_fsn)
+                    sheet.write(row, col + 3, rec.product_id.default_code)
+                    sheet.write(row, col + 4, rec.name)
+                    sheet.write(row, col + 5, rec.article_code)
+                    sheet.write(row, col + 6, rec.product_id.barcode)
+                    sheet.write(row, col + 7, rec.product_id.color)
+                    sheet.write(row, col + 8, rec.product_id.size)
+                    sheet.write(row, col + 9, rec.product_id.lst_price)
+                    sheet.write(row, col + 10, rec.product_uom_qty)
+                    sheet.write(row, col + 11, rec.qty_invoiced)
+                    row += 1

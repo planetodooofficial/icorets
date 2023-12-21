@@ -27,6 +27,14 @@
 <!--            <field name="target">new</field>-->
 <!--        </record>-->
 
+   <record id="get_sale_order_xls" model="ir.actions.report">
+        <field name="name">Picking List</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">icorets.saleorder_report_xls</field>
+        <field name="report_file">Picking List</field>
+    </record>
+
     <!--    For adding style code on product Kanban view-->
 
     <record model="ir.ui.view" id="product_kanban_inherited_view">
@@ -69,7 +77,8 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_cancel']" position="after">
-                <button string="Updating Picking List" name="update_picking_list_wizard" type="object" class="btn-primary"/>
+                <button string="Download Sale Order" name="get_report_xlsx" type="object" class="btn-primary" attrs="{'invisible': [['state', '=', 'done']]}"/>
+                <button string="Updating Picking List" name="update_picking_list_wizard" type="object" class="btn-primary" attrs="{'invisible': [['state', '=', 'done']]}"/>
             </xpath>
         </field>
     </record>
@@ -592,7 +601,7 @@
                 <group>
                     <group>
                         <field name="file_name" invisible="1"/>
-                        <field name="upload_file" options="{'accepted_file_extensions':'.csv'}" filename="file_name"/>
+                        <field name="upload_file" options="{'accepted_file_extensions':'.xlsx'}" filename="file_name"/>
                     </group>
                     <group>
                     </group>
