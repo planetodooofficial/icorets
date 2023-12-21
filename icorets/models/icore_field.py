@@ -1273,45 +1273,6 @@ class InheritResPartner(models.Model):
         return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (record.id, "%s" % (record.name)) for record in self]
 
 
-    # Commented Approval cateory on creating vendor
-    # @api.model_create_multi
-    # def create(self, vals):
-    #     result = super(InheritResPartner, self).create(vals)
-    #     active_ids = self.env.context.get('default_supplier_rank')
-    #     if active_ids:
-    #         result.active = False
-    #         approval_category_id = self.env['approval.category'].sudo().search([
-    #             ('name', '=', 'Vendor')
-    #         ], limit=1)
-    #         if not approval_category_id:
-    #             raise ValidationError("'Vendor' Approval Category Is Not Created.")
-    #
-    #         approval_vals = {
-    #             'name': "Vendor Approval",
-    #             'request_owner_id': self.env.user.id,
-    #             'cust_partner_id': result.id,
-    #             "category_id": approval_category_id.id,
-    #             "vendor_count": 1,
-    #         }
-    #         data = self.env['approval.request'].create(approval_vals)
-    #         data.action_confirm()
-    #         print(data)
-    #     return result
-
-    # @api.model
-    # def default_get(self, fields):
-    #     res = super(InheritResPartner, self).default_get(fields)
-    #     active_ids = self.env.context.get('default_supplier_rank')
-    #     if active_ids:
-    #         if 'is_approved' in fields and 'active' in fields:
-    #             res['is_approved'] = False
-    #             res['active'] = False
-    #     else:
-    #         if 'is_approved' in fields and 'active' in fields:
-    #             res['is_approved'] = True
-    #             res['active'] = True
-    #     return res
-
 # Created for Packing List
 class PackingListManual(models.TransientModel):
     _name = "packing.list.manual"
@@ -1329,14 +1290,13 @@ class PackingListManual(models.TransientModel):
         filename = BytesIO(base64.b64decode(excel_data))
         data = pd.read_csv(filename)
 
-        cols_to_check = ['Product', 'Unit of Measure', 'Source Package','Done Quantity']
+        cols_to_check = ['Product', 'Unit of Measure', 'Destination Package', 'Done Quantity', 'Destination Package']
         empty_column = data[cols_to_check].isnull().any()
         cols_with_null_names = empty_column[empty_column == True].index.tolist()
 
         if cols_with_null_names:
             raise ValidationError("Empty cells in %s columns." % cols_with_null_names)
 
-        st_move_line_lst = []
         for index, rows in data.iterrows():
             search_product = self.env["product.product"].search([('default_code', '=', rows['Product'])], limit=1)
             if not search_product:
@@ -1346,17 +1306,33 @@ class PackingListManual(models.TransientModel):
             if not search_uom:
                 raise ValidationError(f"Unit of Measure {rows['Unit of Measure']} Not Found.")
 
+            destination_package = rows['Destination Package']
 
-            package_obj = self.env['stock.quant.package']
-            if rows['Source Package']:
-                pck = package_obj.create({'name': rows['Source Package'] + " " + '('+ picking_id.origin +')'})
+            # Create a package if the destination_package is present
+            package = False
+            if destination_package:
+                package_obj = self.env['stock.quant.package']
+                package_vals = {'name': destination_package}
+                package = package_obj.create(package_vals)
 
-            st_move_line_vals = (0, 0, {
-                'product_id': search_product.id,
-                'product_uom_id': search_uom.id,
-                'package_id': pck.id,
-                'qty_done': rows['Done Quantity'],
+            existing_move_lines = picking_id.move_line_ids_without_package.filtered(
+                lambda move_line: move_line.product_id == search_product and
+                                  move_line.product_uom_id == search_uom
+            )
 
-            })
-            st_move_line_lst.append(st_move_line_vals)
-        picking_id.write({'move_line_ids_without_package': st_move_line_lst})
+            if existing_move_lines:
+                for existing_move_line in existing_move_lines:
+                    existing_move_line.update({
+                        'qty_done': rows['Done Quantity'],
+                        'result_package_id': package.id if package else False
+                    })
+            else:
+                # Product not found in move_line_ids_without_package, create a new record
+                new_move_line_vals = {
+                    'product_id': search_product.id,
+                    'product_uom_id': search_uom.id,
+                    'qty_done': rows['Done Quantity'],
+                    'result_package_id': package.id if package else False
+                }
+                picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
+

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_payslip,hr.payslip.portal,hr_payroll.model_hr_payslip,,1,1,0,0
+access_hr_payslip_run,hr.payslip.run.portal,hr_payroll.model_hr_payslip_run,,1,0,0,0
+access_hr_employee,hr.employee.portal,hr_payroll.model_hr_employee,,1,0,0,0

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Change documents to My documents -->
+    <template id="portal_my_home_document" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_my_home')]/h3" position="replace">
+            <h3>My Documents</h3>
+        </xpath>
+    </template>
+
+     <template id="portal_my_home_payslip" name="Show Payslips" customize_show="True" inherit_id="portal.portal_my_home" priority="14">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Payslips</t>
+                <t t-set="url" t-value="'/my/payslips'"/>
+                <t t-set="placeholder_count" t-value="'payslip_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+     <template id="portal_my_home_menu_payslip" name="Portal layout : payslip menu entry" inherit_id="portal.portal_breadcrumbs" priority="14">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'payslips' " t-attf-class="breadcrumb-item #{'active ' if not payslip else ''}">
+                <a t-if="payslip" t-attf-href="/my/payslips?{{ keep_query() }}">
+                    payslips
+                </a>
+                <t t-else="">
+                    payslips
+                </t>
+            </li>
+            <li t-if="payslip" class="breadcrumb-item active">
+                <span t-field="payslip.name"/>
+            </li>
+        </xpath>
+    </template>
+
+     <template id="portal_my_payslips" name="My Payslips">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Payslips</t>
+            </t>
+            <div t-if="not payslips" class="alert alert-warning mt8" role="alert">
+                There are no payslips.
+            </div>
+            <t t-if="payslips" t-call="portal.portal_table">
+                <thead>
+                    <tr>
+                        <th>Payslip Name</th>
+                        <th>Date From</th>
+                        <th>Date To</th>
+                        <th class="text-right">Reference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="payslips" t-as="payslip">
+                        <td><a t-attf-href="/my/payslip/#{payslip.id}"><span t-field="payslip.name"/></a></td>
+                        <td><span t-field="payslip.date_from" t-options='{"widget": "date"}'/></td>
+                        <td><span t-field="payslip.date_to" t-options='{"widget": "date"}'/></td>
+                        <td class="text-right"><span t-field="payslip.number"/></td>
+                    </tr>
+                </tbody>
+            </t>
+            <div class="modal" id="rangemodal" tabindex="-1" role="dialog" aria-labelledby="rangemodaltitle">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rangemodaltitle">Search In Date From - To</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span>X</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row justify-content-center">
+                                <input type="date" name="date_from" class="form-control date_from"/>
+                                <input type="date" name="date_to" class="form-control date_to"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary close_modal" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary apply_date_range">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="payslip_followup" name="payslip Portal Template" inherit_id="portal.portal_sidebar" primary="True">
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+            <div class="row mt16 o_portal_sale_sidebar">
+                <!-- Sidebar -->
+                <t t-call="portal.portal_record_sidebar">
+                    <t t-set="classes" t-value="'col-lg-auto d-print-none'"/>
+
+                    <t t-set="entries">
+                        <ul class="list-group list-group-flush flex-wrap flex-row flex-lg-column">
+                            <li class="list-group-item flex-grow-1">
+                                <div class="o_download_pdf btn-toolbar flex-sm-nowrap">
+                                    <div class="btn-group flex-grow-1 mr-1 mb-1">
+                                        <a role="button" type="submit" class="btn btn-secondary btn-block o_download_btn" t-attf-href="/payslip/report/#{payslip.id}" title="Download"><i class="fa fa-download"/> Download</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </t>
+                </t>
+
+                <div id="quote_content" class="col-12 col-lg justify-content-end">
+                    <div class="card" id="portal_payslip_content">
+                        <div t-call="bi_payslip_portal.payslip_portal_content"/>
+                    </div>
+
+                    <div id="sale_order_communication" class="mt-4">
+                        <h2>History</h2>
+                        <t t-call="portal.message_thread">
+                            <t t-set="object" t-value="payslip"/>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="payslip_portal_content" name="Payslip Portal Content">
+        <!-- Intro -->
+        <div class="card-header bg-white">
+            <div id="introduction">
+                <h2 class="my-0">
+                    <span t-esc="payslip.name"/>
+                </h2>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Informations -->
+            <div id="informations"> 
+                <table class="table table-sm table-bordered">
+                    <tbody>
+                        <tr>
+                            <td class="w-25"><strong>Employee</strong></td>
+                            <td class="w-25"><strong>Marital Status</strong></td>
+                            <td class="w-25"><strong>Designation</strong></td>
+                            <td class="w-25"><strong>Pay Period</strong></td>
+                        </tr>
+                        <tr>
+                            <td><span t-field="payslip.employee_id"/></td>
+                            <td><span t-field="payslip.employee_id.marital"/></td>
+                            <td><span t-field="payslip.employee_id.job_title"/></td>
+                            <td><span t-field="payslip.date_from" t-options="{'format': 'MM/dd/YYYY'}"/> - <span t-field="payslip.date_to" t-options="{'format': 'MM/dd/YYYY'}"/></td>
+                        </tr>
+                        <tr>
+                            <td><span t-field="payslip.employee_id.address_home_id.street"/></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span t-field="payslip.employee_id.address_home_id.city"/> <span t-field="payslip.employee_id.address_home_id.zip"/></td>
+                            <td><strong>Person in charge</strong></td>
+                            <td><strong>Identification</strong></td>
+                            <td><strong>Computed on </strong></td>
+                        </tr>
+                        <tr>
+                            <td><span t-field="payslip.employee_id.work_email"/></td>
+                            <td name="personne-in-charge"><t t-esc="payslip.employee_id.children"/></td>
+                            <td><span t-field="payslip.employee_id.identification_id"/></td>
+                            <td><span t-field="payslip.compute_date"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-sm">
+                    <tr>
+                        <td class="w-25"><strong>Basic Salary</strong></td>
+                        <td style="color:#875A7B" class="w-25">
+                            <span t-esc="payslip.contract_id._get_contract_wage()" t-options="{'widget': 'monetary', 'display_currency': payslip.company_id.currency_id}"/>
+                        </td>
+                        <td class="w-25"></td>
+                        <td class="w-25"></td>
+                    </tr>
+                </table>
+                <table class="table table-sm">
+                    <thead class="o_black_border">
+                        <tr>
+                            <th>Name</th>
+                            <th>Number of Hours</th>
+                            <th>Number of Days</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <span t-foreach="payslip.worked_days_line_ids" t-as="worked_days">
+                            <t t-if="worked_days.code != 'OUT'">
+                                <tr style="color:none">
+                                    <td>
+                                        <span t-field="worked_days.name"/>
+                                    </td>
+                                    <td><span t-field="worked_days.number_of_hours"/></td>
+                                    <td><span t-field="worked_days.number_of_days"/></td>
+                                    <td><span t-esc="worked_days.amount" digits="[42, 2]"
+                                            t-options='{"widget": "monetary", "display_currency": payslip.company_id.currency_id}'/></td>
+                                </tr>
+                            </t>
+                        </span>
+                        <tr style="color:#0fbd9d;">
+                            <td class="w-25"><strong>Basic Salary</strong></td>
+                            <td></td>
+                            <td></td>
+                            <td class="w-25">
+                            <span t-esc="payslip.line_ids.filtered(lambda line: line.code == 'BASIC').total"
+                                  t-options='{"widget": "monetary", "display_currency": payslip.company_id.currency_id}'/>
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>  
+                <div class="modal" id="o_payslip_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header d-none"></div>
+                            <div class="modal-body">
+                                <p class="text-center mb-0">Email has been sent to respective contact email.</p>
+                            </div>
+                            <div class="modal-footer d-none"></div>
+                        </div>
+                    </div>
+                </div>             
+            </div>
+        </div>
+    </template>
+
+</odoo>
