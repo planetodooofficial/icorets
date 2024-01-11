@@ -122,6 +122,7 @@ class ProductBrand(models.Model):
 class AccountMoveInheritClass(models.Model):
     _inherit = 'account.move'
 
+    no_of_cartons = fields.Char('No of Cartons')
     grn_names = fields.Char(string='GRN Names', help='Names of associated GRNs')
     check_amount_in_words = fields.Char(compute='_amt_in_words', string='Amount in Words')
     # warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
@@ -324,7 +325,7 @@ class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
 
     # po_no = fields.Char('PO No')
-    no_of_cartons = fields.Char('No of Cartons')
+    # no_of_cartons = fields.Char('No of Cartons')
     location_id = fields.Many2one(
         'stock.location', ' Source Location',
         ondelete='restrict', index=True, check_company=True)  # removed the required=True
@@ -560,7 +561,7 @@ class SaleOrderInherit(models.Model):
                 'payment_term_id': self.payment_term_id.id,
                 'l10n_in_journal_id': self.l10n_in_journal_id.id,
                 'event': self.event,
-                'no_of_cartons': self.no_of_cartons,
+                # 'no_of_cartons': self.no_of_cartons,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
                 'warehouse_id': top_priority_warehouse.id,
@@ -629,7 +630,7 @@ class SaleOrderInherit(models.Model):
                 'payment_term_id': self.payment_term_id.id,
                 'l10n_in_journal_id': self.l10n_in_journal_id.id,
                 'event': self.event,
-                'no_of_cartons': self.no_of_cartons,
+                # 'no_of_cartons': self.no_of_cartons,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
                 'warehouse_id': medium_priority_warehouse.id,
@@ -697,7 +698,7 @@ class SaleOrderInherit(models.Model):
                 'payment_term_id': self.payment_term_id.id,
                 'l10n_in_journal_id': self.l10n_in_journal_id.id,
                 'event': self.event,
-                'no_of_cartons': self.no_of_cartons,
+                # 'no_of_cartons': self.no_of_cartons,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
                 'warehouse_id': low_priority_warehouse.id,
@@ -739,7 +740,7 @@ class SaleOrderInherit(models.Model):
                 'payment_term_id': self.payment_term_id.id,
                 'l10n_in_journal_id': self.l10n_in_journal_id.id,
                 'event': self.event,
-                'no_of_cartons': self.no_of_cartons,
+                # 'no_of_cartons': self.no_of_cartons,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
                 'warehouse_id': low_priority_warehouse.id,

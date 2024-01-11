@@ -433,12 +433,13 @@
                                 warranty applicable as provided by the respective brands.
                             </td>
                             <td style="border:1px solid black;text-align: center" colspan="3">
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.no_of_cartons">
-                                            <b><span t-esc="acc.sale_line_ids.order_id.mapped('no_of_cartons')[0]"/></b></t>
-                                    </t>
-                                </t>
+<!--                                <t t-if="o.invoice_line_ids">-->
+<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+<!--                                        <t t-if="acc.sale_line_ids.order_id.no_of_cartons">-->
+<!--                                            <b><span t-esc="acc.sale_line_ids.order_id.mapped('no_of_cartons')[0]"/></b></t>-->
+<!--                                    </t>-->
+<!--                                </t>-->
+                                <span t-esc="doc.no_of_cartons"/>
                             </td>
                             <td style="bordr:1px solid black;text-align: center" colspan="3">
                                 iCOREts Private Limited
@@ -826,12 +827,13 @@
                                 warranty applicable as provided by the respective brands.
                             </td>
                             <td style="border:1px solid black;text-align: center" colspan="3">
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.no_of_cartons">
-                                            <b><span t-esc="acc.sale_line_ids.order_id.mapped('no_of_cartons')[0]"/></b></t>
-                                    </t>
-                                </t>
+<!--                                <t t-if="o.invoice_line_ids">-->
+<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+<!--                                        <t t-if="acc.sale_line_ids.order_id.no_of_cartons">-->
+<!--                                            <b><span t-esc="acc.sale_line_ids.order_id.mapped('no_of_cartons')[0]"/></b></t>-->
+<!--                                    </t>-->
+<!--                                </t>-->
+                                <span t-esc="doc.no_of_cartons"/>
                             </td>
                             <td style="bordr:1px solid black;text-align: center" colspan="3">
                                 iCOREts Private Limited
@@ -1220,12 +1222,13 @@
                                 warranty applicable as provided by the respective brands.
                             </td>
                             <td style="border:1px solid black;text-align: center" colspan="3">
-                                <t t-if="o.invoice_line_ids">
-                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
-                                        <t t-if="acc.sale_line_ids.order_id.no_of_cartons">
-                                            <b><span t-esc="acc.sale_line_ids.order_id.mapped('no_of_cartons')[0]"/></b></t>
-                                    </t>
-                                </t>
+<!--                                <t t-if="o.invoice_line_ids">-->
+<!--                                    <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">-->
+<!--                                        <t t-if="acc.sale_line_ids.order_id.no_of_cartons">-->
+<!--                                            <b><span t-esc="acc.sale_line_ids.order_id.mapped('no_of_cartons')[0]"/></b></t>-->
+<!--                                    </t>-->
+<!--                                </t>-->
+                                <span t-esc="doc.no_of_cartons"/>
                             </td>
                             <td style="bordr:1px solid black;text-align: center" colspan="3">
                                 iCOREts Private Limited
