@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_shop_instance_list" model="ir.ui.view">
+        <field name="name">shop.instance.list</field>
+        <field name="model">shop.instance</field>
+        <field name="arch" type="xml">
+            <tree string="Shop Instance">
+                <field name="name"/>
+                <field name="shop_url"/>
+                <field name="username" string="Username"/>
+                <field name="password" string="Password" password="True"/>
+                <field name="auth_bearer" password="True"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Form View   -->
+    <record id="view_shop_instance_form" model="ir.ui.view">
+        <field name="name">shop.instance.form</field>
+        <field name="model">shop.instance</field>
+        <field name="arch" type="xml">
+            <form string="Shop Instance">
+                <header>
+                    <button name="generate_token" string="Generate Token" type="object" class="oe_highlight"/>
+                    <button name="get_orders" string="Get Orders" type="object" class="oe_highlight"/>
+                    <button name="create_sales" string="Create Sales" type="object" class="oe_highlight"/>
+                    <button name="create_returns_sales" string="Create Returns" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="shop_url" widget="url"/>
+                        <field name="username"/>
+                        <field name="password" password="True"/>
+                        <field name="auth_bearer" password="True"/>
+                        <field name="last_import_date"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Import Logs">
+                            <field name="shop_import_logs_ids" nolabel="1">
+                                <tree string="Import Logs" decoration-success="state == 'success'"
+                                    decoration-warning="state == 'exception'" limit="10">
+                                    <field name="state" optional="hide"/>
+                                    <field name="shop_id"/>
+                                    <field name="message"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="count"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Action -->
+    <record id="action_shop_instance" model="ir.actions.act_window">
+        <field name="name">Shop Instance</field>
+        <field name="res_model">shop.instance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new shop instance.
+            </p>
+            <p>
+                You can also create shop instance from the configuration menu.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_unicommerce_orders,unicommerce.orders,model_unicommerce_orders,,1,1,1,1
+access_unicommerce_order_line,unicommerce.order.line,model_unicommerce_order_line,,1,1,1,1
+access_shop_instance,shop.instance,model_shop_instance,,1,1,1,1
+access_shop_import_logs,shop.import.logs,model_shop_import_logs,,1,1,1,1
+access_shop_sales_channel,shop.sales.channel,model_shop_sales_channel,,1,1,1,1

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="unicommerce_orders_list" model="ir.ui.view">
+        <field name="name">unicommerce.orders.list</field>
+        <field name="model">unicommerce.orders</field>
+        <field name="arch" type="xml">
+            <tree string="unicommerce Orders" create="0" edit="0">
+                <field name="code"/>
+                <field name="name" optional="hide"/>
+                <field name="status"/>
+                <field name="order_state" widget="badge" decoration-info="order_state == 'draft'"
+                       decoration-success="order_state == 'done'" decoration-danger="order_state =='exception'"
+                       decoration-warning="order_state == 'return'"/>
+            </tree>
+        </field>
+    </record>
+    <!--  Tree View  -->
+    <record id="unicommerce_orders_tree" model="ir.ui.view">
+        <field name="name">unicommerce.orders.tree</field>
+        <field name="model">unicommerce.orders</field>
+        <field name="arch" type="xml">
+            <tree string="unicommerce Orders" create="0" edit="0">
+                <field name="name"/>
+                <field name="status"/>
+                <field name="order_state" widget="badge" decoration-info="order_state == 'draft'"
+                       decoration-success="order_state == 'done'" decoration-danger="order_state =='exception'"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Form View   -->
+    <record id="unicommerce_orders_form" model="ir.ui.view">
+        <field name="name">unicommerce.orders.form</field>
+        <field name="model">unicommerce.orders</field>
+        <field name="arch" type="xml">
+            <form string="Unicommerce Orders" create="0" edit="0">
+                <sheet>
+                    <group>
+                        <group string="Customer Details">
+                            <field name="billing_name"/>
+                            <field name="billing_addressLine1"/>
+                            <field name="billing_addressLine2"/>
+                            <field name="billing_city"/>
+                            <field name="billing_district"/>
+                            <field name="billing_state"/>
+                            <field name="billing_country"/>
+                            <field name="billing_pincode"/>
+                            <field name="billing_phone"/>
+                            <field name="billing_email"/>
+                        </group>
+                        <group string="Order Details">
+                            <field name="name"/>
+                            <field name="status"/>
+                            <field name="order_state" widget="badge"
+                                   decoration-info="order_state == 'draft'"
+                                   decoration-success="order_state == 'done'"
+                                   decoration-danger="order_state =='exception'"
+                                   decoration-warning="order_state == 'return'"/>
+                            <field name="code"/>
+                            <field name="invoice_no"/>
+                            <field name="return_invoice_no"/>
+                            <field name="displayOrderCode"/>
+                            <field name="channel"/>
+                            <field name="source"/>
+                            <field name="displayOrderDateTime"/>
+                            <field name="shipping_date"/>
+                            <field name="invoice_date"/>
+                        </group>
+                    </group>
+                    <separator style="color: black;"/>
+                    <group>
+                        <group string="Shipping Details">
+                            <field name="shipping_name"/>
+                            <field name="shipping_addressLine1"/>
+                            <field name="shipping_addressLine2"/>
+                            <field name="shipping_city"/>
+                            <field name="shipping_district"/>
+                            <field name="shipping_state"/>
+                            <field name="shipping_country"/>
+                            <field name="shipping_pincode"/>
+                            <field name="shipping_phone"/>
+                            <field name="shipping_email"/>
+                        </group>
+                        <group string="Other Details">
+                            <field name="created"/>
+                            <field name="updated"/>
+                            <field name="fulfillmentTat"/>
+                            <field name="notificationEmail"/>
+                            <field name="notificationMobile"/>
+                            <field name="customerGSTIN"/>
+                            <field name="channelProcessingTime"/>
+                            <field name="cod"/>
+                            <field name="thirdPartyShipping"/>
+                            <field name="priority"/>
+                            <field name="currencyCode"/>
+                            <field name="customerCode"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="order_line">
+                                <tree string="Order Lines">
+                                    <field name="status" optional="hide"/>
+                                    <field name="return_status" optional="hide"/>
+                                    <field name="is_returned" optional="hide"/>
+                                    <field name="product_id" optional="show"/>
+                                    <field name="tax_id" optional="show"/>
+                                    <field name="shipping_package_code" optional="hide"/>
+                                    <field name="shipping_package_status" optional="hide"/>
+                                    <field name="facility_code" optional="hide"/>
+                                    <field name="facility_name" optional="hide"/>
+                                    <field name="alternate_facility_code" optional="hide"/>
+                                    <field name="reverse_pickup_code" optional="hide"/>
+                                    <field name="shipping_address_id" optional="hide"/>
+                                    <field name="packet_number" optional="hide"/>
+                                    <field name="combination_identifier" optional="hide"/>
+                                    <field name="combination_description" optional="hide"/>
+                                    <field name="type" optional="hide"/>
+                                    <field name="item" optional="show"/>
+                                    <field name="shipping_method_code" optional="show"/>
+                                    <field name="item_name" optional="show"/>
+                                    <field name="item_sku" optional="show"/>
+                                    <field name="seller_sku_code" optional="hide"/>
+                                    <field name="channel_product_id" optional="hide"/>
+                                    <field name="image_url" optional="hide"/>
+                                    <field name="status_code" optional="show"/>
+                                    <field name="code" optional="hide"/>
+                                    <field name="shelf_code" optional="hide"/>
+                                    <field name="total_price" optional="show" sum="Total Price"/>
+                                    <field name="selling_price" optional="hide" sum="Selling Price"/>
+                                    <field name="shipping_charges" optional="hide"/>
+                                    <field name="shipping_method_charges" optional="hide"/>
+                                    <field name="cash_on_delivery_charges" optional="hide"/>
+                                    <field name="prepaid_amount" optional="hide"/>
+                                    <field name="voucher_code" optional="hide"/>
+                                    <field name="voucher_value" optional="hide"/>
+                                    <field name="store_credit" optional="hide"/>
+                                    <field name="discount" optional="hide"/>
+                                    <field name="gift_wrap" optional="hide"/>
+                                    <field name="gift_wrap_charges" optional="hide"/>
+                                    <field name="tax_percentage" optional="hide"/>
+                                    <field name="gift_message" optional="hide"/>
+                                    <field name="cancellable" optional="hide"/>
+                                    <field name="edit_address" optional="hide"/>
+                                    <field name="reverse_pickable" optional="hide"/>
+                                    <field name="packet_configurable" optional="hide"/>
+                                    <field name="created" optional="hide"/>
+                                    <field name="updated" optional="hide"/>
+                                    <field name="on_hold" optional="hide"/>
+                                    <field name="sale_order_item_alternate_id" optional="hide"/>
+                                    <field name="cancellation_reason" optional="hide"/>
+                                    <field name="cancelled_by_seller" optional="hide"/>
+                                    <field name="page_url" optional="hide"/>
+                                    <field name="color" optional="hide"/>
+                                    <field name="brand" optional="hide"/>
+                                    <field name="size" optional="hide"/>
+                                    <field name="replacement_sale_order_code" optional="hide"/>
+                                    <field name="bundle_sku_code" optional="hide"/>
+                                    <field name="custom_field_values" optional="hide"/>
+                                    <field name="item_detail_field_dto_list" optional="hide"/>
+                                    <field name="hsn_code" optional="hide"/>
+                                    <field name="total_integrated_gst" optional="hide" sum="Tax"/>
+                                    <field name="integrated_gst_percentage" optional="hide"/>
+                                    <field name="total_union_territory_gst" optional="hide"/>
+                                    <field name="union_territory_gst_percentage" optional="hide"/>
+                                    <field name="total_state_gst" optional="hide" sum="SGST"/>
+                                    <field name="state_gst_percentage" optional="hide"/>
+                                    <field name="total_central_gst" optional="hide" sum="CGST"/>
+                                    <field name="central_gst_percentage" optional="hide"/>
+                                    <field name="max_retail_price" optional="hide"/>
+                                    <field name="selling_price_without_taxes_and_discount" optional="hide"
+                                           sum="Unit Price"/>
+                                    <field name="batch_dto" optional="hide"/>
+                                    <field name="shipping_charge_tax_percentage" optional="hide"/>
+                                    <field name="tcs" optional="hide"/>
+                                    <field name="uc_batch_code" optional="hide"/>
+                                    <field name="channel_mrp" optional="hide"/>
+                                    <field name="channel_expiry_date" optional="hide"/>
+                                    <field name="channel_vendor_batch_number" optional="hide"/>
+                                    <field name="channel_mfd" optional="hide"/>
+                                    <field name="country_of_origin" optional="hide"/>
+                                    <field name="expected_delivery_date" optional="hide"/>
+                                    <field name="item_detail_fields" optional="hide"/>
+                                    <field name="item_details_key" optional="hide"/>
+                                    <field name="channel_sale_order_item_code" optional="hide"/>
+                                    <field name="effective_tolerance" optional="hide"/>
+                                    <field name="shipping_label_link" optional="hide"/>
+                                    <field name="irn" optional="hide"/>
+                                    <field name="additional_info" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Api Data">
+                            <field name="order_data_json"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Action -->
+    <record id="action_unicommerce_orders" model="ir.actions.act_window">
+        <field name="name">Unicommerce Orders</field>
+        <field name="res_model">unicommerce.orders</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Order Records From Api
+            </p>
+        </field>
+    </record>
+
+</odoo>

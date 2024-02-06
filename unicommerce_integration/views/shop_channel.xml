@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!--  Tree View  -->
+    <record id="shop_sales_channel_tree" model="ir.ui.view">
+        <field name="name">shop.sales.channel.tree</field>
+        <field name="model">shop.sales.channel</field>
+        <field name="arch" type="xml">
+            <tree string="Shop Sales Channel">
+                <field name="name"/>
+                <field name="shop_instance_id"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--  Form View  -->
+    <record id="shop_sales_channel_form" model="ir.ui.view">
+        <field name="name">shop.sales.channel.form</field>
+        <field name="model">shop.sales.channel</field>
+        <field name="arch" type="xml">
+            <form string="Shop Sales Channel">
+                <sheet>
+                    <group>
+                        <group string="Channel Details">
+                            <field name="name"/>
+                            <field name="shop_instance_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group string="Accounts Details">
+                            <field name="sale_journal_id" domain="[('type','=', 'sale')]"
+                                   options="{'no_edit': True, 'no_create': True}"/>
+                            <field name="analytics_id"/>
+                            <field name="prepaid_holding_journal_id" domain="[('type','=', 'bank')]" options="{'no_edit': True, 'no_create': True}"/>
+                            <field name="cod_holding_journal_id" domain="[('type','=', 'bank')]" options="{'no_edit': True, 'no_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--  Action  -->
+    <record id="shop_sales_channel_action" model="ir.actions.act_window">
+        <field name="name">Shop Sales Channel</field>
+        <field name="res_model">shop.sales.channel</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new shop sales channel.
+            </p>
+        </field>
+    </record>
+</odoo>

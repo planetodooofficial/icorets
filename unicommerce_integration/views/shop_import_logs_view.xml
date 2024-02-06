@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shop_import_logs_view_list" model="ir.ui.view">
+        <field name="name">shop.import.logs.view.tree</field>
+        <field name="model">shop.import.logs</field>
+        <field name="arch" type="xml">
+            <tree string="Shop Import Logs" create="0" edit="0"
+                  decoration-success="state == 'success'"
+                  decoration-warning="state == 'exception'"
+            >
+                <field name="name" readonly="1" optional="hide"/>
+                <field name="shop_id" readonly="1"/>
+                <field name="operation_performed" readonly="1"/>
+                <field name="start_date" readonly="1"/>
+                <field name="end_date" readonly="1"/>
+                <field name="count" readonly="1"/>
+                <field name="state" optional="hide"/>
+                <field name="message" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action  -->
+    <record id="action_shop_import_logs" model="ir.actions.act_window">
+        <field name="name">Shop Import Logs</field>
+        <field name="res_model">shop.import.logs</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new shop import logs.
+            </p>
+        </field>
+    </record>
+
+</odoo>

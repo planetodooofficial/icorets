@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Menu -->
+    <menuitem id="unicommerce_menu"
+              name="Unicommerce Menu"
+              web_icon="unicommerce_integration, static/img/icon.png"
+              sequence="1"/>
+
+    <menuitem id="menu_shop_import_logs"
+              name="Shop Import Logs"
+              sequence="1"
+              parent="unicommerce_menu"
+              action="action_shop_import_logs"/>
+
+    <menuitem id="menu_shop_import_logs_submenu"
+              name="Shop Import Logs"
+              sequence="2"
+              parent="menu_shop_import_logs"
+              action="action_shop_import_logs"/>
+
+    <menuitem id="menu_shop_instance"
+              name="Shop Instance"
+              sequence="3"
+              parent="menu_shop_import_logs"
+              action="action_shop_instance"/>
+
+    <menuitem id="magento_orders_menu"
+              name="Unicommerce Orders"
+              parent="menu_shop_import_logs"
+              sequence="4"
+              action="action_unicommerce_orders"/>
+
+    <!--  Sales Channel  -->
+    <menuitem id="shop_sales_channel_menu"
+              name="Shop Sales Channel"
+              parent="unicommerce_menu"
+              action="unicommerce_integration.shop_sales_channel_action"
+              sequence="2"/>
+</odoo>
