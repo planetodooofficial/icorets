@@ -374,8 +374,8 @@ class ShopInstance(models.Model):
             for order in orders:
                 # Create sale order
                 billing_id, shipping_id = self.create_partner(order)
-                if not billing_id or not shipping_id:
-                    raise UserError(_("Billing or Shipping Partner not found!"))
+                # if not billing_id or not shipping_id:
+                #     raise UserError(_("Billing or Shipping Partner not found!"))
                 vals_list = {
                     'partner_id': billing_id.id,
                     'order_line': self.create_order_lines(order),
