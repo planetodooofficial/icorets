@@ -5,3 +5,5 @@ from . import shop_channel
 from . import sale
 from . import account
 from . import stock_picking
+from . import stock_quant
+

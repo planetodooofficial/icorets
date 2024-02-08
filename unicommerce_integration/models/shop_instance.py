@@ -53,7 +53,7 @@ class ShopInstance(models.Model):
                 'Facility': 'karan'
             }
             data = {
-                "updatedSinceInMinutes": 30,
+                "updatedSinceInMinutes": 90,
             }
             fetch_orders = post(url=url, headers=headers, data=json.dumps(data))
             if fetch_orders.status_code != 200:
