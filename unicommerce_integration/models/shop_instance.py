@@ -4,6 +4,9 @@ from odoo import models, fields, api, _
 from requests import get, post
 
 from odoo.exceptions import UserError
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ShopInstance(models.Model):
@@ -371,7 +374,9 @@ class ShopInstance(models.Model):
             for order in orders:
                 # Create sale order
                 billing_id, shipping_id = self.create_partner(order)
-                sale_order = self.env['sale.order'].create({
+                if not billing_id or not shipping_id:
+                    raise UserError(_("Billing or Shipping Partner not found!"))
+                vals_list = {
                     'partner_id': billing_id.id,
                     'order_line': self.create_order_lines(order),
                     'l10n_in_journal_id': order.sales_channel_id.sale_journal_id.id,
@@ -380,12 +385,14 @@ class ShopInstance(models.Model):
                     'shop_instance_id': order.shop_instance_id.id,
                     'sales_channel_id': order.sales_channel_id.id,
                     'unicommerce_order_id': order.id,
-                    'partner_shipping_id': shipping_id.id,
-                    'partner_invoice_id': billing_id.id,
+                    'partner_shipping_id': shipping_id.id if shipping_id else False,
+                    'partner_invoice_id': billing_id.id if billing_id else False,
                     'dump_sequence': order.code,
                     'location_id': location_id.id,
                     'gstin_id': self.env.company.partner_id.id,
-                })
+                }
+                logger.info(vals_list)
+                sale_order = self.env['sale.order'].create(vals_list)
                 # Update order state to "done"
                 sale_order.set_order_line()
                 order.order_state = 'done'
