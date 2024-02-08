@@ -373,9 +373,9 @@ class ShopInstance(models.Model):
         try:
             for order in orders:
                 # Create sale order
-                billing_id, shipping_id = self.create_partner(order)
-                # if not billing_id or not shipping_id:
-                #     raise UserError(_("Billing or Shipping Partner not found!"))
+                partners = self.create_partner(order)
+                billing_id = partners.get('billing_partner')
+                shipping_id = partners.get('shipping_partner')
                 vals_list = {
                     'partner_id': billing_id.id,
                     'order_line': self.create_order_lines(order),
@@ -569,9 +569,10 @@ class ShopInstance(models.Model):
             # Create shipping partner
             shipping_partner = partner_obj.create(shipping_partner_data)
 
-            return billing_partner, shipping_partner
+            return {'billing_partner': billing_partner, 'shipping_partner': shipping_partner}
         else:
-            return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+            return {'billing_partner': partner,
+                    'shipping_partner': partner.child_ids.filtered(lambda r: r.type == 'delivery')}
 
     def get_state_id(self, state_name):
         """ Get state ID based on state name """
