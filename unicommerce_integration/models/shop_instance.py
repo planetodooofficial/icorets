@@ -22,6 +22,7 @@ class ShopInstance(models.Model):
     active = fields.Boolean(string="Active")
     last_import_date = fields.Datetime(string='Last Update Datetime', readonly=True)
     shop_import_logs_ids = fields.One2many('shop.import.logs', 'shop_id', string='Shop Import Logs')
+    update_time = fields.Integer(string='Update Time (in minutes)', default=30)
 
     def generate_token(self):
         """ Generate The Auth Token For The Shop Instance """
@@ -57,7 +58,7 @@ class ShopInstance(models.Model):
                 'Facility': 'karan'
             }
             data = {
-                "updatedSinceInMinutes": 1400,
+                "updatedSinceInMinutes": self.update_time,
             }
             fetch_orders = post(url=url, headers=headers, data=json.dumps(data))
             if fetch_orders.status_code != 200:
