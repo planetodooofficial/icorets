@@ -374,8 +374,8 @@ class ShopInstance(models.Model):
             for order in orders:
                 # Create sale order
                 partners = self.create_partner(order)
-                billing_id = partners.get('billing_partner')
-                shipping_id = partners.get('shipping_partner')
+                billing_id = partners[0]
+                shipping_id = partners[1]
                 vals_list = {
                     'partner_id': billing_id.id,
                     'order_line': self.create_order_lines(order),
@@ -385,8 +385,8 @@ class ShopInstance(models.Model):
                     'shop_instance_id': order.shop_instance_id.id,
                     'sales_channel_id': order.sales_channel_id.id,
                     'unicommerce_order_id': order.id,
-                    'partner_shipping_id': shipping_id.id if shipping_id else False,
-                    'partner_invoice_id': billing_id.id if billing_id else False,
+                    'partner_shipping_id': shipping_id.id,
+                    'partner_invoice_id': billing_id.id,
                     'dump_sequence': order.code,
                     'location_id': location_id.id,
                     'gstin_id': self.env.company.partner_id.id,
@@ -447,7 +447,7 @@ class ShopInstance(models.Model):
                 payment._create_payments()
             except UserError as e:
                 # Handle any errors while creating payments
-                print(f"Error creating payment for invoice {payment.invoice_ids}: {e}")
+                logger.error(e)
 
         return payments
 
@@ -569,10 +569,9 @@ class ShopInstance(models.Model):
             # Create shipping partner
             shipping_partner = partner_obj.create(shipping_partner_data)
 
-            return {'billing_partner': billing_partner, 'shipping_partner': shipping_partner}
+            return billing_partner, shipping_partner
         else:
-            return {'billing_partner': partner,
-                    'shipping_partner': partner.child_ids.filtered(lambda r: r.type == 'delivery')}
+            return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
 
     def get_state_id(self, state_name):
         """ Get state ID based on state name """
