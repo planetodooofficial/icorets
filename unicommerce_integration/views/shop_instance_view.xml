@@ -40,7 +40,7 @@
                         <page string="Import Logs">
                             <field name="shop_import_logs_ids" nolabel="1">
                                 <tree string="Import Logs" decoration-success="state == 'success'"
-                                    decoration-warning="state == 'exception'" limit="10">
+                                      decoration-warning="state == 'exception'" limit="10">
                                     <field name="state" optional="hide"/>
                                     <field name="shop_id"/>
                                     <field name="message"/>
@@ -52,6 +52,10 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>

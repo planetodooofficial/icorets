@@ -4,8 +4,9 @@ from odoo import api, fields, models, _
 class ShopSalesChannel(models.Model):
     _name = "shop.sales.channel"
     _description = "Sales Channel"
+    _inherit = ['mail.thread']
 
-    name = fields.Char(string="Name", tracking=True)
+    name = fields.Char(string="Name", tracking_=True)
     shop_instance_id = fields.Many2one(comodel_name="shop.instance", tracking=True)
     company_id = fields.Many2one("res.company", string="Company", default=lambda self: self.env.company.id,
                                  tracking=True)

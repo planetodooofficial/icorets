@@ -12,14 +12,15 @@ logger = logging.getLogger(__name__)
 class ShopInstance(models.Model):
     _name = 'shop.instance'
     _description = 'Shop Instance'
+    _inherit = ['mail.thread']
 
-    name = fields.Char(string='Name', required=True)
-    shop_url = fields.Char(string='Shop URL', required=True)
-    username = fields.Char(string='User Name/Email', required=True)
+    name = fields.Char(string='Name', required=True, tracking=True)
+    shop_url = fields.Char(string='Shop URL', required=True, tracking=True)
+    username = fields.Char(string='User Name/Email', required=True, tracking=True)
     auth_bearer = fields.Char(string='Auth Bearer', readonly=True)
-    password = fields.Char(string="Password", required=True)
+    password = fields.Char(string="Password", required=True, tracking=True)
     active = fields.Boolean(string="Active")
-    last_import_date = fields.Datetime(string='Last Update Datetime')
+    last_import_date = fields.Datetime(string='Last Update Datetime', readonly=True)
     shop_import_logs_ids = fields.One2many('shop.import.logs', 'shop_id', string='Shop Import Logs')
 
     def generate_token(self):
@@ -56,7 +57,7 @@ class ShopInstance(models.Model):
                 'Facility': 'karan'
             }
             data = {
-                "updatedSinceInMinutes": 90,
+                "updatedSinceInMinutes": 30,
             }
             fetch_orders = post(url=url, headers=headers, data=json.dumps(data))
             if fetch_orders.status_code != 200:
@@ -385,8 +386,8 @@ class ShopInstance(models.Model):
                     'shop_instance_id': order.shop_instance_id.id,
                     'sales_channel_id': order.sales_channel_id.id,
                     'unicommerce_order_id': order.id,
-                    'partner_shipping_id': shipping_id.id,
-                    'partner_invoice_id': billing_id.id,
+                    'partner_shipping_id': shipping_id.id if shipping_id else False,
+                    'partner_invoice_id': billing_id.id if billing_id else False,
                     'dump_sequence': order.code,
                     'location_id': location_id.id,
                     'gstin_id': self.env.company.partner_id.id,
