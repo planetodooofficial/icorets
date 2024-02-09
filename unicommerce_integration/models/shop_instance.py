@@ -377,8 +377,10 @@ class ShopInstance(models.Model):
                 # Create sale order
                 # partners = self.create_partner(order)
                 partner_id = self.create_partner(order)
-                billing_id = self.env['res.partner'].search([('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
-                shipping_id = self.env['res.partner'].search([('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
+                billing_id = self.env['res.partner'].search(
+                    [('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
+                shipping_id = self.env['res.partner'].search(
+                    [('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
                 vals_list = {
                     'partner_id': partner_id.id,
                     'order_line': self.create_order_lines(order),
@@ -571,8 +573,7 @@ class ShopInstance(models.Model):
 
             # Create shipping partner
             shipping_partner = partner_obj.create(shipping_partner_data)
-            print(partner_obj.partner_shipping_id)
-
+            logger.info(f"Created shipping partner: {shipping_partner}")
             # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
             return billing_partner
         else:
