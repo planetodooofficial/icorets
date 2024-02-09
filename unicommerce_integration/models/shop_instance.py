@@ -377,8 +377,8 @@ class ShopInstance(models.Model):
                 # Create sale order
                 # partners = self.create_partner(order)
                 partner_id = self.create_partner(order)
-                # billing_id = partners[0]
-                # shipping_id = partners[1]
+                billing_id = self.env['res.partner'].search([('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
+                shipping_id = self.env['res.partner'].search([('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
                 vals_list = {
                     'partner_id': partner_id.id,
                     'order_line': self.create_order_lines(order),
@@ -388,8 +388,8 @@ class ShopInstance(models.Model):
                     'shop_instance_id': order.shop_instance_id.id,
                     'sales_channel_id': order.sales_channel_id.id,
                     'unicommerce_order_id': order.id,
-                    'partner_shipping_id': partner_id.partner_shipping_id.id if partner_id.partner_shipping_id else partner_id.id,
-                    'partner_invoice_id': partner_id.partner_billing_id.id if partner_id.partner_billing_id else partner_id.id,
+                    'partner_shipping_id': shipping_id.id if shipping_id else partner_id.id,
+                    'partner_invoice_id': billing_id.id if billing_id else partner_id.id,
                     'dump_sequence': order.code,
                     'location_id': location_id.id,
                     'gstin_id': self.env.company.partner_id.id,
@@ -574,9 +574,10 @@ class ShopInstance(models.Model):
             print(partner_obj.partner_shipping_id)
 
             # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
-            return partner_obj
+            return billing_partner
         else:
-            return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+            # return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+            return partner
 
     def get_state_id(self, state_name):
         """ Get state ID based on state name """
