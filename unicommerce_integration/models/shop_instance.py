@@ -697,8 +697,7 @@ class ShopInstance(models.Model):
                                     search_return_delivery = self.env["stock.picking"].search(
                                         [('id', '=', new_picking_id)])
                                     for new_delivery in search_return_delivery:
-                                        new_delivery.write({'location_id': uni_order.name.location_id.id,
-                                                            'shop_instance_id': uni_order.shop_instance_id.id, })
+                                        new_delivery.write({'shop_instance_id': uni_order.shop_instance_id.id})
                                         if new_delivery.products_availability == "Not Available":
                                             for stock_move_package in new_delivery.move_ids_without_package:
                                                 stock_move_package.quantity_done = stock_move_package.product_uom_qty
