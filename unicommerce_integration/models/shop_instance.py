@@ -656,7 +656,7 @@ class ShopInstance(models.Model):
                                 if search_return_delivery.state != 'done':
                                     search_return_delivery.action_set_quantities_to_reservation()
                                     search_return_delivery.button_validate()
-                                    search_return_delivery.write({'sequence_dump': uni_order.code})
+                                    search_return_delivery.write({'dump_sequence': uni_order.code})
                         # create a credit note
                         self.create_credit_note(uni_order)
                         lines_to_return.write({'return_status': False, 'is_returned': True})
