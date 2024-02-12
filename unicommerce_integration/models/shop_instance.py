@@ -134,7 +134,7 @@ class ShopInstance(models.Model):
                 # check whether the return dictionary is there and it's status is completed
                 if order['returns']:
                     for return_order in order['returns']:
-                        if return_order['statusCode'] == 'COMPLETE':
+                        if return_order['statusCode'] in ['COMPLETE', 'RETURNED']:
                             update_orders.append(order)
             else:
                 new_orders.append(order)
