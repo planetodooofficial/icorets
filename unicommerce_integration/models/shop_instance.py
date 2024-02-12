@@ -616,6 +616,8 @@ class ShopInstance(models.Model):
             2. Create a credit note,\n
             3. Change the order_state to done again.
         """
+        start_date = fields.Datetime.now()
+        count = 0
         try:
             orders = self.env['unicommerce.orders'].search(
                 [('is_return', '=', True), ('name', '!=', False), ('return_state', '=', 'draft')])
@@ -638,7 +640,7 @@ class ShopInstance(models.Model):
                                 })
                                 lst.append(reverse_transfer_line_val)
                             reverse_transfer_val = {
-                                'location_id': delivery.location_dest_id.id,
+                                'location_id': delivery.location_id.id,
                                 'picking_id': delivery.id,
                                 'product_return_moves': lst
                             }
@@ -648,7 +650,6 @@ class ShopInstance(models.Model):
                             if new_picking_id:
                                 search_return_delivery = self.env["stock.picking"].search([('id', '=', new_picking_id)])
                                 for new_delivery in search_return_delivery:
-                                    new_delivery.write({'location_id': uni_order.name.location_id.id})
                                     if new_delivery.products_availability == "Not Available":
                                         for stock_move_package in new_delivery.move_ids_without_package:
                                             stock_move_package.quantity_done = stock_move_package.product_uom_qty
@@ -662,6 +663,7 @@ class ShopInstance(models.Model):
                         lines_to_return.write({'return_status': False, 'is_returned': True})
                         uni_order.order_state = 'done'
                         uni_order.is_return = False
+                        count += 1
                     else:
                         # handle the partial line return
                         move_lines = []
@@ -708,6 +710,9 @@ class ShopInstance(models.Model):
                         self.create_partial_credit_note(uni_order, lines_dict)
                         lines_to_return.write({'return_status': False, 'is_returned': True})
                         uni_order.order_state = 'done'
+                        uni_order.is_return = False
+                        count += 1
+
         except Exception as e:
             self.generate_exception_log(message=e, start_date=fields.Datetime.now(),
                                         operation_performed='Return Order Creation',
