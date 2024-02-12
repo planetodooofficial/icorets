@@ -662,6 +662,7 @@ class ShopInstance(models.Model):
                         self.create_credit_note(uni_order)
                         lines_to_return.write({'return_status': False, 'is_returned': True})
                         uni_order.order_state = 'done'
+                        uni_order.is_return = False
                     else:
                         # handle the partial line return
                         move_lines = []
