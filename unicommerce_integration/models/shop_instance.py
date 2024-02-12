@@ -639,7 +639,6 @@ class ShopInstance(models.Model):
                                 lst.append(reverse_transfer_line_val)
                             reverse_transfer_val = {
                                 'location_id': delivery.location_dest_id.id,
-                                'location_dest_id': delivery.location_id.id,
                                 'picking_id': delivery.id,
                                 'product_return_moves': lst
                             }
