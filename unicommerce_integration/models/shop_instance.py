@@ -380,10 +380,10 @@ class ShopInstance(models.Model):
                 # Create sale order
                 # partners = self.create_partner(order)
                 partner_id = self.create_partner(order)
-                billing_id = self.env['res.partner'].search(
-                    [('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
-                shipping_id = self.env['res.partner'].search(
-                    [('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
+                # billing_id = self.env['res.partner'].search(
+                #     [('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
+                # shipping_id = self.env['res.partner'].search(
+                #     [('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
                 vals_list = {
                     'partner_id': partner_id.id,
                     'order_line': self.create_order_lines(order),
@@ -393,11 +393,12 @@ class ShopInstance(models.Model):
                     'shop_instance_id': order.shop_instance_id.id,
                     'sales_channel_id': order.sales_channel_id.id,
                     'unicommerce_order_id': order.id,
-                    'partner_shipping_id': shipping_id.id if shipping_id else partner_id.id,
-                    'partner_invoice_id': billing_id.id if billing_id else partner_id.id,
+                    'partner_shipping_id': partner_id.id,
+                    'partner_invoice_id': partner_id.id,
                     'dump_sequence': order.code,
                     'location_id': location_id.id,
                     'gstin_id': self.env.company.partner_id.id,
+                    'client_order_ref': order.displayOrderCode,
                 }
                 logger.info(vals_list)
                 sale_order = self.env['sale.order'].create(vals_list)
@@ -525,63 +526,65 @@ class ShopInstance(models.Model):
         """ Create partner in Odoo """
         partner_obj = self.env['res.partner']
         partner_data = partner_data.read()[0]
+        state_id = self.get_state_id(partner_data.get('billing_state'))
+        partner_id = partner_obj.search([('is_website_partner', '=', True), ('state_id', '=', state_id.id)], limit=1)
 
-        # Determine if the partner is a business based on GSTIN
-        is_business = bool(partner_data.get('customerGSTIN'))
-
-        # search for the partner in case the is_business is true
-        if is_business:
-            partner = partner_obj.search([('vat', '=', partner_data.get('customerGSTIN'))], limit=1)
-            if partner:
-                return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
-        partner = partner_obj.search([('name', '=', partner_data.get('billing_name')),
-                                      ('state_id.code', '=', partner_data.get('billing_state')),
-                                      ('country_id.code', '=', partner_data.get('billing_country'))], limit=1)
+        # # Determine if the partner is a business based on GSTIN
+        # is_business = bool(partner_data.get('customerGSTIN'))
+        #
+        # # search for the partner in case the is_business is true
+        # if is_business:
+        #     partner = partner_obj.search([('vat', '=', partner_data.get('customerGSTIN'))], limit=1)
+        #     if partner:
+        #         return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+        # partner = partner_obj.search([('name', '=', partner_data.get('billing_name')),
+        #                               ('state_id.code', '=', partner_data.get('billing_state')),
+        #                               ('country_id.code', '=', partner_data.get('billing_country'))], limit=1)
         # Prepare data for billing partner
-        if not partner:
-            billing_partner_data = {
-                'name': partner_data.get('billing_name'),
-                'street': partner_data.get('billing_addressLine1'),
-                'street2': partner_data.get('billing_addressLine2'),
-                'city': partner_data.get('billing_city'),
-                'state_id': self.get_state_id(partner_data.get('billing_state')),
-                'country_id': self.get_country_id(partner_data.get('billing_country')),
-                'zip': partner_data.get('billing_pincode'),
-                'phone': partner_data.get('billing_phone'),
-                'email': partner_data.get('billing_email'),
-                'is_company': is_business,
-                'vat': partner_data.get('customerGSTIN') if is_business else False,
-                'l10n_in_gst_treatment': 'registered' if is_business else False,
-            }
-
-            # Create billing partner
-            billing_partner = partner_obj.create(billing_partner_data)
-
-            # Prepare data for shipping partner
-            shipping_partner_data = {
-                'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
-                'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
-                'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
-                'city': partner_data.get('shipping_city') or partner_data.get('billing_city'),
-                'state_id': self.get_state_id(partner_data.get('shipping_state') or partner_data.get('billing_state')),
-                'country_id': self.get_country_id(
-                    partner_data.get('shipping_country') or partner_data.get('billing_country')),
-                'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
-                'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
-                'email': partner_data.get('shipping_email') or partner_data.get('billing_email'),
-                'is_company': is_business,
-                'type': 'delivery',
-                'parent_id': billing_partner.id,
-            }
-
-            # Create shipping partner
-            shipping_partner = partner_obj.create(shipping_partner_data)
-            logger.info(f"Created shipping partner: {shipping_partner}")
-            # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
-            return billing_partner
-        else:
-            # return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
-            return partner
+        # if not partner:
+        #     billing_partner_data = {
+        #         'name': partner_data.get('billing_name'),
+        #         'street': partner_data.get('billing_addressLine1'),
+        #         'street2': partner_data.get('billing_addressLine2'),
+        #         'city': partner_data.get('billing_city'),
+        #         'state_id': self.get_state_id(partner_data.get('billing_state')),
+        #         'country_id': self.get_country_id(partner_data.get('billing_country')),
+        #         'zip': partner_data.get('billing_pincode'),
+        #         'phone': partner_data.get('billing_phone'),
+        #         'email': partner_data.get('billing_email'),
+        #         'is_company': is_business,
+        #         'vat': partner_data.get('customerGSTIN') if is_business else False,
+        #         'l10n_in_gst_treatment': 'registered' if is_business else False,
+        #     }
+        #
+        #     # Create billing partner
+        #     billing_partner = partner_obj.create(billing_partner_data)
+        #
+        #     # Prepare data for shipping partner
+        #     shipping_partner_data = {
+        #         'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
+        #         'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
+        #         'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
+        #         'city': partner_data.get('shipping_city') or partner_data.get('billing_city'),
+        #         'state_id': self.get_state_id(partner_data.get('shipping_state') or partner_data.get('billing_state')),
+        #         'country_id': self.get_country_id(
+        #             partner_data.get('shipping_country') or partner_data.get('billing_country')),
+        #         'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
+        #         'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
+        #         'email': partner_data.get('shipping_email') or partner_data.get('billing_email'),
+        #         'is_company': is_business,
+        #         'type': 'delivery',
+        #         'parent_id': billing_partner.id,
+        #     }
+        #
+        #     # Create shipping partner
+        #     shipping_partner = partner_obj.create(shipping_partner_data)
+        #     logger.info(f"Created shipping partner: {shipping_partner}")
+        #     # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
+        #     return billing_partner
+        # else:
+        #     # return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+        return partner_id
 
     def get_state_id(self, state_name):
         """ Get state ID based on state name """

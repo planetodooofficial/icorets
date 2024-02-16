@@ -8,7 +8,7 @@
             <field name="model_id" ref="unicommerce_integration.model_shop_instance"/>
             <field name="state">code</field>
             <field name="code">model.generate_auth_token()</field>
-            <field name='interval_number'>8</field>
+            <field name='interval_number'>5</field>
             <field name='interval_type'>hours</field>
             <field name="numbercall">-1</field>
         </record>
@@ -43,6 +43,17 @@
             <field name="code">model.create_unicomm_returns()</field>
             <field name='interval_number'>2</field>
             <field name='interval_type'>hours</field>
+            <field name="numbercall">-1</field>
+        </record>
+
+        <!-- Sync Inventory Cron   -->
+        <record id="sync_inventory_unicommerce" model="ir.cron">
+            <field name="name">Sync Inventory Cron Unicommerce</field>
+            <field name="model_id" ref="unicommerce_integration.model_shop_instance"/>
+            <field name="state">code</field>
+            <field name="code">model.sync_odoo_inventory()</field>
+            <field name='interval_number'>30</field>
+            <field name='interval_type'>minutes</field>
             <field name="numbercall">-1</field>
         </record>
 
