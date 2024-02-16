@@ -1,5 +1,8 @@
 from datetime import datetime
 import json
+
+import requests
+
 from odoo import models, fields, api, _
 from requests import get, post
 
@@ -795,6 +798,63 @@ class ShopInstance(models.Model):
                                                                                       })
         payment_id._create_payments()
         return payment_id
+
+    def sync_odoo_inventory(self):
+        """ Sync the inventory of the products from the shop instance to the Odoo """
+        start_date = fields.Datetime.now()
+        count = 0
+        try:
+            parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
+            location_id = self.env['stock.location'].search(
+                [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
+            stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
+            inventory_adjustment = [
+                {
+                    "itemSKU": quant.product_id.default_code,
+                    "quantity": quant.available_quantity,
+                    "shelfCode": "DEFAULT",
+                    "inventoryType": "GOOD_INVENTORY",
+                    "adjustmentType": "REPLACE",
+                    "facilityCode": "playr"
+                } for quant in stock_quant if quant.available_quantity > 0 and quant.product_id.default_code
+            ]
+            if inventory_adjustment:
+                url = self.shop_url + '/services/rest/v1/inventory/adjust/bulk'
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': self.auth_bearer,
+                    'Accept': 'application/json'
+                }
+                data = {
+                    "inventoryAdjustments": inventory_adjustment
+                }
+                response = requests.post(url, headers=headers, data=json.dumps(data))
+
+                if response.status_code == 200:
+                    data = response.json()
+                    for line in data['inventoryAdjustmentResponses']:
+                        if line['successful']:
+                            self.generate_success_log(
+                                message='Inventory Updated Successfully,For %s Product' %
+                                        line['facilityInventoryAdjustment']['itemSKU'],
+                                count=line['facilityInventoryAdjustment']['quantity'],
+                                start_date=start_date,
+                                end_date=fields.Datetime.now(),
+                                state='success',
+                                operation_performed='Inventory Adjustment')
+                            count += 1
+                        else:
+                            self.generate_exception_log(
+                                message='Inventory Update Failed,For %s Product' %
+                                        line['facilityInventoryAdjustment']['itemSKU'],
+                                start_date=start_date,
+                                end_date=fields.Datetime.now(), state='exception',
+                                operation_performed='Inventory Adjustment')
+        except Exception as e:
+            self.generate_exception_log(message=e, start_date=fields.Datetime.now(),
+                                        operation_performed='Inventory Sync',
+                                        end_date=fields.Datetime.now(), count=1, state='exception')
+            pass
 
     @staticmethod
     def has_exception(dictionary_list):

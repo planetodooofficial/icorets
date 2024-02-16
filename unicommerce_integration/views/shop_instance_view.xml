@@ -21,6 +21,8 @@
         <field name="arch" type="xml">
             <form string="Shop Instance">
                 <header>
+                    <button name="sync_odoo_inventory" string="Sync Odoo Inventory" type="object" class="btn btn-danger"
+                            groups="base.group_system"/>
                     <button name="generate_token" string="Generate Token" type="object" class="oe_highlight"/>
                     <button name="get_orders" string="Get Orders" type="object" class="oe_highlight"/>
                     <button name="create_sales" string="Create Sales" type="object" class="oe_highlight"/>
