@@ -34,7 +34,7 @@
     </record>
 
     <record id="flipkart_tax_invoice_report" model="ir.actions.report">
-        <field name="name">Flipkart</field>
+        <field name="name">Tax Invoice - Flipkart</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.custom_invoice_report_flipkart</field>

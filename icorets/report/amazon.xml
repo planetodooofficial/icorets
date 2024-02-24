@@ -36,7 +36,7 @@
 
 
     <record id="tax_invoice_report_amazon" model="ir.actions.report">
-        <field name="name">Amazon</field>
+        <field name="name">Tax Invoice - Amazon</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.custom_invoice_report_amazon</field>
