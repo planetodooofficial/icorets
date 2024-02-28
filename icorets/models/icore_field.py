@@ -1333,10 +1333,50 @@ class PackingListManual(models.TransientModel):
         if cols_with_null_names:
             raise ValidationError("Empty cells in %s columns." % cols_with_null_names)
 
+        # for index, rows in data.iterrows():
+        #     # Check if 'Destination Location' is empty
+        #     if rows['Destination Location'] == '0' or not rows['Destination Location']:
+        #         continue  # Skip this iteration if 'Destination Location' is empty
+        #
+        #     search_product = self.env["product.product"].search([('default_code', '=', rows['SKU'])], limit=1)
+        #
+        #     if not search_product:
+        #         raise ValidationError(f"Product {rows['SKU']} Not Found.")
+        #
+        #     create_date_str = create_date.strftime("%d/%m/%Y")
+        #     destination_package_name = str(picking_id.origin) + '-' + str(create_date_str) + '-' + str(
+        #         rows['Destination Location'])
+        #
+        #     existing_package = self.env['stock.quant.package'].search([('name', '=', destination_package_name)],
+        #                                                               limit=1)
+        #
+        #     if existing_package:
+        #         package = existing_package
+        #     else:
+        #         package_obj = self.env['stock.quant.package']
+        #         package_vals = {'name': destination_package_name}
+        #         package = package_obj.create(package_vals)
+        #
+        #     existing_move_lines = picking_id.move_line_ids_without_package.filtered(
+        #         lambda move_line: move_line.product_id == search_product
+        #     )
+        #
+        #     if existing_move_lines:
+        #         for existing_move_line in existing_move_lines:
+        #             existing_move_line.update({
+        #                 'qty_done': rows['Packed Qty'],
+        #                 'result_package_id': package.id
+        #             })
+        #     else:
+        #         new_move_line_vals = {
+        #             'product_id': search_product.id,
+        #             'qty_done': rows['Packed Qty'],
+        #             'result_package_id': package.id
+        #         }
+        #         picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
         for index, rows in data.iterrows():
-            # Check if 'Destination Location' is empty
             if rows['Destination Location'] == '0' or not rows['Destination Location']:
-                continue  # Skip this iteration if 'Destination Location' is empty
+                continue
 
             search_product = self.env["product.product"].search([('default_code', '=', rows['SKU'])], limit=1)
 
@@ -1357,64 +1397,15 @@ class PackingListManual(models.TransientModel):
                 package_vals = {'name': destination_package_name}
                 package = package_obj.create(package_vals)
 
-            existing_move_lines = picking_id.move_line_ids_without_package.filtered(
-                lambda move_line: move_line.product_id == search_product
-            )
 
-            if existing_move_lines:
-                for existing_move_line in existing_move_lines:
-                    existing_move_line.update({
-                        'qty_done': rows['Packed Qty'],
-                        'result_package_id': package.id
-                    })
-            else:
-                new_move_line_vals = {
-                    'product_id': search_product.id,
-                    'qty_done': rows['Packed Qty'],
-                    'result_package_id': package.id
-                }
-                picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
+            new_move_line_vals = {
+                'product_id': search_product.id,
+                'qty_done': rows['Packed Qty'],
+                'result_package_id': package.id
+            }
+            picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
 
-    #
-    #     for index, rows in data.iterrows():
-    #         search_product = self.env["product.product"].search([('default_code', '=', rows['SKU'])], limit=1)
-    #         if not search_product:
-    #             raise ValidationError(f"Product {rows['SKU']} Not Found.")
-    #         # create_date = fields.date.strftime(create_date, tools.DEFAULT_SERVER_DATE_FORMAT)
-    #         create_date_str = create_date.strftime("%d/%m/%Y")
-    #         destination_package_name = str(picking_id.origin) + '-' + str(create_date_str) + '-' + str(
-    #             rows['Destination Location'])
-    #
-    #         # Check if the package with the given name already exists
-    #         existing_package = self.env['stock.quant.package'].search([('name', '=', destination_package_name)],
-    #                                                                   limit=1)
-    #
-    #         if existing_package:
-    #             package = existing_package
-    #         else:
-    #             # Create a new package if the destination_package is not present
-    #             package_obj = self.env['stock.quant.package']
-    #             package_vals = {'name': destination_package_name}
-    #             package = package_obj.create(package_vals)
-    #
-    #         existing_move_lines = picking_id.move_line_ids_without_package.filtered(
-    #             lambda move_line: move_line.product_id == search_product
-    #         )
-    #
-    #         if existing_move_lines:
-    #             for existing_move_line in existing_move_lines:
-    #                 existing_move_line.update({
-    #                     'qty_done': rows['Packed Qty'],
-    #                     'result_package_id': package.id
-    #                 })
-    #         else:
-    #             # Product not found in move_line_ids_without_package, create a new record
-    #             new_move_line_vals = {
-    #                 'product_id': search_product.id,
-    #                 'qty_done': rows['Packed Qty'],
-    #                 'result_package_id': package.id
-    #             }
-    #             picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
+
 
 
 
