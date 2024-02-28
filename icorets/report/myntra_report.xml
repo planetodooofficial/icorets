@@ -35,7 +35,7 @@
     </record>
 
     <record id="myntra_tax_invoice_report" model="ir.actions.report">
-        <field name="name">Myntra</field>
+        <field name="name">Tax Invoice - Myntra</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-html</field>
         <field name="report_name">icorets.myntra_tax_invoice_forms</field>

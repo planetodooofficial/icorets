@@ -23,7 +23,7 @@
         <field name="report_name">icorets.taxes_invoice_forms</field>
         <field name="report_file">icorets.taxes_invoice_forms</field>
         <field name="print_report_name">'Tax Invoice# %s' % (object.name)</field>
-        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_invoice"/>
+        <field name="paperformat_id" ref="icorets.paperformat_debit"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
     </record>
 
@@ -48,7 +48,7 @@
                 <div class="page">
                     <table style="width:100%;margin-top: 0px">
                         <tr style="border:1px solid black;">
-                            <th class="text-center" colspan="3"><strong>Tax Invoice (Original for Receipient)</strong></th>
+                            <th class="text-center" colspan="3"><strong>Tax Invoice</strong></th>
                         </tr>
                         <tr style="background-color:#87CEEB;border:1px solid black">
                             <th style="border:1px solid black;width:40%" class="text-center"><strong>Invoice Details</strong></th>
@@ -59,31 +59,32 @@
                             <td style="border:1px solid black;"><strong>Invoice No.:</strong>
                                 <t t-esc="o.name"/>
                             </td>
-                            <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
+                            <td style="border:1px solid black;width: 26%;padding-left: 3px" rowspan="4">
 
                                     <t t-esc="o.company_id.name"/><br/>
-                                    <t t-esc="o.company_id.street"/>,
+                                    <t t-esc="o.company_id.street"/><br/>
 
                                     <t t-esc="o.company_id.street2"/>
                                     <br/>
-                                    <t t-esc="o.company_id.city"/>,<t t-esc="o.company_id.zip"/>
-                                    <t t-esc="o.company_id.state_id.name"/>,
+                                    <t t-esc="o.company_id.city"/> <span> - </span>
+                                    <t t-esc="o.company_id.zip"/>. <span> - </span>
+                                    <t t-esc="o.company_id.state_id.name"/>, <span> - </span>
                                     <t t-esc="o.company_id.country_id.name"/>
                                     <br/>
                                     <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
                                     <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
 
                             </td>
-                            <td style="border:1px solid black;padding-left: 3px" rowspan="4">
+                            <td style="border:1px solid black;padding-left: 3px;vertical-align : top" rowspan="4">
 
                                     <t t-esc="o.dispatch_partner_id.name"/><br/>
                                     <t t-esc="o.dispatch_partner_id.street"/>
                                     <br/>
                                     <t t-esc="o.dispatch_partner_id.street2"/>
                                     <br/>
-                                    <t t-esc="o.dispatch_partner_id.city"/>,
-                                    <t t-esc="o.dispatch_partner_id.zip"/>,
-                                    <t t-esc="o.dispatch_partner_id.state_id.name"/>,
+                                    <t t-esc="o.dispatch_partner_id.city"/> <span> - </span>
+                                    <t t-esc="o.dispatch_partner_id.zip"/>. <span> - </span>
+                                    <t t-esc="o.dispatch_partner_id.state_id.name"/>, <span> - </span>
                                     <t t-esc="o.dispatch_partner_id.country_id.name"/>
                                     <br/>
 
@@ -91,7 +92,7 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Invoice Date:</strong>
-                                <t t-esc="o.invoice_date"/>
+                                <t t-esc="o.invoice_date" t-options="{'widget': 'date'}"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">
@@ -116,14 +117,14 @@
                             <t t-if="doc.transaction_id.qr_code">
                                 <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="3">
                                     <t t-if="doc.transaction_id.qr_code">
-                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %                 ('QR', doc.transaction_id.qr_code, 200, 200)"/></t>
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %                 ('QR', doc.transaction_id.qr_code, 130, 130)"/></t>
 
                                 </td>
                             </t>
                             <t t-else="">
                                 <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="6">
                                     <t t-if="doc.transaction_id.qr_code">
-                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %                 ('QR', doc.transaction_id.qr_code, 200, 200)"/></t>
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' %                 ('QR', doc.transaction_id.qr_code, 130, 130)"/></t>
 
                                 </td>
                             </t>
@@ -137,27 +138,27 @@
                         </tr>
                         <tr style="border:1px solid black;">
 
-                            <td style="border:1px solid black;width: 30%;padding-left: 3px" rowspan="4">
+                            <td style="border:1px solid black;width:  26%;padding-left: 3px;vertical-align : top" rowspan="4">
                                 <t t-if="o.invoice_line_ids">
                                     <t t-foreach="doc.invoice_line_ids[0]" t-as="acc">
                                         <t t-if="acc.sale_line_ids.order_id.warehouse_id">
-                                            <p>
+
 
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.name')[0]"/><br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street')[0]"/><br/>
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.street2')[0]"/>
                                                 <br/>
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.city')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.zip')[0]"/>,
-                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>,
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.city')[0]"/> <span> - </span>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.zip')[0]"/>. <span> - </span>
+                                                <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.state_id.name')[0]"/>. <span> - </span>
                                                 <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.country_id.name')[0]"/><br/>
                                                 <strong>GST Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.vat')[0]"/><br/>
                                                 <strong>PAN Number</strong> <t t-esc="acc.sale_line_ids.order_id.mapped('partner_invoice_id.x_studio_pan')[0]"/>
-                                                </p>
+
 
                                         </t>
                                         <t t-else="">
-                                                <p>
+
                                                 <t t-esc="o.partner_id.name"/><br/>
                                                 <t t-esc="o.partner_id.street"/>
                                                 <br/>
@@ -170,14 +171,14 @@
                                                 <br/>
                                                 <strong>GST Number</strong> <t t-esc="o.partner_id.vat"/><br/>
                                                 <strong>PAN Number</strong> <t t-esc="o.partner_id.x_studio_pan"/>
-                                            </p>
+
 
                                         </t>
                                     </t>
                                 </t>
                             </td>
-                            <td style="border:1px solid black;padding-left: 3px" rowspan="4">
-                                <p>
+                            <td style="border:1px solid black;padding-left: 3px;vertical-align : top" rowspan="4">
+
                                     <t t-esc="o.partner_shipping_id.name"/><br/>
                                     <t t-esc="o.partner_shipping_id.street"/>
                                     <br/>
@@ -188,7 +189,7 @@
                                     <t t-esc="o.partner_shipping_id.country_id.name"/>
                                     <br/>
 
-                                </p>
+
                             </td>
                         </tr>
                         <tr>
@@ -203,7 +204,7 @@
 
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;width: 50%"><strong>Reverse Charge (Y/N) : N</strong></td>
-                            <td colspan="2" style="width: 50%;"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"></t> </td>
+                            <td colspan="2" style="width: 50%;"><strong>PAYMENT TERMS: </strong> <t t-esc="o.invoice_payment_term_id.name"/> </td>
                         </tr>
 
                     </table>
@@ -244,9 +245,9 @@
                                 <th class="text-center" width="12%">
                                     <strong>Tax Rate</strong>
                                 </th>
-                                <th class="text-center" width="%">
-                                    <strong>Tax Amount</strong>
-                                </th>
+<!--                                <th class="text-center" width="%">-->
+<!--                                    <strong>Tax Amount</strong>-->
+<!--                                </th>-->
                                 <th class="text-center" width="8%">
                                     <strong>Total Price Incl Tax</strong>
                                 </th>
@@ -308,9 +309,9 @@
                                         </t>
                                     </t>
                                 </td>
-                                <td style="text-align: center">
-                                    <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>
-                                </td>
+<!--                                <td style="text-align: center">-->
+<!--                                    <t t-esc="line.tax_amount_line" t-options="{'widget': 'float', 'precision': 2}"/>-->
+<!--                                </td>-->
                                 <td>
                                     <t t-esc="'%.2f'% line.price_total"/>
 
@@ -325,17 +326,17 @@
                                     <t t-esc="sum(l.quantity for l in o.invoice_line_ids) "/>
                                 </td>
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>
+                                <!--<t t-esc="round(sum(l.price_unit for l in o.invoice_line_ids), 2) "/>-->
                             </td>
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2) "/>
+<!--                                <t t-esc="round(sum(l.price_subtotal for l in o.invoice_line_ids), 2) "/>-->
+                                <t t-esc="'%.2f'% sum(l.price_subtotal for l in o.invoice_line_ids)"/>
                             </td>
                             <td/>
+
                             <td style="text-align: center">
-                                <t t-esc="round(sum(l.tax_amount_line for l in o.invoice_line_ids), 2)"/>
-                            </td>
-                            <td style="text-align: center">
-                                <t t-esc="round(sum(l.price_total for l in o.invoice_line_ids), 2) "/>
+<!--                                <t t-esc="round(sum(l.price_total for l in o.invoice_line_ids), 2) "/>-->
+                                <t t-esc="'%.2f'% sum(l.price_total for l in o.invoice_line_ids)"/>
                             </td>
                         </tr>
 
@@ -418,7 +419,8 @@
                                 amount
                                 remaining unpaid after due date of the bill. Goods once sold will not be accepted
                                 back,
-                                warranty applicable as provided by the respective brands.
+                                warranty applicable as provided by the respective brands.<br/>
+                                MSME : UDYAM-MH-18-0026765
                             </td>
                             <td style="border:1px solid black;text-align: center" colspan="3">
 <!--                                <t t-if="o.invoice_line_ids">-->
@@ -511,7 +513,7 @@
                         </tr>
                         <tr style="border:1px solid black;">
                             <td style="border:1px solid black;"><strong>Invoice Date:</strong>
-                                <t t-esc="o.invoice_date"/>
+                                <t t-esc="o.invoice_date" t-options="{'widget': 'date'}"/>
                             </td>
                         </tr>
                         <tr style="border:1px solid black;">

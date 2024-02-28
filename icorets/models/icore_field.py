@@ -3,7 +3,7 @@ from lxml import etree
 from num2words import num2words
 from datetime import timedelta
 import logging
-from odoo import models, api, fields, _
+from odoo import models, api, fields, tools, _
 import base64
 import csv
 import io
@@ -154,6 +154,9 @@ class AccountMoveInheritClass(models.Model):
     partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
     partner_shipping_id_country = fields.Many2one('res.country', 'Del Country',
                                                   related='partner_shipping_id.country_id')
+
+    #new selection field of address for credit note
+    shipping_id_credit = fields.Many2one('res.partner', string='Ship To')
 
     @api.depends('invoice_line_ids.quantity')
     def _tot_line_qty(self):
@@ -326,6 +329,7 @@ class SaleOrderInherit(models.Model):
 
     # po_no = fields.Char('PO No')
     # no_of_cartons = fields.Char('No of Cartons')
+    check_amount_in_words = fields.Char(compute='_amt_in_words', string='Amount in Words')
     location_id = fields.Many2one(
         'stock.location', ' Source Location',
         ondelete='restrict', index=True, check_company=True)  # removed the required=True
@@ -352,6 +356,13 @@ class SaleOrderInherit(models.Model):
     partner_shipping_id_state = fields.Many2one('res.country.state','Del State', related='partner_shipping_id.state_id')
     partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
     partner_shipping_id_country = fields.Many2one('res.country','Del Country', related='partner_shipping_id.country_id')
+
+    @api.depends('amount_total')
+    def _amt_in_words(self):
+        for rec in self:
+            rec.check_amount_in_words = num2words(str(rec.amount_total), lang='en_IN').replace(',', '').replace('and',
+                                                                                                                '').replace(
+                'point', 'and paise').replace('thous', 'thousand')
 
 
     def action_view_fo_so(self):
@@ -785,6 +796,18 @@ class SaleOrderLineInherit(models.Model):
     article_code = fields.Char(string='Article Code', related='product_id.variant_article_code')
     size = fields.Char(string='Size', related='product_id.size')
     color = fields.Char(string='Color', related='product_id.color')
+    tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
+                                      compute="check_tax_amount", currency_field='currency_id')
+
+    @api.depends('tax_id')
+    def check_tax_amount(self):
+        for rec in self:
+            if rec.tax_id:
+                for tax in rec.tax_id:
+                    rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
+                    rec.tax_amount_line = rec.product_uom_qty * rec.tax_amount_line
+            else:
+                rec.tax_amount_line = 0
 
     # Inherited for sale order line unit_price
     @api.depends('product_id', 'product_uom', 'product_uom_qty')
@@ -1286,9 +1309,10 @@ class PackingListManual(models.TransientModel):
     upload_file = fields.Binary("Upload File", required=True, help="Upload your .xlsx file here.")
     file_name = fields.Char('File Name')
     alert_notification = fields.Html(
-        default="<h6 style='color:red;text-align:center;'>Please Upload .CSV File Only.</h6>", readonly=True)
+        default="<h6 style='color:red;text-align:center;'>Please Upload Excel File Only.</h6>", readonly=True)
 
     def action_confirm(self):
+        create_date = datetime.now()
         active_id = self.env.context.get('active_id')
         picking_id = self.env["stock.picking"].browse(active_id)
 
@@ -1310,20 +1334,25 @@ class PackingListManual(models.TransientModel):
             raise ValidationError("Empty cells in %s columns." % cols_with_null_names)
 
         for index, rows in data.iterrows():
+            # Check if 'Destination Location' is empty
+            if rows['Destination Location'] == '0' or not rows['Destination Location']:
+                continue  # Skip this iteration if 'Destination Location' is empty
+
             search_product = self.env["product.product"].search([('default_code', '=', rows['SKU'])], limit=1)
+
             if not search_product:
                 raise ValidationError(f"Product {rows['SKU']} Not Found.")
 
-            destination_package_name = rows['Destination Location']
+            create_date_str = create_date.strftime("%d/%m/%Y")
+            destination_package_name = str(picking_id.origin) + '-' + str(create_date_str) + '-' + str(
+                rows['Destination Location'])
 
-            # Check if the package with the given name already exists
             existing_package = self.env['stock.quant.package'].search([('name', '=', destination_package_name)],
                                                                       limit=1)
 
             if existing_package:
                 package = existing_package
             else:
-                # Create a new package if the destination_package is not present
                 package_obj = self.env['stock.quant.package']
                 package_vals = {'name': destination_package_name}
                 package = package_obj.create(package_vals)
@@ -1339,13 +1368,54 @@ class PackingListManual(models.TransientModel):
                         'result_package_id': package.id
                     })
             else:
-                # Product not found in move_line_ids_without_package, create a new record
                 new_move_line_vals = {
                     'product_id': search_product.id,
                     'qty_done': rows['Packed Qty'],
                     'result_package_id': package.id
                 }
                 picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
+
+    #
+    #     for index, rows in data.iterrows():
+    #         search_product = self.env["product.product"].search([('default_code', '=', rows['SKU'])], limit=1)
+    #         if not search_product:
+    #             raise ValidationError(f"Product {rows['SKU']} Not Found.")
+    #         # create_date = fields.date.strftime(create_date, tools.DEFAULT_SERVER_DATE_FORMAT)
+    #         create_date_str = create_date.strftime("%d/%m/%Y")
+    #         destination_package_name = str(picking_id.origin) + '-' + str(create_date_str) + '-' + str(
+    #             rows['Destination Location'])
+    #
+    #         # Check if the package with the given name already exists
+    #         existing_package = self.env['stock.quant.package'].search([('name', '=', destination_package_name)],
+    #                                                                   limit=1)
+    #
+    #         if existing_package:
+    #             package = existing_package
+    #         else:
+    #             # Create a new package if the destination_package is not present
+    #             package_obj = self.env['stock.quant.package']
+    #             package_vals = {'name': destination_package_name}
+    #             package = package_obj.create(package_vals)
+    #
+    #         existing_move_lines = picking_id.move_line_ids_without_package.filtered(
+    #             lambda move_line: move_line.product_id == search_product
+    #         )
+    #
+    #         if existing_move_lines:
+    #             for existing_move_line in existing_move_lines:
+    #                 existing_move_line.update({
+    #                     'qty_done': rows['Packed Qty'],
+    #                     'result_package_id': package.id
+    #                 })
+    #         else:
+    #             # Product not found in move_line_ids_without_package, create a new record
+    #             new_move_line_vals = {
+    #                 'product_id': search_product.id,
+    #                 'qty_done': rows['Packed Qty'],
+    #                 'result_package_id': package.id
+    #             }
+    #             picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
+
 
 
 # Code for creating excel report in csv then updating it on stock.picking itself
