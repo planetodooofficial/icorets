@@ -25,6 +25,7 @@
                             <field name="name"/>
                             <field name="shop_instance_id"/>
                             <field name="company_id"/>
+                            <field name="is_no_invoice"/>
                         </group>
                         <group string="Accounts Details">
                             <field name="sale_journal_id" domain="[('type','=', 'sale')]"

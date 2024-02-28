@@ -423,42 +423,43 @@ class ShopInstance(models.Model):
 
     def create_payments_entries(self, order, sales_channel_id):
         """Create payments for the sale orders """
-        invoice_ids = order.invoice_ids
-        journal_id = sales_channel_id.prepaid_holding_journal_id if not order.unicommerce_order_id.cod else sales_channel_id.cod_holding_journal_id
-        search_payment_method = self.env["account.payment.method"].search([('name', '=', 'Manual')], limit=1)
-        search_payment_method_line = self.env["account.payment.method.line"].search([
-            ('payment_method_id', '=', search_payment_method.id),
-            ('journal_id', '=', journal_id.id)
-        ])
+        if not sales_channel_id.is_no_invoice:
+            invoice_ids = order.invoice_ids
+            journal_id = sales_channel_id.prepaid_holding_journal_id if not order.unicommerce_order_id.cod else sales_channel_id.cod_holding_journal_id
+            search_payment_method = self.env["account.payment.method"].search([('name', '=', 'Manual')], limit=1)
+            search_payment_method_line = self.env["account.payment.method.line"].search([
+                ('payment_method_id', '=', search_payment_method.id),
+                ('journal_id', '=', journal_id.id)
+            ])
 
-        payment_obj = self.env["account.payment.register"]
+            payment_obj = self.env["account.payment.register"]
 
-        acc_type = 'asset_receivable' if invoice_ids[0].move_type == 'out_invoice' else 'liability_payable'
+            acc_type = 'asset_receivable' if invoice_ids[0].move_type == 'out_invoice' else 'liability_payable'
 
-        # Filter invoice lines for each invoice and prepare payment
-        payments = []
-        for invoice_id in invoice_ids:
-            payment_move_line = invoice_id.line_ids.filtered(lambda x: x.account_id.account_type == acc_type)
-            if payment_move_line:
-                payment_id = payment_obj.with_context({
-                    'active_model': 'account.move',
-                    'active_ids': invoice_id.ids
-                }).create({
-                    'journal_id': journal_id.id,
-                    'payment_method_line_id': search_payment_method_line.id,
-                    'line_ids': [(4, line.id) for line in payment_move_line]
-                })
-                payments.append(payment_id)
+            # Filter invoice lines for each invoice and prepare payment
+            payments = []
+            for invoice_id in invoice_ids:
+                payment_move_line = invoice_id.line_ids.filtered(lambda x: x.account_id.account_type == acc_type)
+                if payment_move_line:
+                    payment_id = payment_obj.with_context({
+                        'active_model': 'account.move',
+                        'active_ids': invoice_id.ids
+                    }).create({
+                        'journal_id': journal_id.id,
+                        'payment_method_line_id': search_payment_method_line.id,
+                        'line_ids': [(4, line.id) for line in payment_move_line]
+                    })
+                    payments.append(payment_id)
 
-        # Create and post payments
-        for payment in payments:
-            try:
-                payment._create_payments()
-            except UserError as e:
-                # Handle any errors while creating payments
-                logger.error(e)
+            # Create and post payments
+            for payment in payments:
+                try:
+                    payment._create_payments()
+                except UserError as e:
+                    # Handle any errors while creating payments
+                    logger.error(e)
 
-        return payments
+            return payments
 
     def sale_order_confirm_batch(self, sale_orders, record_type, dump_sequence):
         order_dates = {}
@@ -498,7 +499,7 @@ class ShopInstance(models.Model):
 
         # Batch process invoices
         for sale_order in sale_orders:
-            if sale_order.sales_channel_id:
+            if sale_order.sales_channel_id and not sale_order.sales_channel_id.is_no_invoice:
                 invoice_vals = sale_order._prepare_invoice()
 
                 lst = [(0, 0, so_order_line._prepare_invoice_line()) for so_order_line in sale_order.order_line]
@@ -527,7 +528,7 @@ class ShopInstance(models.Model):
         partner_obj = self.env['res.partner']
         partner_data = partner_data.read()[0]
         state_id = self.get_state_id(partner_data.get('billing_state'))
-        partner_id = partner_obj.search([('is_website_partner', '=', True), ('state_id', '=', state_id.id)], limit=1)
+        partner_id = partner_obj.search([('is_website_partner', '=', True), ('state_id', '=', state_id)], limit=1)
 
         # # Determine if the partner is a business based on GSTIN
         # is_business = bool(partner_data.get('customerGSTIN'))
@@ -724,59 +725,61 @@ class ShopInstance(models.Model):
                                         end_date=fields.Datetime.now(), count=1, state='exception')
 
     def create_credit_note(self, order):
-        sale_order = order.name
-        search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
-                                                          ('move_type', '=', 'out_invoice')])
-        invoice_no = order.return_invoice_no
-        account_move_reversal_obj = self.env["account.move.reversal"]
-        invoice_val = {
-            'refund_method': 'cancel',
-            'date_mode': 'entry',
-            'journal_id': search_invoice.journal_id.id,
-            'move_ids': [(4, search_invoice.id)]
-        }
-        account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
-        data = account_move_reverse_wizard_id.reverse_moves()
-        search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
-        if invoice_no:
-            search_credit_note.write({'payment_reference': invoice_no, 'dump_sequence': order.code})
-            return True
-        return False
+        if not order.sales_channel_id.is_no_invoice:
+            sale_order = order.name
+            search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
+                                                              ('move_type', '=', 'out_invoice')])
+            invoice_no = order.return_invoice_no
+            account_move_reversal_obj = self.env["account.move.reversal"]
+            invoice_val = {
+                'refund_method': 'cancel',
+                'date_mode': 'entry',
+                'journal_id': search_invoice.journal_id.id,
+                'move_ids': [(4, search_invoice.id)]
+            }
+            account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
+            data = account_move_reverse_wizard_id.reverse_moves()
+            search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
+            if invoice_no:
+                search_credit_note.write({'payment_reference': invoice_no, 'dump_sequence': order.code})
+                return True
+            return False
 
     def create_partial_credit_note(self, order, lines_to_return):
         """ Create a partial credit note for the returned items """
-        sale_order = order.name
-        credit_note_no = order.return_invoice_no
-        search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
-                                                          ('move_type', '=', 'out_invoice')])
-        # search_invoice.write("name")
-        account_move_reversal_obj = self.env["account.move.reversal"]
-        # in this invoice replace the invoice line with only the refundable products
-        invoice_val = {
-            'refund_method': 'refund',
-            'date_mode': 'entry',
-            'journal_id': search_invoice.journal_id.id,
-            'move_ids': [(4, search_invoice.id)]
-        }
-        account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
-        data = account_move_reverse_wizard_id.reverse_moves()
-        search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
-        # create the credit note lines
-        lines_to_refund = list()
-        for move_line in search_credit_note.invoice_line_ids:
-            line = lines_to_return.get(move_line.product_id.default_code)
-            if line:
-                lines_to_refund.append(move_line.id)
-                move_line.quantity = 1
-        search_credit_note.write({'invoice_line_ids': [(6, 0, lines_to_refund)]})
-        if credit_note_no:
-            search_credit_note.write({'payment_reference': credit_note_no, 'dump_sequence': order.code})
-            search_credit_note.action_post()
-            journal_id = search_invoice.sales_channel_id.prepaid_holding_journal_id if not order.cod \
-                else search_invoice.sales_channel_id.cod_holding_journal_id
-            self.action_create_payment_entries_partial_line(invoice_id=search_credit_note,
-                                                            journal_id=journal_id)
-            return True
+        if not order.sales_channel_id.is_no_invoice:
+            sale_order = order.name
+            credit_note_no = order.return_invoice_no
+            search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
+                                                              ('move_type', '=', 'out_invoice')])
+            # search_invoice.write("name")
+            account_move_reversal_obj = self.env["account.move.reversal"]
+            # in this invoice replace the invoice line with only the refundable products
+            invoice_val = {
+                'refund_method': 'refund',
+                'date_mode': 'entry',
+                'journal_id': search_invoice.journal_id.id,
+                'move_ids': [(4, search_invoice.id)]
+            }
+            account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
+            data = account_move_reverse_wizard_id.reverse_moves()
+            search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
+            # create the credit note lines
+            lines_to_refund = list()
+            for move_line in search_credit_note.invoice_line_ids:
+                line = lines_to_return.get(move_line.product_id.default_code)
+                if line:
+                    lines_to_refund.append(move_line.id)
+                    move_line.quantity = 1
+            search_credit_note.write({'invoice_line_ids': [(6, 0, lines_to_refund)]})
+            if credit_note_no:
+                search_credit_note.write({'payment_reference': credit_note_no, 'dump_sequence': order.code})
+                search_credit_note.action_post()
+                journal_id = search_invoice.sales_channel_id.prepaid_holding_journal_id if not order.cod \
+                    else search_invoice.sales_channel_id.cod_holding_journal_id
+                self.action_create_payment_entries_partial_line(invoice_id=search_credit_note,
+                                                                journal_id=journal_id)
+                return True
 
     def action_create_payment_entries_partial_line(self, invoice_id, journal_id):
         search_payment_method = self.env["account.payment.method"].search([('name', '=', 'Manual')], limit=1)
