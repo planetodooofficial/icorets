@@ -819,7 +819,7 @@ class ShopInstance(models.Model):
                 stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
                 inventory_adjustment = [
                     {
-                        "itemSKU": ['PRSBSS-MI-02-900ML'],
+                        "itemSKU": quant.product_id.default_code,
                         "quantity": quant.available_quantity,
                         "shelfCode": "DEFAULT",
                         "inventoryType": "GOOD_INVENTORY",
