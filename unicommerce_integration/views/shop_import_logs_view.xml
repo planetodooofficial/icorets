@@ -16,6 +16,7 @@
                 <field name="count" readonly="1"/>
                 <field name="state" optional="hide"/>
                 <field name="message" readonly="1"/>
+                <field name="error_message" optional="hide"/>
             </tree>
         </field>
     </record>

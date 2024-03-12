@@ -351,7 +351,8 @@ class ShopInstance(models.Model):
         }
         shop_import_logs_obj.create(vals)
 
-    def generate_exception_log(self, message, start_date, end_date=False, count=1, state='', operation_performed=''):
+    def generate_exception_log(self, message, start_date, end_date=False, count=1, state='', operation_performed='',
+                               error_message=''):
         """ Generate The Exception logs for the processed requests """
         shop_import_logs_obj = self.env['shop.import.logs']
         vals = {
@@ -809,58 +810,67 @@ class ShopInstance(models.Model):
         """ Sync the inventory of the products from the shop instance to the Odoo """
         start_date = fields.Datetime.now()
         count = 0
-        try:
-            parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
-            location_id = self.env['stock.location'].search(
-                [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
-            stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
-            inventory_adjustment = [
-                {
-                    "itemSKU": quant.product_id.default_code,
-                    "quantity": quant.available_quantity,
-                    "shelfCode": "DEFAULT",
-                    "inventoryType": "GOOD_INVENTORY",
-                    "adjustmentType": "REPLACE",
-                    "facilityCode": "playr"
-                } for quant in stock_quant if quant.available_quantity > 0 and quant.product_id.default_code
-            ]
-            if inventory_adjustment:
-                url = self.shop_url + '/services/rest/v1/inventory/adjust/bulk'
-                headers = {
-                    'Content-Type': 'application/json',
-                    'Authorization': self.auth_bearer,
-                    'Accept': 'application/json'
-                }
-                data = {
-                    "inventoryAdjustments": inventory_adjustment
-                }
-                response = requests.post(url, headers=headers, data=json.dumps(data))
+        shop_instances = self.env['shop.instance'].search([])
+        for instance in shop_instances:
+            try:
+                parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
+                location_id = self.env['stock.location'].search(
+                    [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
+                stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
+                inventory_adjustment = [
+                    {
+                        "itemSKU": quant.product_id.default_code,
+                        "quantity": quant.available_quantity,
+                        "shelfCode": "DEFAULT",
+                        "inventoryType": "GOOD_INVENTORY",
+                        "adjustmentType": "REPLACE",
+                        "facilityCode": "playr"
+                    } for quant in stock_quant if quant.available_quantity > 0 and quant.product_id.default_code
+                ]
+                if inventory_adjustment:
+                    url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': instance.auth_bearer,
+                        'Accept': 'application/json'
+                    }
+                    data = {
+                        "inventoryAdjustments": inventory_adjustment
+                    }
+                    response = requests.post(url, headers=headers, data=json.dumps(data))
 
-                if response.status_code == 200:
-                    data = response.json()
-                    for line in data['inventoryAdjustmentResponses']:
-                        if line['successful']:
-                            self.generate_success_log(
-                                message='Inventory Updated Successfully,For %s Product' %
-                                        line['facilityInventoryAdjustment']['itemSKU'],
-                                count=line['facilityInventoryAdjustment']['quantity'],
-                                start_date=start_date,
-                                end_date=fields.Datetime.now(),
-                                state='success',
-                                operation_performed='Inventory Adjustment')
-                            count += 1
-                        else:
-                            self.generate_exception_log(
-                                message='Inventory Update Failed,For %s Product' %
-                                        line['facilityInventoryAdjustment']['itemSKU'],
-                                start_date=start_date,
-                                end_date=fields.Datetime.now(), state='exception',
-                                operation_performed='Inventory Adjustment')
-        except Exception as e:
-            self.generate_exception_log(message=e, start_date=fields.Datetime.now(),
-                                        operation_performed='Inventory Sync',
-                                        end_date=fields.Datetime.now(), count=1, state='exception')
-            pass
+                    if response.status_code == 200:
+                        data = response.json()
+                        for line in data['inventoryAdjustmentResponses']:
+                            if line['successful']:
+                                instance.generate_success_log(
+                                    message='Inventory Updated Successfully,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    count=line['facilityInventoryAdjustment']['quantity'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(),
+                                    state='success',
+                                    operation_performed='Inventory Adjustment')
+                                count += 1
+                            else:
+                                instance.generate_exception_log(
+                                    message='Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(line['error'], indent=3))
+            except TypeError as e:
+                instance.generate_exception_log(message="Your Token Has Probably Expired!",
+                                                start_date=fields.Datetime.now(),
+                                                operation_performed='Inventory Sync',
+                                                end_date=fields.Datetime.now(), count=1, state='exception')
+                pass
+            except Exception as e:
+                instance.generate_exception_log(message=e, start_date=fields.Datetime.now(),
+                                                operation_performed='Inventory Sync',
+                                                end_date=fields.Datetime.now(), count=1, state='exception')
+                pass
 
     @staticmethod
     def has_exception(dictionary_list):

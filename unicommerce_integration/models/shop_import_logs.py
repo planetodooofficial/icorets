@@ -14,3 +14,4 @@ class ShopImportLogs(models.Model):
     count = fields.Integer('Count')
     state = fields.Selection([('success', 'Success'), ('exception', 'Exception')], string="Request State")
     operation_performed = fields.Char('Operation Performed')
+    error_message = fields.Text('Error Message')
