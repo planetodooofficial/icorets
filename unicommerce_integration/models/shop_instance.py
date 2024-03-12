@@ -859,7 +859,8 @@ class ShopInstance(models.Model):
                                     start_date=start_date,
                                     end_date=fields.Datetime.now(), state='exception',
                                     operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(line['errors'], indent=2))
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
                     else:
                         raise
             except TypeError as e:
