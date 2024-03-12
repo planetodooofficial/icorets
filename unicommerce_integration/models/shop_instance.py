@@ -859,7 +859,7 @@ class ShopInstance(models.Model):
                                     start_date=start_date,
                                     end_date=fields.Datetime.now(), state='exception',
                                     operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(line['error'], indent=3))
+                                    error_message=json.dumps(line['errors'], indent=3))
             except TypeError as e:
                 instance.generate_exception_log(message="Your Token Has Probably Expired!",
                                                 start_date=fields.Datetime.now(),
