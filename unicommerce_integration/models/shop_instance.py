@@ -871,7 +871,7 @@ class ShopInstance(models.Model):
                 pass
             except Exception as e:
                 response = response.json()
-                instance.generate_exception_log(message=response['errors']['message'], start_date=fields.Datetime.now(),
+                instance.generate_exception_log(message=response['errors'][0]['message'], start_date=fields.Datetime.now(),
                                                 operation_performed='Inventory Sync',
                                                 end_date=fields.Datetime.now(), count=1, state='exception',
                                                 error_message=json.dumps(response, indent=2))
