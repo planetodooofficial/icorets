@@ -819,7 +819,7 @@ class ShopInstance(models.Model):
                 stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
                 inventory_adjustment = [
                     {
-                        "itemSKU": quant.product_id.default_code,
+                        "itemSKU": ['PRSBSS-MI-02-900ML'],
                         "quantity": quant.available_quantity,
                         "shelfCode": "DEFAULT",
                         "inventoryType": "GOOD_INVENTORY",
@@ -859,7 +859,9 @@ class ShopInstance(models.Model):
                                     start_date=start_date,
                                     end_date=fields.Datetime.now(), state='exception',
                                     operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(line['errors'], indent=3))
+                                    error_message=json.dumps(line['errors'], indent=2))
+                    else:
+                        raise
             except TypeError as e:
                 instance.generate_exception_log(message="Your Token Has Probably Expired!",
                                                 start_date=fields.Datetime.now(),
@@ -867,9 +869,11 @@ class ShopInstance(models.Model):
                                                 end_date=fields.Datetime.now(), count=1, state='exception')
                 pass
             except Exception as e:
-                instance.generate_exception_log(message=e, start_date=fields.Datetime.now(),
+                response = response.json()
+                instance.generate_exception_log(message=response['errors']['message'], start_date=fields.Datetime.now(),
                                                 operation_performed='Inventory Sync',
-                                                end_date=fields.Datetime.now(), count=1, state='exception')
+                                                end_date=fields.Datetime.now(), count=1, state='exception',
+                                                error_message=json.dumps(response, indent=2))
                 pass
 
     @staticmethod
