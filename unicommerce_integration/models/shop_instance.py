@@ -854,7 +854,7 @@ class ShopInstance(models.Model):
                                     operation_performed='Inventory Adjustment')
                                 count += 1
                             elif line['errors']:
-                                logger.log(level=40, msg=line)
+                                # logger.log(level=40, msg=line)
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
@@ -864,7 +864,7 @@ class ShopInstance(models.Model):
                                     error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
                                         line['errors'], indent=2))
                             elif line['warnings']:
-                                logger.log(level=30, msg=data)
+                                # logger.log(level=30, msg=data)
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
@@ -874,7 +874,7 @@ class ShopInstance(models.Model):
                                     error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
                                         line['errors'], indent=2))
                             else:
-                                logger.log(level=30, msg=data)
+                                # logger.log(level=30, msg=data)
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
