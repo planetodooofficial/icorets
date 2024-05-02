@@ -852,6 +852,24 @@ class ShopInstance(models.Model):
                                     state='success',
                                     operation_performed='Inventory Adjustment')
                                 count += 1
+                            elif line['errors']:
+                                instance.generate_exception_log(
+                                    message='Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                            elif line['warnings']:
+                                instance.generate_exception_log(
+                                    message='Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
                             else:
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
