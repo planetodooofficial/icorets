@@ -364,6 +364,7 @@ class ShopInstance(models.Model):
             'count': count,
             'state': state,
             'operation_performed': operation_performed,
+            'error_message': error_message,
         }
         shop_import_logs_obj.create(vals)
 
@@ -853,6 +854,7 @@ class ShopInstance(models.Model):
                                     operation_performed='Inventory Adjustment')
                                 count += 1
                             elif line['errors']:
+                                logger.log(level=40, msg=line)
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
@@ -862,6 +864,7 @@ class ShopInstance(models.Model):
                                     error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
                                         line['errors'], indent=2))
                             elif line['warnings']:
+                                logger.log(level=30, msg=data)
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
@@ -871,6 +874,7 @@ class ShopInstance(models.Model):
                                     error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
                                         line['errors'], indent=2))
                             else:
+                                logger.log(level=30, msg=data)
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
@@ -889,7 +893,8 @@ class ShopInstance(models.Model):
                 pass
             except Exception as e:
                 response = response.json()
-                instance.generate_exception_log(message=response['errors'][0]['message'], start_date=fields.Datetime.now(),
+                instance.generate_exception_log(message=response['errors'][0]['message'],
+                                                start_date=fields.Datetime.now(),
                                                 operation_performed='Inventory Sync',
                                                 end_date=fields.Datetime.now(), count=1, state='exception',
                                                 error_message=json.dumps(response, indent=2))
