@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_register_wizard_report" model="ir.ui.view">
+        <field name="name">Stock Register</field>
+        <field name="model">stock.register.po.report</field>
+        <field name="arch" type="xml">
+            <form string="Choose Date">
+                <group>
+                    <group>
+                        <field name="from_date"/>
+                        <field name="to_date"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_stock_register_excel_report" string="Export" type="object"
+                            class="oe_highlight"
+                    />
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="stock_register_excel_report_action" model="ir.actions.act_window">
+        <field name="name">Stock Register Excel Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.register.po.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+            id="menu_stock_register_excel_report"
+            name="Stock Register Excel Report"
+            action="stock_register_excel_report_action"
+            parent="account.menu_finance_payables"
+            sequence="200"/>
+
+
+</odoo>

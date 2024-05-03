@@ -1,0 +1,9 @@
+<odoo>
+    <record id="stock_register_po_report_action_excel" model="ir.actions.report">
+        <field name="name">Stock Register PO Report (Excel)</field>
+        <field name="model">stock.register.po.report</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">register_reports_v16.stock_register_excel</field>
+        <field name="report_file">Stock Register PO Report (Excel)</field>
+    </record>
+</odoo>

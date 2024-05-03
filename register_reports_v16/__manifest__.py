@@ -8,12 +8,15 @@
     'maintainer': 'Planetodoo',
     'company': 'PlanetOdoo',
     'website': 'https://planet-odoo.com/',
-    'depends': ['base','account_reports','account'],
+    'depends': ['base','account_reports','account','po_accounting_v16'],
     'category': 'Accounting',
     'demo': [],
     'data': [
             'security/ir.model.access.csv',
             'views/partner_ledger_views.xml',
+            'report/report_actions.xml',
+            'wizard/stock_register_view.xml',
+
             # 'views/ledger_confirmation.xml',
 
 
