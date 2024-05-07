@@ -105,12 +105,18 @@ class StockRegisterReport(models.AbstractModel):
         all_data = {}
         # Date Filter
         if report_data.to_date and report_data.from_date:
+            if report_data.product_category:
+                category = report_data.product_category.ids
+            else:
+                all_category = self.env['product.category'].search([])
+                category = all_category.ids
             search_mumbai = self.env['stock.warehouse'].search([('name','=','Mumbai')])
             search_bhiwandi = self.env['stock.warehouse'].search([('name','=','Bhiwandi')])
             search_delhi = self.env['stock.warehouse'].search([('name', '=', 'Delhi Office')])
 
             # IN stock
             in_stock_moves = self.env['stock.move'].search([
+                ('product_id.categ_id.id', 'in', category),
                 ('location_id.usage', '=', 'supplier'),
                 ('location_dest_id.usage', '=', 'internal'),
                 ('location_dest_id.warehouse_id.id','in',[search_mumbai.id,search_bhiwandi.id,search_delhi.id]),
@@ -127,6 +133,7 @@ class StockRegisterReport(models.AbstractModel):
             # Out Stock
 
             out_stock_moves = self.env['stock.move'].search([
+                ('product_id.categ_id.id', 'in', category),
                 ('location_id.usage', '=', 'internal'),
                 ('location_id.warehouse_id.id','in',[search_mumbai.id,search_bhiwandi.id,search_delhi.id]),
                 ('location_dest_id.usage', '=', 'customer'),
@@ -148,7 +155,7 @@ class StockRegisterReport(models.AbstractModel):
                 ('location_id.warehouse_id', '=', False),  # Check if warehouse is not set
                 ('location_id.warehouse_id.id', '!=', search_mumbai.id),
                 ('location_dest_id.warehouse_id.id','=',search_mumbai.id),
-                ('state', '=', 'done'),
+                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                 ('date', '<', report_data.from_date)])
             quantities_opening_in_mum_by_product = opening_moves_in_mumbai.read_group(
                 [('id', 'in', opening_moves_in_mumbai.ids)], ['product_id', 'product_qty'], ['product_id']
@@ -158,7 +165,7 @@ class StockRegisterReport(models.AbstractModel):
                 ('location_dest_id.warehouse_id','=',False),
                 ('location_dest_id.warehouse_id.id', '!=',search_mumbai.id),
                 ('location_id.warehouse_id', '=', search_mumbai.id),
-                ('state', '=', 'done'),
+                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                 ('date', '<', report_data.from_date)])
             quantities_opening_out_mum_by_product = opening_moves_out_mumbai.read_group(
                 [('id', 'in', opening_moves_out_mumbai.ids)], ['product_id', 'product_qty'], ['product_id']
@@ -171,7 +178,7 @@ class StockRegisterReport(models.AbstractModel):
                 ('location_id.warehouse_id', '=', False),  # Check if warehouse is not set
                 ('location_id.warehouse_id.id', '!=', search_bhiwandi.id),
                 ('location_dest_id.warehouse_id.id','=',search_bhiwandi.id),
-                ('state', '=', 'done'),
+                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                 ('date', '<', report_data.from_date)])
             quantities_opening_in_bhiwandi_by_product = opening_moves_in_mumbai.read_group(
                 [('id', 'in', opening_moves_in_bhiwandi.ids)], ['product_id', 'product_qty'], ['product_id'])
@@ -180,7 +187,7 @@ class StockRegisterReport(models.AbstractModel):
                 ('location_dest_id.warehouse_id','=',False),
                 ('location_dest_id.warehouse_id.id', '!=',search_bhiwandi.id),
                 ('location_id.warehouse_id', '=', search_bhiwandi.id),
-                ('state', '=', 'done'),
+                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                 ('date', '<', report_data.from_date)])
 
             quantities_opening_out_bhiwandi_by_product = opening_moves_out_bhiwandi.read_group([('id', 'in', opening_moves_out_bhiwandi.ids)], ['product_id', 'product_qty'], ['product_id'])
@@ -193,7 +200,7 @@ class StockRegisterReport(models.AbstractModel):
             opening_moves_in_delhi = self.env['stock.move'].search(['|',('location_id.warehouse_id', '=', False),
                                                                      ('location_id.warehouse_id.id', '!=', search_delhi.id),
                                                                      ('location_dest_id.warehouse_id.id', '=',search_delhi.id),
-                                                                     ('state', '=', 'done'),
+                                                                     ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                                                                      ('date', '<', report_data.from_date)])
             quantities_opening_in_del_by_product = opening_moves_in_delhi.read_group(
                 [('id', 'in', opening_moves_in_delhi.ids)], ['product_id', 'product_qty'], ['product_id']
@@ -204,7 +211,7 @@ class StockRegisterReport(models.AbstractModel):
                                                                       ('location_dest_id.warehouse_id', '=', False),
                                                                       ('location_dest_id.warehouse_id.id', '!=',search_delhi.id),
                                                                       ('location_id.warehouse_id', '=',search_delhi.id),
-                                                                      ('state', '=', 'done'),
+                                                                      ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                                                                       ('date', '<', report_data.from_date)])
             quantities_opening_out_del_by_product = opening_moves_out_delhi.read_group(
                 [('id', 'in', opening_moves_out_delhi.ids)], ['product_id', 'product_qty'], ['product_id']
@@ -221,7 +228,7 @@ class StockRegisterReport(models.AbstractModel):
                 ('location_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                 ('location_dest_id.usage', '=', 'supplier'),
                 ('state', '=', 'done'),
-                ('product_id','=',41308),
+                ('product_id.categ_id.id', 'in', category),
                 ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)
             ])
             quantities_return_by_product = return_stock_moves.read_group([('id', 'in', return_stock_moves.ids)], ['product_id', 'product_qty'], ['product_id'])
@@ -234,7 +241,7 @@ class StockRegisterReport(models.AbstractModel):
                 ('location_id.usage', '=', 'customer'),
                 ('location_dest_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                 ('location_dest_id.usage', '=', 'internal'),
-                ('state', '=', 'done'),
+                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                 ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)
             ])
             quantities_sale_return_by_product = sale_return_stock_moves.read_group([('id', 'in', sale_return_stock_moves.ids)], ['product_id', 'product_qty'], ['product_id'])
@@ -246,7 +253,7 @@ class StockRegisterReport(models.AbstractModel):
             in_moves_mumbai = self.env['stock.move'].search(['|',
                                                                      ('location_id.warehouse_id', '=', False),
                                                                      ('location_id.warehouse_id.id', '!=',search_mumbai.id),
-                                                                     ('location_dest_id.warehouse_id.id', '=',search_mumbai.id),('state', '=', 'done'),
+                                                                     ('location_dest_id.warehouse_id.id', '=',search_mumbai.id),('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                                                                      ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)])
             quantities_in_mum_by_product = in_moves_mumbai.read_group(
                 [('id', 'in', in_moves_mumbai.ids)], ['product_id', 'product_qty'], ['product_id']
@@ -256,7 +263,7 @@ class StockRegisterReport(models.AbstractModel):
             # Out mumbai
             out_move_mumbai = self.env['stock.move'].search(['|',
                                                              ('location_dest_id.warehouse_id', '=', False),
-                                                             ('location_dest_id.warehouse_id.id', '!=',search_mumbai.id),
+                                                             ('location_dest_id.warehouse_id.id', '!=',search_mumbai.id),('product_id.categ_id.id', 'in', category),
                                                              ('location_id.warehouse_id', '=',search_mumbai.id),('state', '=', 'done'),
                                                              ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)])
             out_mum_by_product = out_move_mumbai.read_group(
@@ -270,7 +277,7 @@ class StockRegisterReport(models.AbstractModel):
             in_moves_bhiwandi = self.env['stock.move'].search(['|',
                                                              ('location_id.warehouse_id', '=', False),
                                                              ('location_id.warehouse_id.id', '!=', search_bhiwandi.id),
-                                                             ('location_dest_id.warehouse_id.id', '=', search_bhiwandi.id),
+                                                             ('location_dest_id.warehouse_id.id', '=', search_bhiwandi.id),('product_id.categ_id.id', 'in', category),
                                                              ('state', '=', 'done'),
                                                              ('date', '>=', report_data.from_date),
                                                              ('date', '<=', report_data.to_date)])
@@ -280,8 +287,7 @@ class StockRegisterReport(models.AbstractModel):
             # Out mumbai
             out_move_bhiwandi = self.env['stock.move'].search(['|',
                                                              ('location_dest_id.warehouse_id', '=', False),
-                                                             ('location_dest_id.warehouse_id.id', '!=',
-                                                              search_bhiwandi.id),
+                                                             ('location_dest_id.warehouse_id.id', '!=',search_bhiwandi.id),('product_id.categ_id.id', 'in', category),
                                                              ('location_id.warehouse_id', '=', search_bhiwandi.id),
                                                              ('state', '=', 'done'),
                                                              ('date', '>=', report_data.from_date),
@@ -299,7 +305,7 @@ class StockRegisterReport(models.AbstractModel):
                                                                ('location_id.warehouse_id', '=', False),
                                                                ('location_id.warehouse_id.id', '!=', search_delhi.id),
                                                                ('location_dest_id.warehouse_id.id', '=',search_delhi.id),
-                                                               ('state', '=', 'done'),
+                                                               ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                                                                ('date', '>=', report_data.from_date),
                                                                ('date', '<=', report_data.to_date)])
             quantities_in_delhi_by_product = in_moves_delhi.read_group([('id', 'in', in_moves_delhi.ids)],
@@ -313,7 +319,7 @@ class StockRegisterReport(models.AbstractModel):
                                                                ('location_dest_id.warehouse_id', '=', False),
                                                                ('location_dest_id.warehouse_id.id', '!=',search_delhi.id),
                                                                ('location_id.warehouse_id', '=', search_delhi.id),
-                                                               ('state', '=', 'done'),
+                                                               ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
                                                                ('date', '>=', report_data.from_date),
                                                                ('date', '<=', report_data.to_date)])
             out_delhi_by_product = out_move_delhi.read_group(
@@ -328,7 +334,7 @@ class StockRegisterReport(models.AbstractModel):
 
 
             # Quotation Quantity
-            draft_sale_order_line = self.env['sale.order.line'].search([('create_date', '<=', report_data.to_date),
+            draft_sale_order_line = self.env['sale.order.line'].search([('create_date', '<=', report_data.to_date),('product_id.categ_id.id', 'in', category),
                                                                         ('order_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                                                                         ('order_id.state', '=', 'draft')])
 
@@ -339,7 +345,7 @@ class StockRegisterReport(models.AbstractModel):
             draft_sale_order_line_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in draft_sale_order_line_by_product}
 
             # Done Quantity
-            done_sale_order_line = self.env['sale.order.line'].search([('create_date', '<=', report_data.to_date),
+            done_sale_order_line = self.env['sale.order.line'].search([('create_date', '<=', report_data.to_date),('product_id.categ_id.id', 'in', category),
                                                                         ('order_id.warehouse_id.id', 'in',[search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                                                                         ('order_id.state', 'in', ['sale','done'])])
 
@@ -350,7 +356,7 @@ class StockRegisterReport(models.AbstractModel):
             # quotation receipt
 
             draft_stock_move = self.env['stock.move'].search([('create_date', '<=', report_data.to_date),
-                                                              ('picking_id', '!=', False),
+                                                              ('picking_id', '!=', False),('product_id.categ_id.id', 'in', category),
                                                               ('picking_id.state', 'not in', ['cancel', 'done']),
                                                               ('picking_type_id.warehouse_id.id', 'in',[search_mumbai.id, search_bhiwandi.id, search_delhi.id])])
 

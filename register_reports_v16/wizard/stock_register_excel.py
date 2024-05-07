@@ -9,6 +9,9 @@ class StockRegisterPoReport(models.TransientModel):
     # year = fields.Char("Year")
     from_date = fields.Date("From Date")
     to_date = fields.Date("To Date")
+    product_category = fields.Many2many('product.category', string='Product Category')
+
+
 
     def action_stock_register_excel_report(self):
         return self.env.ref('register_reports_v16.stock_register_po_report_action_excel').report_action(self)

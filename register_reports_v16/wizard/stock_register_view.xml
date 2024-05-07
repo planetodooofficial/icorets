@@ -9,6 +9,8 @@
                     <group>
                         <field name="from_date"/>
                         <field name="to_date"/>
+                        <field name="product_category" widget="many2many_tags"/>
+
                     </group>
                 </group>
                 <footer>
