@@ -334,7 +334,8 @@ class StockRegisterReport(models.AbstractModel):
 
 
             # Quotation Quantity
-            draft_sale_order_line = self.env['sale.order.line'].search([('create_date', '<=', report_data.to_date),('product_id.categ_id.id', 'in', category),
+            draft_sale_order_line = self.env['sale.order.line'].search([('create_date', '>=', report_data.from_date), ('create_date', '<=', report_data.to_date),
+                                                                        ('product_id.categ_id.id', 'in', category),
                                                                         ('order_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                                                                         ('order_id.state', '=', 'draft')])
 
@@ -345,7 +346,7 @@ class StockRegisterReport(models.AbstractModel):
             draft_sale_order_line_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in draft_sale_order_line_by_product}
 
             # Done Quantity
-            done_sale_order_line = self.env['sale.order.line'].search([('create_date', '<=', report_data.to_date),('product_id.categ_id.id', 'in', category),
+            done_sale_order_line = self.env['sale.order.line'].search([('create_date', '>=', report_data.from_date), ('create_date', '<=', report_data.to_date),('product_id.categ_id.id', 'in', category),
                                                                         ('order_id.warehouse_id.id', 'in',[search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                                                                         ('order_id.state', 'in', ['sale','done'])])
 
