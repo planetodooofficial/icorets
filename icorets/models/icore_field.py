@@ -57,9 +57,9 @@ class ProductVariantInherit(models.Model):
     product_dimension1 = fields.Char(related='product_tmpl_id.product_dimension1', string='Product Dimension (cm)')
     product_dimension2 = fields.Char(related='product_tmpl_id.product_dimension2', string='Product Dimension (cm)')
     product_dimension3 = fields.Char(related='product_tmpl_id.product_dimension3', string='Product Dimension (cm)')
-    product_dimension4 = fields.Char(related='product_tmpl_id.product_dimension4', string='Product Dimension (cm)')
-    product_dimension5 = fields.Char(related='product_tmpl_id.product_dimension5', string='Product Dimension (cm)')
-    product_dimension6 = fields.Char(related='product_tmpl_id.product_dimension6', string='Product Dimension (cm)')
+    package_dimension1 = fields.Char(related='product_tmpl_id.package_dimension1', string='Package Dimension (cm)')
+    package_dimension2 = fields.Char(related='product_tmpl_id.package_dimension2', string='Package Dimension (cm)')
+    package_dimension3 = fields.Char(related='product_tmpl_id.package_dimension3', string='Package Dimension (cm)')
     package_weight = fields.Char(related='product_tmpl_id.package_weight', string='Package Weight (gms)')
 
 
@@ -104,9 +104,9 @@ class ProductInherit(models.Model):
     product_dimension1 = fields.Char('Product Dimension (cm)')
     product_dimension2 = fields.Char('Product Dimension (cm)')
     product_dimension3 = fields.Char('Product Dimension (cm)')
-    product_dimension4 = fields.Char('Product Dimension (cm)')
-    product_dimension5 = fields.Char('Product Dimension (cm)')
-    product_dimension6 = fields.Char('Product Dimension (cm)')
+    package_dimension1 = fields.Char('Package Dimension (cm)')
+    package_dimension2 = fields.Char('Package Dimension (cm)')
+    package_dimension3 = fields.Char('Package Dimension (cm)')
     package_weight = fields.Char('Package Weight (gms)')
     # technical details
 
