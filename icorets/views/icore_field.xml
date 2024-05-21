@@ -156,13 +156,16 @@
                             <field name="brand_id"/>
                             <field name="parent_buin"/>
                             <field name="age_group"/>
-                            <field name="myntra"/>
-                            <field name="ajio"/>
-                            <field name="fancode"/>
-                            <field name="blinkit"/>
-                            <field name="zepto"/>
-                            <field name="swiggy"/>
-                            <field name="bigbasket"/>
+                            <field name="product_dimension1"/>
+                            <field name="product_dimension2"/>
+                            <field name="product_dimension3"/>
+<!--                            <field name="myntra"/>-->
+<!--                            <field name="ajio"/>-->
+<!--                            <field name="fancode"/>-->
+<!--                            <field name="blinkit"/>-->
+<!--                            <field name="zepto"/>-->
+<!--                            <field name="swiggy"/>-->
+<!--                            <field name="bigbasket"/>-->
                         </group>
                         <group>
                             <field name="user_defined_miscallaneous1"/>
@@ -171,9 +174,6 @@
                             <field name="user_defined_miscallaneous4"/>
                             <field name="user_defined_miscallaneous5"/>
                             <field name="product_net_weight"/>
-                            <field name="product_dimension1"/>
-                            <field name="product_dimension2"/>
-                            <field name="product_dimension3"/>
                             <field name="product_dimension4"/>
                             <field name="product_dimension5"/>
                             <field name="product_dimension6"/>
@@ -215,6 +215,14 @@
                             <field name="variants_fsn"/>
                             <field name="variant_article_code"/>
                             <field name="buin"/>
+                            <field name="age_group"/>
+                            <field name="myntra"/>
+                            <field name="ajio"/>
+                            <field name="fancode"/>
+                            <field name="blinkit"/>
+                            <field name="zepto"/>
+                            <field name="swiggy"/>
+                            <field name="bigbasket"/>
                         </group>
                         <group>
                             <field name="variant_total_cost"/>
@@ -222,6 +230,14 @@
                             <field name="variant_packaging_cost"/>
                             <field name="color"/>
                             <field name="size"/>
+                            <field name="product_net_weight"/>
+                            <field name="product_dimension1"/>
+                            <field name="product_dimension2"/>
+                            <field name="product_dimension3"/>
+                            <field name="product_dimension4"/>
+                            <field name="product_dimension5"/>
+                            <field name="product_dimension6"/>
+                            <field name="package_weight"/>
                         </group>
 
                     </group>
