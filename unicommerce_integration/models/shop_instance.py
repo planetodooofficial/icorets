@@ -531,6 +531,24 @@ class ShopInstance(models.Model):
         partner_data = partner_data.read()[0]
         state_id = self.get_state_id(partner_data.get('billing_state'))
         partner_id = partner_obj.search([('is_website_partner', '=', True), ('state_id', '=', state_id)], limit=1)
+        if not partner_id:
+            if not state_id:
+                search_export_partner = partner_obj.search([('name', '=', 'playR Website - B2C - Export')])
+                if not search_export_partner:
+                    raise UserError(
+                        _("Export Partner Not Found! Please Create a Partner with Name `playR Website - B2C - Export`"))
+                state_id = self.get_state_id(partner_data.get('shipping_state'), partner_data.get('shipping_country'))
+                country_id = self.get_country_id(partner_data.get('shipping_country'))
+                partner_id = search_export_partner.child_ids.filtered(
+                    lambda r: r.state_id == state_id and r.country_id == country_id)
+                if not partner_id:
+                    partner_id = partner_obj.create({
+                        'name': partner_data.get('shipping_state'),
+                        'state_id': state_id,
+                        'country_id': country_id,
+                        'parent_id': search_export_partner.id,
+                    })
+                return partner_id
 
         # # Determine if the partner is a business based on GSTIN
         # is_business = bool(partner_data.get('customerGSTIN'))
@@ -589,9 +607,12 @@ class ShopInstance(models.Model):
         #     # return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
         return partner_id
 
-    def get_state_id(self, state_name):
+    def get_state_id(self, state_name, country_code=None):
         """ Get state ID based on state name """
-        country = self.env['res.country'].search([('code', '=', 'IN')], limit=1)
+        if not country_code:
+            country = self.env['res.country'].search([('code', '=', 'IN')], limit=1)
+        else:
+            country = self.env['res.country'].search([('code', '=', country_code)], limit=1)
         state = self.env['res.country.state'].search([('code', '=', state_name), ('country_id', '=', country.id)],
                                                      limit=1)
         return state.id if state else False
