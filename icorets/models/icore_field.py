@@ -98,7 +98,7 @@ class ProductInherit(models.Model):
     user_defined_miscallaneous3 = fields.Char('User Defined Miscallaneous3')
     user_defined_miscallaneous4 = fields.Char('User Defined Miscallaneous4')
     user_defined_miscallaneous5 = fields.Char('User Defined Miscallaneous5')
-    age_group = fields.Char('Age Group')
+    age_group = fields.Char(string='Age Group')
 
     product_net_weight = fields.Char('Product Net Weight (gms)')
     product_dimension1 = fields.Char('Product Dimension (cm)')
