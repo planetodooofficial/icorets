@@ -842,12 +842,12 @@ class ShopInstance(models.Model):
                 inventory_adjustment = [
                     {
                         "itemSKU": quant.product_id.default_code,
-                        "quantity": quant.available_quantity,
+                        "quantity": quant.available_quantity if quant.available_quantity >= 0 else 0,
                         "shelfCode": "DEFAULT",
                         "inventoryType": "GOOD_INVENTORY",
                         "adjustmentType": "REPLACE",
                         "facilityCode": "playr"
-                    } for quant in stock_quant if quant.available_quantity > -1 and quant.product_id.default_code
+                    } for quant in stock_quant if (quant.available_quantity <= 0 or quant.available_quantity >= 0) and quant.product_id.default_code
                 ]
                 if inventory_adjustment:
                     url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
