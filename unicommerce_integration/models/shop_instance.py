@@ -835,10 +835,25 @@ class ShopInstance(models.Model):
         shop_instances = self.env['shop.instance'].search([])
         for instance in shop_instances:
             try:
+                inventory_adjustment = []
                 parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
                 location_id = self.env['stock.location'].search(
                     [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
                 stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
+                products = self.env['product.product'].search([])
+                # find if the stock quant contains the product if not then the stock is zero else
+                # the stock is the available quantity
+                product_zero_quant = products.filtered(lambda x: x.id not in stock_quant.product_id.ids)
+                inventory_adjustment_zero_quant = [
+                    {
+                        "itemSKU": product.default_code,
+                        "quantity": 0,
+                        "shelfCode": "DEFAULT",
+                        "inventoryType": "GOOD_INVENTORY",
+                        "adjustmentType": "REPLACE",
+                        "facilityCode": "playr"
+                    } for product in product_zero_quant
+                ]
                 inventory_adjustment = [
                     {
                         "itemSKU": quant.product_id.default_code,
@@ -847,8 +862,10 @@ class ShopInstance(models.Model):
                         "inventoryType": "GOOD_INVENTORY",
                         "adjustmentType": "REPLACE",
                         "facilityCode": "playr"
-                    } for quant in stock_quant if (quant.available_quantity <= 0 or quant.available_quantity >= 0) and quant.product_id.default_code
+                    } for quant in stock_quant if
+                    quant.available_quantity >= 0 and quant.product_id.default_code
                 ]
+                inventory_adjustment.extend(inventory_adjustment_zero_quant)
                 if inventory_adjustment:
                     url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
                     headers = {
