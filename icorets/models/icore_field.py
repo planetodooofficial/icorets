@@ -1523,3 +1523,9 @@ class SaleOrderReport(models.AbstractModel):
                     sheet.write(row, col + 10, rec.product_uom_qty)
                     sheet.write(row, col + 11, rec.qty_invoiced)
                     row += 1
+
+class InheritProductAttribute(models.Model):
+    _inherit = 'product.attribute'
+
+    is_colour = fields.Boolean()
+    is_size = fields.Boolean()

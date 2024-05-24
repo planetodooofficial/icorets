@@ -51,6 +51,20 @@
         </field>
     </record>
 
+    <record model="ir.ui.view" id="product_attribute_inherited_view">
+        <field name="name">product.attribute.inherited</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='main_fields']/field[@name='create_variant']" position="after">
+                <field name="is_colour"/>
+                <field name="is_size"/>
+            </xpath>
+        </field>
+    </record>
+
+
+
     <!--    For removing attributes in carrier id in stock picking-->
 
     <record model="ir.ui.view" id="stock_picking_inherited_view">
