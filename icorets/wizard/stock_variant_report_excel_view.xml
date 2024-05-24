@@ -32,7 +32,7 @@
             id="menu_stock_variant_excel_report"
             name="Stock Variant Excel Report"
             action="stock_variant_excel_report_action"
-            parent="account.menu_finance_payables"
+            parent="stock.menu_warehouse_report"
             sequence="202"/>
 
 
