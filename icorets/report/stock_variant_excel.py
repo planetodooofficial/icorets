@@ -15,7 +15,7 @@ class StockVariantReport(models.AbstractModel):
         search_attributes = self.env['product.attribute'].search([('is_size', '=', 'True')])
         attribute_list = [att.name for att in search_attributes.value_ids]
 
-        static_columns = ['Brand', 'Category 3', 'Style Code', 'Article Code', 'Colour']
+        static_columns = ['Brand', 'Category 3', 'Style Code', 'Article Code', 'MRP', 'Colour']
         dynamic_columns = static_columns + attribute_list
 
         # Write the column headers
@@ -43,6 +43,7 @@ class StockVariantReport(models.AbstractModel):
                 'Category 3': product.categ_id.name or '',
                 'Style Code': product.style_code or '',
                 'Article Code': product.variant_article_code or '',
+                'MRP': product.lst_price or '',
                 'Colour': colour or ''
             }
 
