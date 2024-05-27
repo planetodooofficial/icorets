@@ -12,7 +12,7 @@ class StockVariantReport(models.AbstractModel):
         product_list = self.search_product(report)
 
         header_report = workbook.add_worksheet("Header Report")
-        search_attributes = self.env['product.attribute'].search([('name', '=', 'Size')])
+        search_attributes = self.env['product.attribute'].search([('is_size', '=', 'True')])
         attribute_list = [att.name for att in search_attributes.value_ids]
 
         static_columns = ['Brand', 'Category 3', 'Style Code', 'Article Code', 'Colour']
