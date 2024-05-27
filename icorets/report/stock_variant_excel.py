@@ -61,7 +61,7 @@ class StockVariantReport(models.AbstractModel):
         df = pd.DataFrame(data)
 
         # Group by 'Brand', 'Category 3', 'Style Code', 'Article Code', 'Colour' and aggregate the size quantities
-        df = df.groupby(['Brand', 'Category 3', 'Style Code', 'Article Code', 'Colour'], as_index=False).sum()
+        df = df.groupby(['Brand', 'Category 3', 'Style Code', 'Article Code','MRP', 'Colour'], as_index=False).sum()
 
         # Write the DataFrame back to the worksheet
         for r, row_data in enumerate(df.values):
