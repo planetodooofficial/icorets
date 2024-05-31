@@ -172,14 +172,14 @@ class LocationReport(models.AbstractModel):
                 'FREE TO USE': 0,
                 'PO Receipt Pending': 0,
                 'Age group': product.age_group or '',
-                'Product Net Weight (gms)': product.product_net_weight,
-                'Product Length (cm)': product.product_dimension1,
-                'Product Breadth (cm)': product.product_dimension2,
-                'Product Height (cm)': product.product_dimension3,
-                'Package Length (cm)': product.package_dimension1,
-                'Package Breadth (cm)': product.package_dimension2,
-                'Package Height (cm)': product.package_dimension3,
-                'Package Gross Weight (gms)': product.package_weight,
+                'Product Net Weight (gms)': product.product_net_weight or '',
+                'Product Length (cm)': product.product_dimension1 or '',
+                'Product Breadth (cm)': product.product_dimension2 or '',
+                'Product Height (cm)': product.product_dimension3 or '',
+                'Package Length (cm)': product.package_dimension1 or '',
+                'Package Breadth (cm)': product.package_dimension2 or '',
+                'Package Height (cm)': product.package_dimension3 or '',
+                'Package Gross Weight (gms)': product.package_weight or '',
 
             }
 
