@@ -111,13 +111,13 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 36, 'PO Receipt Pending', bold)
         sheet.write(0, 37, 'To Replenish', bold)
         sheet.write(0, 38, 'Product Net Weight (gms)', bold)
-        sheet.write(0, 39, 'Product Dimension (cm)', bold)
-        sheet.write(0, 40, 'Product Dimension (cm)', bold)
-        sheet.write(0, 41, 'Product Dimension (cm)', bold)
-        sheet.write(0, 42, 'Package Weight (gms)', bold)
-        sheet.write(0, 43, 'Package Dimension (cm)', bold)
-        sheet.write(0, 44, 'Package Dimension (cm)', bold)
-        sheet.write(0, 45, 'Package Dimension (cm)', bold)
+        sheet.write(0, 39, 'Product Length (cm)', bold)
+        sheet.write(0, 40, 'Product Breadth (cm)', bold)
+        sheet.write(0, 41, 'Product Height (cm)', bold)
+        sheet.write(0, 42, 'Package Gross Weight (gms)', bold)
+        sheet.write(0, 43, 'Package Length (cm)', bold)
+        sheet.write(0, 44, 'Package Breadth (cm)', bold)
+        sheet.write(0, 45, 'Package Height (cm)', bold)
         # sheet.write(0, 30, '(Onhand + incoming) - outgoing', bold)
         # sheet.write(0, 31, '(Onhand + incoming) - outgoing(With_Qtn)', bold)
         sheet.freeze_panes(1, 0)
@@ -149,6 +149,13 @@ class LocationReport(models.AbstractModel):
                 'EAN Code': product.barcode or '',
                 'ASIN': product.variants_asin or '',
                 'FSIN': product.variants_fsn or '',
+                'Myntra': product.myntra or '',
+                'AJIO': product.ajio or '',
+                'Fancode': product.fancode or '',
+                'Swiggy': product.swiggy or '',
+                'Bigbasket': product.bigbasket or '',
+                'Blinkit': product.blinkit or '',
+                'Zepto': product.zepto or '',
                 'Colour': product.color or '',
                 'Size': product.size or '',
                 'MRP': product.lst_price or '',
@@ -163,7 +170,17 @@ class LocationReport(models.AbstractModel):
                 'Quotation Qty': 0,
                 'Confirmed SO qty': 0, # Initialize reserved quantity to 0
                 'FREE TO USE': 0,
-                'PO Receipt Pending': 0
+                'PO Receipt Pending': 0,
+                'Age group': product.age_group or '',
+                'Product Net Weight (gms)': product.product_net_weight,
+                'Product Length (cm)': product.product_dimension1,
+                'Product Breadth (cm)': product.product_dimension2,
+                'Product Height (cm)': product.product_dimension3,
+                'Package Length (cm)': product.package_dimension1,
+                'Package Breadth (cm)': product.package_dimension2,
+                'Package Height (cm)': product.package_dimension3,
+                'Package Gross Weight (gms)': product.package_weight,
+
             }
 
             stock_quants = product.stock_quant_ids.filtered(lambda q: q.location_id.usage == 'internal')
@@ -249,13 +266,14 @@ class LocationReport(models.AbstractModel):
 
         # Write data to the sheet
         for product_id, data in sorted(product_data.items(), key=lambda x: (x[1]['Brand'].lower(), x[1]['Category 1'].lower(), x[1]['Category 2'].lower(), x[1]['Category 3'].lower())):
+            print(data,'dataa')
             sheet.write(row, col, data['Brand'])
             sheet.write(row, col + 1, data['Category 1'])
             sheet.write(row, col + 2, data['Category 2'])
             sheet.write(row, col + 3, data['Category 3'])
             sheet.write(row, col + 4, data['Function Sport'])
             sheet.write(row, col + 5, data['Gender'])
-            # sheet.write(row, col + 6, data['Age group'])
+            sheet.write(row, col + 6, data['Age group'])
             sheet.write(row, col + 7, data['Title'])
             sheet.write(row, col + 8, data['Composition / Material'])
             sheet.write(row, col + 9, data['Technology / Features'])
@@ -267,6 +285,13 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 15, data['EAN Code'])
             sheet.write(row, col + 16, data['ASIN'])
             sheet.write(row, col + 17, data['FSIN'])
+            sheet.write(row, col + 18, data['Myntra'])
+            sheet.write(row, col + 19, data['AJIO'])
+            sheet.write(row, col + 20, data['Fancode'])
+            sheet.write(row, col + 21, data['Swiggy'])
+            sheet.write(row, col + 22, data['Bigbasket'])
+            sheet.write(row, col + 23, data['Blinkit'])
+            sheet.write(row, col + 24, data['Zepto'])
             sheet.write(row, col + 25, data['Colour'])
             sheet.write(row, col + 26, data['Size'])
             sheet.write(row, col + 27, data['MRP'])
@@ -280,6 +305,14 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 35, data['FREE TO USE'])
             sheet.write(row, col + 36, data['PO Receipt Pending'])
             sheet.write(row, col + 37, data['To Replenish'])
+            sheet.write(row, col + 38, data['Product Net Weight (gms)'])
+            sheet.write(row, col + 39, data['Product Length (cm)'])
+            sheet.write(row, col + 40, data['Product Breadth (cm)'])
+            sheet.write(row, col + 41, data['Product Height (cm)'])
+            sheet.write(row, col + 42, data['Package Gross Weight (gms)'])
+            sheet.write(row, col + 43, data['Package Length (cm)'])
+            sheet.write(row, col + 44, data['Package Breadth (cm)'])
+            sheet.write(row, col + 45, data['Package Height (cm)'])
             # sheet.write(row, col +30, data['(Onhand + incoming) - outgoing'])
             # sheet.write(row, col + 31, data['(Onhand + incoming) - outgoing(With_Qtn)'])
 

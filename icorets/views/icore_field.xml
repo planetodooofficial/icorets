@@ -222,6 +222,7 @@
                     <group string="Details">
                         <group>
                             <field name="brand_id_rel"/>
+                            <field name="variants_ean_code"/>
                             <field name="variants_asin"/>
                             <field name="variants_func_spo"/>
                             <field name="variants_gender"/>

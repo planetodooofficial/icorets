@@ -31,8 +31,9 @@ class ProductVariantInherit(models.Model):
 
 
 
-    variants_ean_code = fields.Char('EAN Code')
-    variant_article_code = fields.Char(string='Article Code')
+    variants_ean_code = fields.Char('EAN Code', tracking=True)
+    default_code = fields.Char('Internal Reference', index=True, tracking=True)
+    variant_article_code = fields.Char(string='Article Code', tracking=True)
     variants_asin = fields.Char('ASIN')
     variants_func_spo = fields.Char(related='product_tmpl_id.func_spo', string='Function / Sport')
     variants_gender = fields.Char(related='product_tmpl_id.gender', string='Gender')
@@ -91,7 +92,7 @@ class ProductInherit(models.Model):
     material = fields.Char('Moc')
     brand_id = fields.Many2one('product.brand', 'Brand')
     occasion = fields.Char('Event')
-    style_code = fields.Char('Style Code')
+    style_code = fields.Char('Style Code', tracking=True)
     parent_buin = fields.Char('Parent buin')
     user_defined_miscallaneous1 = fields.Char('User Defined Miscallaneous1')
     user_defined_miscallaneous2 = fields.Char('User Defined Miscallaneous2')
@@ -101,13 +102,13 @@ class ProductInherit(models.Model):
     age_group = fields.Char(string='Age Group')
 
     product_net_weight = fields.Char('Product Net Weight (gms)')
-    product_dimension1 = fields.Char('Product Dimension (cm)')
-    product_dimension2 = fields.Char('Product Dimension (cm)')
-    product_dimension3 = fields.Char('Product Dimension (cm)')
-    package_dimension1 = fields.Char('Package Dimension (cm)')
-    package_dimension2 = fields.Char('Package Dimension (cm)')
-    package_dimension3 = fields.Char('Package Dimension (cm)')
-    package_weight = fields.Char('Package Weight (gms)')
+    product_dimension1 = fields.Char('Product Length (cm)')
+    product_dimension2 = fields.Char('Product Breadth (cm)')
+    product_dimension3 = fields.Char('Product Height (cm)')
+    package_dimension1 = fields.Char('Package Length (cm)')
+    package_dimension2 = fields.Char('Package Breadth (cm)')
+    package_dimension3 = fields.Char('Package Height (cm)')
+    package_weight = fields.Char('Package Gross Weight (gms)')
     # technical details
 
     manufactured_by = fields.Char('Manufactured By')
