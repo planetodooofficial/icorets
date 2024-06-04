@@ -142,9 +142,9 @@
                         <tr>
                             <!--<td style="border:1px solid black" rowspan="8">QR</td>-->
 <!--                            <t t-if="doc.transaction_id.qr_code">-->
-                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="6">
-<!--                                    <t t-if="doc.transaction_id.qr_code">-->
-<!--                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', doc.transaction_id.qr_code, 150, 150)"/></t>-->
+                                <td style="border:1px solid black;text-align: center;padding- 0px" rowspan="7">
+                                    <t t-if="doc.transaction_id.qr_code">
+                                        <img t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', doc.transaction_id.qr_code, 150, 150)"/></t>
 
                                 </td>
 <!--                            </t>-->

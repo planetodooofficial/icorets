@@ -45,6 +45,23 @@ class ProductVariantInherit(models.Model):
     color = fields.Char('Color')
     size = fields.Char('Size')
     buin = fields.Char('BUIN')
+    age_group = fields.Char(related='product_tmpl_id.age_group', string='Age Group')
+    myntra = fields.Char('Myntra')
+    ajio = fields.Char('Ajio')
+    fancode = fields.Char('Fancode')
+    blinkit = fields.Char('Blinkit')
+    zepto = fields.Char('Zepto')
+    swiggy = fields.Char('Swiggy')
+    bigbasket = fields.Char('Bigbasket')
+    product_net_weight = fields.Char(related='product_tmpl_id.product_net_weight', string='Product Net Weight (gms)')
+    product_dimension1 = fields.Char(related='product_tmpl_id.product_dimension1', string='Product Dimension (cm)')
+    product_dimension2 = fields.Char(related='product_tmpl_id.product_dimension2', string='Product Dimension (cm)')
+    product_dimension3 = fields.Char(related='product_tmpl_id.product_dimension3', string='Product Dimension (cm)')
+    package_dimension1 = fields.Char(related='product_tmpl_id.package_dimension1', string='Package Dimension (cm)')
+    package_dimension2 = fields.Char(related='product_tmpl_id.package_dimension2', string='Package Dimension (cm)')
+    package_dimension3 = fields.Char(related='product_tmpl_id.package_dimension3', string='Package Dimension (cm)')
+    package_weight = fields.Char(related='product_tmpl_id.package_weight', string='Package Weight (gms)')
+
 
 
     # Inherited and removed domain
@@ -81,6 +98,16 @@ class ProductInherit(models.Model):
     user_defined_miscallaneous3 = fields.Char('User Defined Miscallaneous3')
     user_defined_miscallaneous4 = fields.Char('User Defined Miscallaneous4')
     user_defined_miscallaneous5 = fields.Char('User Defined Miscallaneous5')
+    age_group = fields.Char(string='Age Group')
+
+    product_net_weight = fields.Char('Product Net Weight (gms)')
+    product_dimension1 = fields.Char('Product Dimension (cm)')
+    product_dimension2 = fields.Char('Product Dimension (cm)')
+    product_dimension3 = fields.Char('Product Dimension (cm)')
+    package_dimension1 = fields.Char('Package Dimension (cm)')
+    package_dimension2 = fields.Char('Package Dimension (cm)')
+    package_dimension3 = fields.Char('Package Dimension (cm)')
+    package_weight = fields.Char('Package Weight (gms)')
     # technical details
 
     manufactured_by = fields.Char('Manufactured By')
