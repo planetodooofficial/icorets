@@ -839,33 +839,21 @@ class ShopInstance(models.Model):
                 parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
                 location_id = self.env['stock.location'].search(
                     [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
-                stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
-                products = self.env['product.product'].search([])
-                # find if the stock quant contains the product if not then the stock is zero else
-                # the stock is the available quantity
-                product_zero_quant = products.filtered(lambda x: x.id not in stock_quant.product_id.ids)
-                inventory_adjustment_zero_quant = [
-                    {
+                products = self.env['product.product'].search(
+                    [('default_code', '!=', False), ('detailed_type', '=', 'product')])
+
+                for product in products:
+                    product_quant = self.env['stock.quant'].search(
+                        [('location_id', '=', location_id.id), ('product_id', '=', product.id)], limit=1)
+                    quantity = product_quant.available_quantity if product_quant and product_quant.available_quantity >= 0 else 0
+                    inventory_adjustment.append({
                         "itemSKU": product.default_code,
-                        "quantity": 0,
+                        "quantity": quantity,
                         "shelfCode": "DEFAULT",
                         "inventoryType": "GOOD_INVENTORY",
                         "adjustmentType": "REPLACE",
                         "facilityCode": "playr"
-                    } for product in product_zero_quant
-                ]
-                inventory_adjustment = [
-                    {
-                        "itemSKU": quant.product_id.default_code,
-                        "quantity": quant.available_quantity if quant.available_quantity >= 0 else 0,
-                        "shelfCode": "DEFAULT",
-                        "inventoryType": "GOOD_INVENTORY",
-                        "adjustmentType": "REPLACE",
-                        "facilityCode": "playr"
-                    } for quant in stock_quant if
-                    quant.available_quantity >= 0 and quant.product_id.default_code
-                ]
-                inventory_adjustment.extend(inventory_adjustment_zero_quant)
+                    })
                 if inventory_adjustment:
                     url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
                     headers = {
