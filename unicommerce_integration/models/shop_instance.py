@@ -836,6 +836,7 @@ class ShopInstance(models.Model):
         for instance in shop_instances:
             try:
                 inventory_adjustment = []
+                blocked_inventory = []
                 parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
                 location_id = self.env['stock.location'].search(
                     [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
@@ -881,6 +882,17 @@ class ShopInstance(models.Model):
                                 count += 1
                             elif line['errors']:
                                 # logger.log(level=40, msg=line)
+                                blk_qty = line['errors']['description'].split(",")[-1]
+                                if "Blocked Quantity" in blk_qty:
+                                    blk_qty = int(blk_qty.split(":")[-1])
+                                    blocked_inventory.append({
+                                        "itemSKU": line['facilityInventoryAdjustment']['itemSKU'],
+                                        "quantity": blk_qty,
+                                        "shelfCode": "DEFAULT",
+                                        "inventoryType": "GOOD_INVENTORY",
+                                        "adjustmentType": "REPLACE",
+                                        "facilityCode": "playr"
+                                    })
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
@@ -903,6 +915,59 @@ class ShopInstance(models.Model):
                                 # logger.log(level=30, msg=data)
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                    else:
+                        raise
+                if blocked_inventory:
+                    url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': instance.auth_bearer,
+                        'Accept': 'application/json'
+                    }
+                    data = {
+                        "inventoryAdjustments": blocked_inventory
+                    }
+                    response = requests.post(url, headers=headers, data=json.dumps(data))
+                    if response.status_code == 200:
+                        data = response.json()
+                        for line in data['inventoryAdjustmentResponses']:
+                            if line['successful']:
+                                instance.generate_success_log(
+                                    message='Blocked Inventory Updated Successfully,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    count=line['facilityInventoryAdjustment']['quantity'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(),
+                                    state='success',
+                                    operation_performed='Inventory Adjustment')
+                                count += 1
+                            elif line['errors']:
+                                instance.generate_exception_log(
+                                    message='Blocked Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                            elif line['warnings']:
+                                instance.generate_exception_log(
+                                    message='Blocked Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                            else:
+                                instance.generate_exception_log(
+                                    message='Blocked Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
                                     start_date=start_date,
                                     end_date=fields.Datetime.now(), state='exception',
