@@ -882,7 +882,7 @@ class ShopInstance(models.Model):
                                 count += 1
                             elif line['errors']:
                                 # logger.log(level=40, msg=line)
-                                blk_qty = line['errors']['description'].split(",")[-1]
+                                blk_qty = line['errors'][0]['description'].split(",")[-1]
                                 if "Blocked Quantity" in blk_qty:
                                     blk_qty = int(blk_qty.split(":")[-1])
                                     blocked_inventory.append({
