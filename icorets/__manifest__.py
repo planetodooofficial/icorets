@@ -17,6 +17,7 @@
              'views/forecast_order_view.xml',
              'views/inherit_approval_request_view.xml',
              'views/location_report_view.xml',
+             'views/hr_contract_view.xml',
              'wizard/forecast_order_wiz_view.xml',
              'wizard/stock_variant_report_excel_view.xml',
              'report/credit_note.xml',
