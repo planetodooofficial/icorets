@@ -143,8 +143,14 @@ class ProductInherit(models.Model):
 
 class ProductBrand(models.Model):
     _name = "product.brand"
+    _rec_name = 'name'
 
     name = fields.Char('Brand Name')
+
+class ReasonReason(models.Model):
+    _name = 'reason.reason'
+
+    name = fields.Char(string='Reason')
 
 
 class AccountMoveInheritClass(models.Model):
@@ -384,6 +390,10 @@ class SaleOrderInherit(models.Model):
     partner_shipping_id_state = fields.Many2one('res.country.state','Del State', related='partner_shipping_id.state_id')
     partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
     partner_shipping_id_country = fields.Many2one('res.country','Del Country', related='partner_shipping_id.country_id')
+    reason_id = fields.Many2one('reason.reason')
+    desc = fields.Char('Description')
+    is_short_close = fields.Boolean()
+    closer_date = fields.Datetime()
 
     @api.depends('amount_total')
     def _amt_in_words(self):
@@ -402,6 +412,17 @@ class SaleOrderInherit(models.Model):
             'view_mode': 'tree,form',
             'views': [(False, 'list'), (False, 'form')],
             'domain': [('id', 'in', search_so.ids)],
+        }
+
+    def short_close(self):
+        view = self.env.ref('icorets.view_short_close_wizard')
+        return {
+            'name': 'Short Close',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'short.close',
+            'view_id': view.id,
+            'target': 'new',
         }
 
 
