@@ -63,6 +63,16 @@ class ProductVariantInherit(models.Model):
     package_dimension3 = fields.Char(related='product_tmpl_id.package_dimension3', string='Package Dimension (cm)')
     package_weight = fields.Char(related='product_tmpl_id.package_weight', string='Package Weight (gms)')
 
+    market_place_tittle = fields.Char(related='product_tmpl_id.market_place_tittle', string='Marketplace Tittle')
+    bullet_point_1 = fields.Char(related='product_tmpl_id.bullet_point_1', string='Bullet Point 1')
+    bullet_point_2 = fields.Char(related='product_tmpl_id.bullet_point_2', string='Bullet Point 2')
+    bullet_point_3 = fields.Char(related='product_tmpl_id.bullet_point_3', string='Bullet Point 3')
+    bullet_point_4 = fields.Char(related='product_tmpl_id.bullet_point_4', string='Bullet Point 4')
+    bullet_point_5 = fields.Char(related='product_tmpl_id.bullet_point_5', string='Bullet Point 5')
+    description = fields.Char(related='product_tmpl_id.description', string='Description')
+    google_drive_link = fields.Char(related='product_tmpl_id.google_drive_link', string='Google Drive Link')
+    drop_box_link = fields.Char(related='product_tmpl_id.drop_box_link', string='Drop Box Link')
+    country_origin = fields.Char(related='product_tmpl_id.country_origin', string='Country of Origin')
 
 
     # Inherited and removed domain
@@ -117,12 +127,24 @@ class ProductInherit(models.Model):
     width = fields.Float('width (Dimensions)')
     height = fields.Float('height (Dimensions)')
     weight = fields.Float('Weight (Dimensions)')
-    cntry_of_origin = fields.Char('Country of Origin')
     manufacture_year = fields.Date('Manufacture Year')
 
     func_spo = fields.Char('Function / Sport')
     gender = fields.Char('Gender')
     tech_feat = fields.Char('Technology / Features')
+
+    market_place_tittle = fields.Char('Marketplace Tittle')
+    bullet_point_1 = fields.Char('Bullet Point 1')
+    bullet_point_2 = fields.Char('Bullet Point 2')
+    bullet_point_3 = fields.Char('Bullet Point 3')
+    bullet_point_4 = fields.Char('Bullet Point 4')
+    bullet_point_5 = fields.Char('Bullet Point 5')
+    description = fields.Char('Description')
+    google_drive_link = fields.Char('Google Drive Link')
+    drop_box_link = fields.Char('Drop Box Link')
+    country_origin = fields.Char('Country of Origin')
+
+
 
     _sql_constraints = [
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
