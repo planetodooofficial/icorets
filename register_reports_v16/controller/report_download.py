@@ -115,6 +115,10 @@ class DownloadReport(Controller):
                         'GST NO': invoice_line.partner_id.vat,
                         'Analytic':invoice_line.analytic_distribution,
                         'Product': invoice_line.product_id.name,
+                        'MRP': invoice_line.product_id.list_price,
+                        'Article Code': invoice_line.article_code,
+                        'SO Number': invoice_line.move_id.invoice_origin,
+                        # 'Article Code': invoice_line.product_id.article_code,
                         'SKU': invoice_line.product_id.default_code,
                         'EAN': invoice_line.product_id.barcode,
                         'Brand': invoice_line.product_id.brand_id.name,
@@ -123,7 +127,7 @@ class DownloadReport(Controller):
                         'Color': invoice_line.product_id.color,
                         'Class': invoice_line.product_id.categ_id.parent_id.name,
                         'SubClass': invoice_line.product_id.categ_id.name,
-                        'HSN Code': invoice_line.hsn_id.hsnsac_code,
+                        # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity, 'Unit Price': invoice_line.price_unit,
                         'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
@@ -182,7 +186,8 @@ class DownloadReport(Controller):
             summary_sheet.write('B' + str(val_col), round(value), txt_font2)
             key_col += 1
             val_col += 1
-        writer.save()
+        # writer.save()
+        writer.close()
         out = fp.getvalue()
         pdfhttpheaders = [('Content-Type', 'application/octet-stream'),
                           ('Content-Disposition', content_disposition(f"Detail Sales and Return Register Report.xlsx"))]
@@ -325,6 +330,10 @@ class DownloadReport(Controller):
                         'Pin': invoice_line.move_id.partner_id.zip,
                         'GST NO': invoice_line.partner_id.vat,
                         'Product': invoice_line.product_id.name,
+                        'MRP': invoice_line.product_id.list_price,
+                        'Article Code': invoice_line.article_code,
+                        'PO Number': invoice_line.move_id.invoice_origin,
+                        # 'Article Code': invoice_line.product_id.article_code,
                         'SKU': invoice_line.product_id.default_code,
                         'EAN': invoice_line.product_id.barcode,
                         'Brand': invoice_line.product_id.brand_id.name,
@@ -333,13 +342,14 @@ class DownloadReport(Controller):
                         'Color': invoice_line.product_id.color,
                         'Class': invoice_line.product_id.categ_id.parent_id.name,
                         'SubClass': invoice_line.product_id.categ_id.name,
-                        'HSN Code': invoice_line.hsn_id.hsnsac_code,
+                        # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity, 'Unit Price': invoice_line.price_unit,
                         'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
                         # 'Price Total': invoice_line.price_total, commented on purpose
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
                         'Bill Net Amt': invoice_line.price_unit * invoice_line.quantity,
                         'Bill Untaxed Amt': un_tax_amt,
+
                         'Bill Tax Amount': invoice_line.tax_amount_line, 'Bill Total Amt': final_total}
 
                 if invoice_line.analytic_distribution:
@@ -401,7 +411,7 @@ class DownloadReport(Controller):
             summary_sheet.write('B' + str(val_col), value, txt_font2)
             key_col += 1
             val_col += 1
-        writer.save()
+        writer.close()
         out = fp.getvalue()
         pdfhttpheaders = [('Content-Type', 'application/octet-stream'),
                           ('Content-Disposition', content_disposition(f"Detail Purchase Register Report.xlsx"))]
