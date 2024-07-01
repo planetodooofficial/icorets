@@ -15,7 +15,7 @@ class Contract(models.Model):
     @api.depends('total_wage_in_days', 'total_leave')
     def _compute_present_days(self):
         for record in self:
-            record.present_days = record.total_wage_in_days - record.total_leave
+            record.present_days = record.total_wage_in_days - record.total_leave + record.extra_present_days
 
     # def action_calculate_present_days(self):
     #     self._compute_present_days()
