@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_variant_wizard_report" model="ir.ui.view">
+        <field name="name">Stock Variant</field>
+        <field name="model">stock.variant.report</field>
+        <field name="arch" type="xml">
+            <form string="Choose Category">
+                <group>
+                    <group>
+                        <field name="product_category" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_stock_variant_excel_report" string="Export" type="object"
+                            class="oe_highlight"
+                    />
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="stock_variant_excel_report_action" model="ir.actions.act_window">
+        <field name="name">Stock Variant Excel Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.variant.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+            id="menu_stock_variant_excel_report"
+            name="Stock Variant Excel Report"
+            action="stock_variant_excel_report_action"
+            parent="stock.menu_warehouse_report"
+            sequence="202"/>
+
+
+</odoo>

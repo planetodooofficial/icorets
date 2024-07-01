@@ -364,6 +364,7 @@ class ShopInstance(models.Model):
             'count': count,
             'state': state,
             'operation_performed': operation_performed,
+            'error_message': error_message,
         }
         shop_import_logs_obj.create(vals)
 
@@ -411,8 +412,8 @@ class ShopInstance(models.Model):
                 count += 1
             if orders:
                 self.sale_order_confirm_batch(sale_orders, "unicommerce", orders[0].code)
-                payments = [self.create_payments_entries(order, order.sales_channel_id) for order in sale_orders if
-                            order.state == "sale"]
+                # payments = [self.create_payments_entries(order, order.sales_channel_id) for order in sale_orders if
+                #             order.state == "sale"]
                 self.generate_success_log(message="Successfully Created Sales Orders", start_date=start_date,
                                           end_date=fields.Datetime.now(), count=count, state='success',
                                           operation_performed='Sales Order Creation')
@@ -422,45 +423,45 @@ class ShopInstance(models.Model):
                                         end_date=fields.Datetime.now(), count=1, state='exception')
             raise UserError(_(e))
 
-    def create_payments_entries(self, order, sales_channel_id):
-        """Create payments for the sale orders """
-        if not sales_channel_id.is_no_invoice:
-            invoice_ids = order.invoice_ids
-            journal_id = sales_channel_id.prepaid_holding_journal_id if not order.unicommerce_order_id.cod else sales_channel_id.cod_holding_journal_id
-            search_payment_method = self.env["account.payment.method"].search([('name', '=', 'Manual')], limit=1)
-            search_payment_method_line = self.env["account.payment.method.line"].search([
-                ('payment_method_id', '=', search_payment_method.id),
-                ('journal_id', '=', journal_id.id)
-            ])
-
-            payment_obj = self.env["account.payment.register"]
-
-            acc_type = 'asset_receivable' if invoice_ids[0].move_type == 'out_invoice' else 'liability_payable'
-
-            # Filter invoice lines for each invoice and prepare payment
-            payments = []
-            for invoice_id in invoice_ids:
-                payment_move_line = invoice_id.line_ids.filtered(lambda x: x.account_id.account_type == acc_type)
-                if payment_move_line:
-                    payment_id = payment_obj.with_context({
-                        'active_model': 'account.move',
-                        'active_ids': invoice_id.ids
-                    }).create({
-                        'journal_id': journal_id.id,
-                        'payment_method_line_id': search_payment_method_line.id,
-                        'line_ids': [(4, line.id) for line in payment_move_line]
-                    })
-                    payments.append(payment_id)
-
-            # Create and post payments
-            for payment in payments:
-                try:
-                    payment._create_payments()
-                except UserError as e:
-                    # Handle any errors while creating payments
-                    logger.error(e)
-
-            return payments
+    # def create_payments_entries(self, order, sales_channel_id):
+    #     """Create payments for the sale orders """
+    #     if not sales_channel_id.is_no_invoice:
+    #         invoice_ids = order.invoice_ids
+    #         journal_id = sales_channel_id.prepaid_holding_journal_id if not order.unicommerce_order_id.cod else sales_channel_id.cod_holding_journal_id
+    #         search_payment_method = self.env["account.payment.method"].search([('name', '=', 'Manual')], limit=1)
+    #         search_payment_method_line = self.env["account.payment.method.line"].search([
+    #             ('payment_method_id', '=', search_payment_method.id),
+    #             ('journal_id', '=', journal_id.id)
+    #         ])
+    #
+    #         payment_obj = self.env["account.payment.register"]
+    #
+    #         acc_type = 'asset_receivable' if invoice_ids[0].move_type == 'out_invoice' else 'liability_payable'
+    #
+    #         # Filter invoice lines for each invoice and prepare payment
+    #         payments = []
+    #         for invoice_id in invoice_ids:
+    #             payment_move_line = invoice_id.line_ids.filtered(lambda x: x.account_id.account_type == acc_type)
+    #             if payment_move_line:
+    #                 payment_id = payment_obj.with_context({
+    #                     'active_model': 'account.move',
+    #                     'active_ids': invoice_id.ids
+    #                 }).create({
+    #                     'journal_id': journal_id.id,
+    #                     'payment_method_line_id': search_payment_method_line.id,
+    #                     'line_ids': [(4, line.id) for line in payment_move_line]
+    #                 })
+    #                 payments.append(payment_id)
+    #
+    #         # Create and post payments
+    #         for payment in payments:
+    #             try:
+    #                 payment._create_payments()
+    #             except UserError as e:
+    #                 # Handle any errors while creating payments
+    #                 logger.error(e)
+    #
+    #         return payments
 
     def sale_order_confirm_batch(self, sale_orders, record_type, dump_sequence):
         order_dates = {}
@@ -530,6 +531,24 @@ class ShopInstance(models.Model):
         partner_data = partner_data.read()[0]
         state_id = self.get_state_id(partner_data.get('billing_state'))
         partner_id = partner_obj.search([('is_website_partner', '=', True), ('state_id', '=', state_id)], limit=1)
+        if not partner_id:
+            if not state_id:
+                search_export_partner = partner_obj.search([('name', '=', 'playR Website - B2C - Export')])
+                if not search_export_partner:
+                    raise UserError(
+                        _("Export Partner Not Found! Please Create a Partner with Name `playR Website - B2C - Export`"))
+                state_id = self.get_state_id(partner_data.get('shipping_state'), partner_data.get('shipping_country'))
+                country_id = self.get_country_id(partner_data.get('shipping_country'))
+                partner_id = search_export_partner.child_ids.filtered(
+                    lambda r: r.state_id == state_id and r.country_id == country_id)
+                if not partner_id:
+                    partner_id = partner_obj.create({
+                        'name': partner_data.get('shipping_state'),
+                        'state_id': state_id,
+                        'country_id': country_id,
+                        'parent_id': search_export_partner.id,
+                    })
+                return partner_id
 
         # # Determine if the partner is a business based on GSTIN
         # is_business = bool(partner_data.get('customerGSTIN'))
@@ -588,9 +607,12 @@ class ShopInstance(models.Model):
         #     # return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
         return partner_id
 
-    def get_state_id(self, state_name):
+    def get_state_id(self, state_name, country_code=None):
         """ Get state ID based on state name """
-        country = self.env['res.country'].search([('code', '=', 'IN')], limit=1)
+        if not country_code:
+            country = self.env['res.country'].search([('code', '=', 'IN')], limit=1)
+        else:
+            country = self.env['res.country'].search([('code', '=', country_code)], limit=1)
         state = self.env['res.country.state'].search([('code', '=', state_name), ('country_id', '=', country.id)],
                                                      limit=1)
         return state.id if state else False
@@ -667,7 +689,7 @@ class ShopInstance(models.Model):
                                     search_return_delivery.button_validate()
                                     search_return_delivery.write({'dump_sequence': uni_order.code})
                         # create a credit note
-                        self.create_credit_note(uni_order)
+                        # self.create_credit_note(uni_order)
                         lines_to_return.write({'return_status': False, 'is_returned': True})
                         uni_order.order_state = 'done'
                         uni_order.is_return = False
@@ -714,7 +736,7 @@ class ShopInstance(models.Model):
                                         search_return_delivery.button_validate()
                                         search_return_delivery.write({'dump_sequence': uni_order.code})
                         # create a credit note
-                        self.create_partial_credit_note(uni_order, lines_dict)
+                        # self.create_partial_credit_note(uni_order, lines_dict)
                         lines_to_return.write({'return_status': False, 'is_returned': True})
                         uni_order.order_state = 'done'
                         uni_order.is_return = False
@@ -725,86 +747,86 @@ class ShopInstance(models.Model):
                                         operation_performed='Return Order Creation',
                                         end_date=fields.Datetime.now(), count=1, state='exception')
 
-    def create_credit_note(self, order):
-        if not order.sales_channel_id.is_no_invoice:
-            sale_order = order.name
-            search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
-                                                              ('move_type', '=', 'out_invoice')])
-            invoice_no = order.return_invoice_no
-            account_move_reversal_obj = self.env["account.move.reversal"]
-            invoice_val = {
-                'refund_method': 'cancel',
-                'date_mode': 'entry',
-                'journal_id': search_invoice.journal_id.id,
-                'move_ids': [(4, search_invoice.id)]
-            }
-            account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
-            data = account_move_reverse_wizard_id.reverse_moves()
-            search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
-            if invoice_no:
-                search_credit_note.write({'payment_reference': invoice_no, 'dump_sequence': order.code})
-                return True
-            return False
+    # def create_credit_note(self, order):
+    #     if not order.sales_channel_id.is_no_invoice:
+    #         sale_order = order.name
+    #         search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
+    #                                                           ('move_type', '=', 'out_invoice')])
+    #         invoice_no = order.return_invoice_no
+    #         account_move_reversal_obj = self.env["account.move.reversal"]
+    #         invoice_val = {
+    #             'refund_method': 'cancel',
+    #             'date_mode': 'entry',
+    #             'journal_id': search_invoice.journal_id.id,
+    #             'move_ids': [(4, search_invoice.id)]
+    #         }
+    #         account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
+    #         data = account_move_reverse_wizard_id.reverse_moves()
+    #         search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
+    #         if invoice_no:
+    #             search_credit_note.write({'payment_reference': invoice_no, 'dump_sequence': order.code})
+    #             return True
+    #         return False
 
-    def create_partial_credit_note(self, order, lines_to_return):
-        """ Create a partial credit note for the returned items """
-        if not order.sales_channel_id.is_no_invoice:
-            sale_order = order.name
-            credit_note_no = order.return_invoice_no
-            search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
-                                                              ('move_type', '=', 'out_invoice')])
-            # search_invoice.write("name")
-            account_move_reversal_obj = self.env["account.move.reversal"]
-            # in this invoice replace the invoice line with only the refundable products
-            invoice_val = {
-                'refund_method': 'refund',
-                'date_mode': 'entry',
-                'journal_id': search_invoice.journal_id.id,
-                'move_ids': [(4, search_invoice.id)]
-            }
-            account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
-            data = account_move_reverse_wizard_id.reverse_moves()
-            search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
-            # create the credit note lines
-            lines_to_refund = list()
-            for move_line in search_credit_note.invoice_line_ids:
-                line = lines_to_return.get(move_line.product_id.default_code)
-                if line:
-                    lines_to_refund.append(move_line.id)
-                    move_line.quantity = 1
-            search_credit_note.write({'invoice_line_ids': [(6, 0, lines_to_refund)]})
-            if credit_note_no:
-                search_credit_note.write({'payment_reference': credit_note_no, 'dump_sequence': order.code})
-                search_credit_note.action_post()
-                journal_id = search_invoice.sales_channel_id.prepaid_holding_journal_id if not order.cod \
-                    else search_invoice.sales_channel_id.cod_holding_journal_id
-                self.action_create_payment_entries_partial_line(invoice_id=search_credit_note,
-                                                                journal_id=journal_id)
-                return True
+    # def create_partial_credit_note(self, order, lines_to_return):
+    #     """ Create a partial credit note for the returned items """
+    #     if not order.sales_channel_id.is_no_invoice:
+    #         sale_order = order.name
+    #         credit_note_no = order.return_invoice_no
+    #         search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
+    #                                                           ('move_type', '=', 'out_invoice')])
+    #         # search_invoice.write("name")
+    #         account_move_reversal_obj = self.env["account.move.reversal"]
+    #         # in this invoice replace the invoice line with only the refundable products
+    #         invoice_val = {
+    #             'refund_method': 'refund',
+    #             'date_mode': 'entry',
+    #             'journal_id': search_invoice.journal_id.id,
+    #             'move_ids': [(4, search_invoice.id)]
+    #         }
+    #         account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
+    #         data = account_move_reverse_wizard_id.reverse_moves()
+    #         search_credit_note = self.env["account.move"].search([('id', '=', data['res_id'])])
+    #         # create the credit note lines
+    #         lines_to_refund = list()
+    #         for move_line in search_credit_note.invoice_line_ids:
+    #             line = lines_to_return.get(move_line.product_id.default_code)
+    #             if line:
+    #                 lines_to_refund.append(move_line.id)
+    #                 move_line.quantity = 1
+    #         search_credit_note.write({'invoice_line_ids': [(6, 0, lines_to_refund)]})
+    #         if credit_note_no:
+    #             search_credit_note.write({'payment_reference': credit_note_no, 'dump_sequence': order.code})
+    #             search_credit_note.action_post()
+    #             journal_id = search_invoice.sales_channel_id.prepaid_holding_journal_id if not order.cod \
+    #                 else search_invoice.sales_channel_id.cod_holding_journal_id
+    #             self.action_create_payment_entries_partial_line(invoice_id=search_credit_note,
+    #                                                             journal_id=journal_id)
+    #             return True
 
-    def action_create_payment_entries_partial_line(self, invoice_id, journal_id):
-        search_payment_method = self.env["account.payment.method"].search([('name', '=', 'Manual')], limit=1)
-        search_payment_method_line = self.env["account.payment.method.line"].search([('payment_method_id', '=',
-                                                                                      search_payment_method.id),
-                                                                                     ('journal_id', '=',
-                                                                                      journal_id.id)]
-                                                                                    )
-
-        payment_obj = self.env["account.payment.register"]
-
-        acc_type = 'asset_receivable' if invoice_id.move_type == 'out_refund' else 'liability_payable'
-        payment_move_line = invoice_id.line_ids.filtered(lambda x: x.account_id.account_type == acc_type)
-
-        payment_id = payment_obj.with_context({'active_model': 'account.move',
-                                               'active_ids': invoice_id.ids}).create({'journal_id': journal_id.id,
-                                                                                      'payment_method_line_id': search_payment_method_line.id,
-                                                                                      'payment_type': 'outbound',
-                                                                                      'line_ids': [(4, line.id) for
-                                                                                                   line in
-                                                                                                   payment_move_line],
-                                                                                      })
-        payment_id._create_payments()
-        return payment_id
+    # def action_create_payment_entries_partial_line(self, invoice_id, journal_id):
+    #     search_payment_method = self.env["account.payment.method"].search([('name', '=', 'Manual')], limit=1)
+    #     search_payment_method_line = self.env["account.payment.method.line"].search([('payment_method_id', '=',
+    #                                                                                   search_payment_method.id),
+    #                                                                                  ('journal_id', '=',
+    #                                                                                   journal_id.id)]
+    #                                                                                 )
+    #
+    #     payment_obj = self.env["account.payment.register"]
+    #
+    #     acc_type = 'asset_receivable' if invoice_id.move_type == 'out_refund' else 'liability_payable'
+    #     payment_move_line = invoice_id.line_ids.filtered(lambda x: x.account_id.account_type == acc_type)
+    #
+    #     payment_id = payment_obj.with_context({'active_model': 'account.move',
+    #                                            'active_ids': invoice_id.ids}).create({'journal_id': journal_id.id,
+    #                                                                                   'payment_method_line_id': search_payment_method_line.id,
+    #                                                                                   'payment_type': 'outbound',
+    #                                                                                   'line_ids': [(4, line.id) for
+    #                                                                                                line in
+    #                                                                                                payment_move_line],
+    #                                                                                   })
+    #     payment_id._create_payments()
+    #     return payment_id
 
     def sync_odoo_inventory(self):
         """ Sync the inventory of the products from the shop instance to the Odoo """
@@ -813,20 +835,26 @@ class ShopInstance(models.Model):
         shop_instances = self.env['shop.instance'].search([])
         for instance in shop_instances:
             try:
+                inventory_adjustment = []
+                blocked_inventory = []
                 parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
                 location_id = self.env['stock.location'].search(
                     [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
-                stock_quant = self.env['stock.quant'].search([('location_id', '=', location_id.id)])
-                inventory_adjustment = [
-                    {
-                        "itemSKU": quant.product_id.default_code,
-                        "quantity": quant.available_quantity,
+                products = self.env['product.product'].search(
+                    [('default_code', '!=', False), ('detailed_type', '=', 'product')])
+
+                for product in products:
+                    product_quant = self.env['stock.quant'].search(
+                        [('location_id', '=', location_id.id), ('product_id', '=', product.id)], limit=1)
+                    quantity = product_quant.available_quantity if product_quant and product_quant.available_quantity >= 0 else 0
+                    inventory_adjustment.append({
+                        "itemSKU": product.default_code,
+                        "quantity": quantity,
                         "shelfCode": "DEFAULT",
                         "inventoryType": "GOOD_INVENTORY",
                         "adjustmentType": "REPLACE",
                         "facilityCode": "playr"
-                    } for quant in stock_quant if quant.available_quantity > 0 and quant.product_id.default_code
-                ]
+                    })
                 if inventory_adjustment:
                     url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
                     headers = {
@@ -852,9 +880,94 @@ class ShopInstance(models.Model):
                                     state='success',
                                     operation_performed='Inventory Adjustment')
                                 count += 1
-                            else:
+                            elif line['errors']:
+                                # logger.log(level=40, msg=line)
+                                blk_qty = line['errors'][0]['description'].split(",")[-1]
+                                if "Blocked Quantity" in blk_qty:
+                                    blk_qty = int(blk_qty.split(":")[-1])
+                                    blocked_inventory.append({
+                                        "itemSKU": line['facilityInventoryAdjustment']['itemSKU'],
+                                        "quantity": blk_qty,
+                                        "shelfCode": "DEFAULT",
+                                        "inventoryType": "GOOD_INVENTORY",
+                                        "adjustmentType": "REPLACE",
+                                        "facilityCode": "playr"
+                                    })
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                            elif line['warnings']:
+                                # logger.log(level=30, msg=data)
+                                instance.generate_exception_log(
+                                    message='Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                            else:
+                                # logger.log(level=30, msg=data)
+                                instance.generate_exception_log(
+                                    message='Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                    else:
+                        raise
+                if blocked_inventory:
+                    url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': instance.auth_bearer,
+                        'Accept': 'application/json'
+                    }
+                    data = {
+                        "inventoryAdjustments": blocked_inventory
+                    }
+                    response = requests.post(url, headers=headers, data=json.dumps(data))
+                    if response.status_code == 200:
+                        data = response.json()
+                        for line in data['inventoryAdjustmentResponses']:
+                            if line['successful']:
+                                instance.generate_success_log(
+                                    message='Blocked Inventory Updated Successfully,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    count=line['facilityInventoryAdjustment']['quantity'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(),
+                                    state='success',
+                                    operation_performed='Inventory Adjustment')
+                                count += 1
+                            elif line['errors']:
+                                instance.generate_exception_log(
+                                    message='Blocked Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                            elif line['warnings']:
+                                instance.generate_exception_log(
+                                    message='Blocked Inventory Update Failed,For %s Product' %
+                                            line['facilityInventoryAdjustment']['itemSKU'],
+                                    start_date=start_date,
+                                    end_date=fields.Datetime.now(), state='exception',
+                                    operation_performed='Inventory Adjustment',
+                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                        line['errors'], indent=2))
+                            else:
+                                instance.generate_exception_log(
+                                    message='Blocked Inventory Update Failed,For %s Product' %
                                             line['facilityInventoryAdjustment']['itemSKU'],
                                     start_date=start_date,
                                     end_date=fields.Datetime.now(), state='exception',
@@ -871,7 +984,8 @@ class ShopInstance(models.Model):
                 pass
             except Exception as e:
                 response = response.json()
-                instance.generate_exception_log(message=response['errors'][0]['message'], start_date=fields.Datetime.now(),
+                instance.generate_exception_log(message=response['errors'][0]['message'],
+                                                start_date=fields.Datetime.now(),
                                                 operation_performed='Inventory Sync',
                                                 end_date=fields.Datetime.now(), count=1, state='exception',
                                                 error_message=json.dumps(response, indent=2))

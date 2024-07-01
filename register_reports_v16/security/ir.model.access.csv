@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 partner_ledger_rprt,partnerledgerreport,model_partner_ledger,base.group_user,1,1,1,1
+stock.register.po.report,stock_register_po_report,register_reports_v16.model_stock_register_po_report,,1,1,1,1
+

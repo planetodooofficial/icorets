@@ -54,6 +54,33 @@ class LocationReport(models.AbstractModel):
         sheet.set_column(0, 27, 25)
         sheet.set_column(0, 28, 25)
         sheet.set_column(0, 29, 25)
+        sheet.set_column(0, 30, 25)
+        sheet.set_column(0, 31, 25)
+        sheet.set_column(0, 32, 25)
+        sheet.set_column(0, 33, 25)
+        sheet.set_column(0, 34, 25)
+        sheet.set_column(0, 35, 25)
+        sheet.set_column(0, 36, 25)
+        sheet.set_column(0, 37, 25)
+        sheet.set_column(0, 38, 25)
+        sheet.set_column(0, 39, 25)
+        sheet.set_column(0, 40, 25)
+        sheet.set_column(0, 41, 25)
+        sheet.set_column(0, 42, 25)
+        sheet.set_column(0, 43, 25)
+        sheet.set_column(0, 44, 25)
+        sheet.set_column(0, 45, 25)
+        sheet.set_column(0, 46, 25)
+        sheet.set_column(0, 47, 25)
+        sheet.set_column(0, 48, 25)
+        sheet.set_column(0, 49, 25)
+        sheet.set_column(0, 50, 25)
+        sheet.set_column(0, 51, 25)
+        sheet.set_column(0, 52, 25)
+        sheet.set_column(0, 53, 25)
+        sheet.set_column(0, 54, 25)
+        sheet.set_column(0, 55, 25)
+        sheet.set_column(0, 56, 25)
 
         # **************************************************
         sheet.write(0, 0, 'Brand', bold)
@@ -62,30 +89,56 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 3, 'Category 3', bold)
         sheet.write(0, 4, 'Function Sport', bold)
         sheet.write(0, 5, 'Gender', bold)
-        sheet.write(0, 6, 'Title', bold)
-        sheet.write(0, 7, 'Composition / Material', bold)
-        sheet.write(0, 8, 'Technology / Features', bold)
-        sheet.write(0, 9, 'Event', bold)
-        sheet.write(0, 10, 'HSN Code', bold)
-        sheet.write(0, 11, 'Style Code', bold)
-        sheet.write(0, 12, 'Article Code', bold)
-        sheet.write(0, 13, 'SKU', bold)
-        sheet.write(0, 14, 'EAN Code', bold)
-        sheet.write(0, 15, 'ASIN', bold)
-        sheet.write(0, 16, 'FSIN', bold)
-        sheet.write(0, 17, 'Colour', bold)
-        sheet.write(0, 18, 'Size', bold)
-        sheet.write(0, 19, 'MRP', bold)
-        sheet.write(0, 20, 'GST', bold)
-        sheet.write(0, 21, 'IHO Stock', bold)
-        sheet.write(0, 22, 'Bhiwandi Stock', bold)
-        sheet.write(0, 23, 'Delhi Stock', bold)
-        sheet.write(0, 24, 'Total Qty', bold)
-        sheet.write(0, 25, 'Quotation Qty', bold)
-        sheet.write(0, 26, 'Confirmed SO qty', bold)
-        sheet.write(0, 27, 'FREE TO USE', bold)
-        sheet.write(0, 28, 'PO Receipt Pending', bold)
-        sheet.write(0, 29, 'To Replenish', bold)
+        sheet.write(0, 6, 'Age group', bold)
+        sheet.write(0, 7, 'Title', bold)
+        sheet.write(0, 8, 'Marketplace Tittle', bold)
+        sheet.write(0, 9, 'Composition / Material', bold)
+        sheet.write(0, 10, 'Technology / Features', bold)
+        sheet.write(0, 11, 'Event', bold)
+        sheet.write(0, 12, 'HSN Code', bold)
+        sheet.write(0, 13, 'Style Code', bold)
+        sheet.write(0, 14, 'Article Code', bold)
+        sheet.write(0, 15, 'SKU', bold)
+        sheet.write(0, 16, 'EAN Code', bold)
+        sheet.write(0, 17, 'ASIN', bold)
+        sheet.write(0, 18, 'FSIN', bold)
+        sheet.write(0, 19, 'Myntra', bold)
+        sheet.write(0, 20, 'AJIO', bold)
+        sheet.write(0, 21, 'Fancode', bold)
+        sheet.write(0, 22, 'Swiggy', bold)
+        sheet.write(0, 23, 'Bigbasket', bold)
+        sheet.write(0, 24, 'Blinkit', bold)
+        sheet.write(0, 25, 'Zepto', bold)
+        sheet.write(0, 26, 'Colour', bold)
+        sheet.write(0, 27, 'Size', bold)
+        sheet.write(0, 28, 'MRP', bold)
+        sheet.write(0, 29, 'GST', bold)
+        sheet.write(0, 30, 'IHO Stock', bold)
+        sheet.write(0, 31, 'Bhiwandi Stock', bold)
+        sheet.write(0, 32, 'Delhi Stock', bold)
+        sheet.write(0, 33, 'Total Qty', bold)
+        sheet.write(0, 34, 'Quotation Qty', bold)
+        sheet.write(0, 35, 'Confirmed SO qty', bold)
+        sheet.write(0, 36, 'FREE TO USE', bold)
+        sheet.write(0, 37, 'PO Receipt Pending', bold)
+        sheet.write(0, 38, 'To Replenish', bold)
+        sheet.write(0, 39, 'Bullet Point 1', bold)
+        sheet.write(0, 40, 'Bullet Point 2', bold)
+        sheet.write(0, 41, 'Bullet Point 3', bold)
+        sheet.write(0, 42, 'Bullet Point 4', bold)
+        sheet.write(0, 43, 'Bullet Point 5', bold)
+        sheet.write(0, 44, 'Description', bold)
+        sheet.write(0, 45, 'Google Drive Link', bold)
+        sheet.write(0, 46, 'Drop Box Link', bold)
+        sheet.write(0, 47, 'Country of Origin', bold)
+        sheet.write(0, 48, 'Product Net Weight (gms)', bold)
+        sheet.write(0, 49, 'Product Length (cm)', bold)
+        sheet.write(0, 50, 'Product Breadth (cm)', bold)
+        sheet.write(0, 51, 'Product Height (cm)', bold)
+        sheet.write(0, 52, 'Package Gross Weight (gms)', bold)
+        sheet.write(0, 53, 'Package Length (cm)', bold)
+        sheet.write(0, 54, 'Package Breadth (cm)', bold)
+        sheet.write(0, 55, 'Package Height (cm)', bold)
         # sheet.write(0, 30, '(Onhand + incoming) - outgoing', bold)
         # sheet.write(0, 31, '(Onhand + incoming) - outgoing(With_Qtn)', bold)
         sheet.freeze_panes(1, 0)
@@ -117,6 +170,13 @@ class LocationReport(models.AbstractModel):
                 'EAN Code': product.barcode or '',
                 'ASIN': product.variants_asin or '',
                 'FSIN': product.variants_fsn or '',
+                'Myntra': product.myntra or '',
+                'AJIO': product.ajio or '',
+                'Fancode': product.fancode or '',
+                'Swiggy': product.swiggy or '',
+                'Bigbasket': product.bigbasket or '',
+                'Blinkit': product.blinkit or '',
+                'Zepto': product.zepto or '',
                 'Colour': product.color or '',
                 'Size': product.size or '',
                 'MRP': product.lst_price or '',
@@ -131,7 +191,27 @@ class LocationReport(models.AbstractModel):
                 'Quotation Qty': 0,
                 'Confirmed SO qty': 0, # Initialize reserved quantity to 0
                 'FREE TO USE': 0,
-                'PO Receipt Pending': 0
+                'PO Receipt Pending': 0,
+                'Age group': product.age_group or '',
+                'Product Net Weight (gms)': product.product_net_weight or '',
+                'Product Length (cm)': product.product_dimension1 or '',
+                'Product Breadth (cm)': product.product_dimension2 or '',
+                'Product Height (cm)': product.product_dimension3 or '',
+                'Package Length (cm)': product.package_dimension1 or '',
+                'Package Breadth (cm)': product.package_dimension2 or '',
+                'Package Height (cm)': product.package_dimension3 or '',
+                'Package Gross Weight (gms)': product.package_weight or '',
+                'Marketplace Tittle': product.market_place_tittle or '',
+                'Bullet Point 1': product.bullet_point_1 or '',
+                'Bullet Point 2': product.bullet_point_2 or '',
+                'Bullet Point 3': product.bullet_point_3 or '',
+                'Bullet Point 4': product.bullet_point_4 or '',
+                'Bullet Point 5': product.bullet_point_5 or '',
+                'Description': product.description or '',
+                'Google Drive Link': product.google_drive_link or '',
+                'Drop Box Link': product.drop_box_link or '',
+                'Country of Origin': product.country_origin or '',
+
             }
 
             stock_quants = product.stock_quant_ids.filtered(lambda q: q.location_id.usage == 'internal')
@@ -217,37 +297,66 @@ class LocationReport(models.AbstractModel):
 
         # Write data to the sheet
         for product_id, data in sorted(product_data.items(), key=lambda x: (x[1]['Brand'].lower(), x[1]['Category 1'].lower(), x[1]['Category 2'].lower(), x[1]['Category 3'].lower())):
+            print(data,'dataa')
             sheet.write(row, col, data['Brand'])
             sheet.write(row, col + 1, data['Category 1'])
             sheet.write(row, col + 2, data['Category 2'])
             sheet.write(row, col + 3, data['Category 3'])
             sheet.write(row, col + 4, data['Function Sport'])
             sheet.write(row, col + 5, data['Gender'])
-            sheet.write(row, col + 6, data['Title'])
-            sheet.write(row, col + 7, data['Composition / Material'])
-            sheet.write(row, col + 8, data['Technology / Features'])
-            sheet.write(row, col + 9, data['Event'])
-            sheet.write(row, col + 10, data['HSN Code'])
-            sheet.write(row, col + 11, data['Style Code'])
-            sheet.write(row, col + 12, data['Article Code'])
-            sheet.write(row, col + 13, data['SKU Code'])
-            sheet.write(row, col + 14, data['EAN Code'])
-            sheet.write(row, col + 15, data['ASIN'])
-            sheet.write(row, col + 16, data['FSIN'])
-            sheet.write(row, col + 17, data['Colour'])
-            sheet.write(row, col + 18, data['Size'])
-            sheet.write(row, col + 19, data['MRP'])
-            sheet.write(row, col + 20, data['GST'])
-            sheet.write(row, col + 21, data['IHO Stock'])
-            sheet.write(row, col + 22, data['Bhiwandi Stock'])
-            sheet.write(row, col + 23, data['Delhi Stock'])
-            sheet.write(row, col + 24, data['Total'])
-            sheet.write(row, col + 25, data['Quotation Qty'])
-            sheet.write(row, col + 26, data['Confirmed SO qty'])
-            sheet.write(row, col + 27, data['FREE TO USE'])
-            sheet.write(row, col + 28, data['PO Receipt Pending'])
-            sheet.write(row, col + 29, data['To Replenish'])
-            # sheet.write(row, col + 30, data['(Onhand + incoming) - outgoing'])
+            sheet.write(row, col + 6, data['Age group'])
+            sheet.write(row, col + 7, data['Title'])
+            sheet.write(row, col + 8, data['Marketplace Tittle'])
+            sheet.write(row, col + 9, data['Composition / Material'])
+            sheet.write(row, col + 10, data['Technology / Features'])
+            sheet.write(row, col + 11, data['Event'])
+            sheet.write(row, col + 12, data['HSN Code'])
+            sheet.write(row, col + 13, data['Style Code'])
+            sheet.write(row, col + 14, data['Article Code'])
+            sheet.write(row, col + 15, data['SKU Code'])
+            sheet.write(row, col + 16, data['EAN Code'])
+            sheet.write(row, col + 17, data['ASIN'])
+            sheet.write(row, col + 18, data['FSIN'])
+            sheet.write(row, col + 19, data['Myntra'])
+            sheet.write(row, col + 20, data['AJIO'])
+            sheet.write(row, col + 21, data['Fancode'])
+            sheet.write(row, col + 22, data['Swiggy'])
+            sheet.write(row, col + 23, data['Bigbasket'])
+            sheet.write(row, col + 24, data['Blinkit'])
+            sheet.write(row, col + 25, data['Zepto'])
+            sheet.write(row, col + 26, data['Colour'])
+            sheet.write(row, col + 27, data['Size'])
+            sheet.write(row, col + 28, data['MRP'])
+            sheet.write(row, col + 29, data['GST'])
+            sheet.write(row, col + 30, data['IHO Stock'])
+            sheet.write(row, col + 31, data['Bhiwandi Stock'])
+            sheet.write(row, col + 32, data['Delhi Stock'])
+            sheet.write(row, col + 33, data['Total'])
+            sheet.write(row, col + 34, data['Quotation Qty'])
+            sheet.write(row, col + 35, data['Confirmed SO qty'])
+            sheet.write(row, col + 36, data['FREE TO USE'])
+            sheet.write(row, col + 37, data['PO Receipt Pending'])
+            sheet.write(row, col + 38, data['To Replenish'])
+
+            sheet.write(row, col + 39, data['Bullet Point 1'])
+            sheet.write(row, col + 40, data['Bullet Point 2'])
+            sheet.write(row, col + 41, data['Bullet Point 3'])
+            sheet.write(row, col + 42, data['Bullet Point 4'])
+            sheet.write(row, col + 43, data['Bullet Point 5'])
+            sheet.write(row, col + 44, data['Description'])
+            sheet.write(row, col + 45, data['Google Drive Link'])
+            sheet.write(row, col + 46, data['Drop Box Link'])
+            sheet.write(row, col + 47, data['Country of Origin'])
+
+            sheet.write(row, col + 48, data['Product Net Weight (gms)'])
+            sheet.write(row, col + 49, data['Product Length (cm)'])
+            sheet.write(row, col + 50, data['Product Breadth (cm)'])
+            sheet.write(row, col + 51, data['Product Height (cm)'])
+            sheet.write(row, col + 52, data['Package Gross Weight (gms)'])
+            sheet.write(row, col + 53, data['Package Length (cm)'])
+            sheet.write(row, col + 54, data['Package Breadth (cm)'])
+            sheet.write(row, col + 55, data['Package Height (cm)'])
+            # sheet.write(row, col +30, data['(Onhand + incoming) - outgoing'])
             # sheet.write(row, col + 31, data['(Onhand + incoming) - outgoing(With_Qtn)'])
 
             row += 1

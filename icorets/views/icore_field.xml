@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
-<!--    #CREATED FOR SAPAT REQUIREMENT-->
+    <!--    #CREATED FOR SAPAT REQUIREMENT-->
 
-<!--      <record id="view_vendorbill_wizard_form" model="ir.ui.view">-->
-<!--            <field name="name">vendorbill.wizard.form</field>-->
-<!--            <field name="model">vendorbill.wizard</field>-->
-<!--            <field name="arch" type="xml">-->
-<!--                <form>-->
-<!--                    <group>-->
-<!--                        <field name="grn_name" widget="many2many_tags" options="{'no_create': True}" />-->
-<!--                    </group>-->
-<!--                    <footer>-->
-<!--                        <button string="Create Vendor Bill" type="object" class="oe_highlight" name="action_create_invoice"/>-->
-<!--                        <button string="Cancel" class="oe_link" special="cancel"/>-->
-<!--                    </footer>-->
-<!--                </form>-->
-<!--            </field>-->
-<!--        </record>-->
+    <!--      <record id="view_vendorbill_wizard_form" model="ir.ui.view">-->
+    <!--            <field name="name">vendorbill.wizard.form</field>-->
+    <!--            <field name="model">vendorbill.wizard</field>-->
+    <!--            <field name="arch" type="xml">-->
+    <!--                <form>-->
+    <!--                    <group>-->
+    <!--                        <field name="grn_name" widget="many2many_tags" options="{'no_create': True}" />-->
+    <!--                    </group>-->
+    <!--                    <footer>-->
+    <!--                        <button string="Create Vendor Bill" type="object" class="oe_highlight" name="action_create_invoice"/>-->
+    <!--                        <button string="Cancel" class="oe_link" special="cancel"/>-->
+    <!--                    </footer>-->
+    <!--                </form>-->
+    <!--            </field>-->
+    <!--        </record>-->
 
-<!--        <record id="action_vendorbill_wizard" model="ir.actions.act_window">-->
-<!--            <field name="name">Vendor Bill Wizard</field>-->
-<!--            <field name="res_model">vendorbill.wizard</field>-->
-<!--            <field name="view_mode">form</field>-->
-<!--            <field name="view_id" ref="icorets.view_vendorbill_wizard_form"/>-->
-<!--            <field name="target">new</field>-->
-<!--        </record>-->
+    <!--        <record id="action_vendorbill_wizard" model="ir.actions.act_window">-->
+    <!--            <field name="name">Vendor Bill Wizard</field>-->
+    <!--            <field name="res_model">vendorbill.wizard</field>-->
+    <!--            <field name="view_mode">form</field>-->
+    <!--            <field name="view_id" ref="icorets.view_vendorbill_wizard_form"/>-->
+    <!--            <field name="target">new</field>-->
+    <!--        </record>-->
 
-   <record id="get_sale_order_xls" model="ir.actions.report">
+    <record id="get_sale_order_xls" model="ir.actions.report">
         <field name="name">Picking List</field>
         <field name="model">stock.picking</field>
         <field name="report_type">xlsx</field>
@@ -51,6 +51,19 @@
         </field>
     </record>
 
+    <record model="ir.ui.view" id="product_attribute_inherited_view">
+        <field name="name">product.attribute.inherited</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='main_fields']/field[@name='create_variant']" position="after">
+                <field name="is_colour"/>
+                <field name="is_size"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <!--    For removing attributes in carrier id in stock picking-->
 
     <record model="ir.ui.view" id="stock_picking_inherited_view">
@@ -64,7 +77,10 @@
             <xpath expr="//group[@name='carrier_data']/div[@name='tracking']" position="replace">
                 <div name="tracking">
                     <field name="carrier_tracking_ref" class="oe_inline"/>
-                    <button type='object' class="fa fa-arrow-right oe_link" confirm="Cancelling a delivery may not be undoable. Are you sure you want to continue?" name="cancel_shipment" string="Cancel" attrs="{'invisible':['|','|','|',('carrier_tracking_ref','=',False),('delivery_type','in', ['fixed', 'base_on_rule']),('delivery_type','=',False),('state','not in',('done'))]}"/>
+                    <button type='object' class="fa fa-arrow-right oe_link"
+                            confirm="Cancelling a delivery may not be undoable. Are you sure you want to continue?"
+                            name="cancel_shipment" string="Cancel"
+                            attrs="{'invisible':['|','|','|',('carrier_tracking_ref','=',False),('delivery_type','in', ['fixed', 'base_on_rule']),('delivery_type','=',False),('state','not in',('done'))]}"/>
                 </div>
             </xpath>
         </field>
@@ -77,8 +93,10 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_cancel']" position="after">
-                <button string="Download Sale Order" name="get_report_xlsx" type="object" class="btn-primary" attrs="{'invisible': [['state', '=', 'done']]}"/>
-                <button string="Updating Picking List" name="update_picking_list_wizard" type="object" class="btn-primary" attrs="{'invisible': [['state', '=', 'done']]}"/>
+                <button string="Download Sale Order" name="get_report_xlsx" type="object" class="btn-primary"
+                        attrs="{'invisible': [['state', '=', 'done']]}"/>
+                <button string="Updating Picking List" name="update_picking_list_wizard" type="object"
+                        class="btn-primary" attrs="{'invisible': [['state', '=', 'done']]}"/>
             </xpath>
         </field>
     </record>
@@ -102,7 +120,7 @@
 
             <xpath expr="//group/group[@name='pricing']" position="inside">
                 <field name="variant_packaging_cost"/>
-                <field name="variant_total_cost" />
+                <field name="variant_total_cost"/>
                 <field name="color"/>
                 <field name="size"/>
                 <field name="buin"/>
@@ -121,7 +139,8 @@
 
             <!--            <xpath expr="//div[@name='button_box']" position="replace">-->
             <div name="button_box" position="inside">
-                <button name="162" type="action" icon="fa-sitemap" class="oe_stat_button"  groups="product.group_product_variant">
+                <button name="162" type="action" icon="fa-sitemap" class="oe_stat_button"
+                        groups="product.group_product_variant">
                     <field string="Variants" name="product_variant_count" widget="statinfo"/>
                 </button>
             </div>
@@ -155,6 +174,17 @@
                             <field name="tech_feat"/>
                             <field name="brand_id"/>
                             <field name="parent_buin"/>
+                            <field name="age_group"/>
+                            <field name="product_dimension1"/>
+                            <field name="product_dimension2"/>
+                            <field name="product_dimension3"/>
+                                                        <field name="market_place_tittle"/>
+                                                        <field name="bullet_point_1"/>
+                                                        <field name="bullet_point_2"/>
+                                                        <field name="bullet_point_3"/>
+                                                        <field name="bullet_point_4"/>
+                                                        <field name="bullet_point_5"/>
+                            <!--                            <field name="bigbasket"/>-->
                         </group>
                         <group>
                             <field name="user_defined_miscallaneous1"/>
@@ -162,17 +192,22 @@
                             <field name="user_defined_miscallaneous3"/>
                             <field name="user_defined_miscallaneous4"/>
                             <field name="user_defined_miscallaneous5"/>
+                            <field name="product_net_weight"/>
+                            <field name="package_dimension1"/>
+                            <field name="package_dimension2"/>
+                            <field name="package_dimension3"/>
+                            <field name="package_weight"/>
+
+                            <field name="description"/>
+                            <field name="google_drive_link"/>
+                            <field name="drop_box_link"/>
                         </group>
 
                     </group>
                     <group string="Technical Specifications">
                         <field name="manufactured_by"/>
                         <field name="marketed_by"/>
-                        <field name="length"/>
-                        <field name="width"/>
-                        <field name="height"/>
-                        <field name="weight"/>
-                        <field name="cntry_of_origin"/>
+                        <field name="country_origin"/>
                         <field name="manufactured_by"/>
                     </group>
                 </page>
@@ -192,6 +227,7 @@
                     <group string="Details">
                         <group>
                             <field name="brand_id_rel"/>
+                            <field name="variants_ean_code"/>
                             <field name="variants_asin"/>
                             <field name="variants_func_spo"/>
                             <field name="variants_gender"/>
@@ -199,6 +235,20 @@
                             <field name="variants_fsn"/>
                             <field name="variant_article_code"/>
                             <field name="buin"/>
+                            <field name="age_group"/>
+                            <field name="myntra"/>
+                            <field name="ajio"/>
+                            <field name="fancode"/>
+                            <field name="blinkit"/>
+                            <field name="zepto"/>
+                            <field name="swiggy"/>
+                            <field name="bigbasket"/>
+
+                            <field name="bullet_point_1"/>
+                            <field name="bullet_point_2"/>
+                            <field name="bullet_point_3"/>
+                            <field name="bullet_point_4"/>
+                            <field name="bullet_point_5"/>
                         </group>
                         <group>
                             <field name="variant_total_cost"/>
@@ -206,6 +256,21 @@
                             <field name="variant_packaging_cost"/>
                             <field name="color"/>
                             <field name="size"/>
+                            <field name="product_net_weight"/>
+                            <field name="product_dimension1"/>
+                            <field name="product_dimension2"/>
+                            <field name="product_dimension3"/>
+                            <field name="package_dimension1"/>
+                            <field name="package_dimension2"/>
+                            <field name="package_dimension3"/>
+                            <field name="package_weight"/>
+
+                            <field name="market_place_tittle"/>
+                            <field name="description"/>
+                            <field name="google_drive_link"/>
+                            <field name="drop_box_link"/>
+                            <field name="country_origin"/>
+
                         </group>
 
                     </group>
@@ -359,41 +424,55 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
 
-<!--            VIEW ADJUSTMENT-->
-            <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='partner_details']/field[@name='partner_shipping_id']" position="replace"/>
-            <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='partner_details']/field[@name='l10n_in_gst_treatment']" position="replace"/>
+            <!--            VIEW ADJUSTMENT-->
+            <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='partner_details']/field[@name='partner_shipping_id']"
+                   position="replace"/>
+            <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='partner_details']/field[@name='l10n_in_gst_treatment']"
+                   position="replace"/>
+            <xpath expr="//notebook//page[@name='other_information']/group/group[1]/field[@name='user_id']"
+                   position="after">
+                <field name="reason_id"/>
+                <field name="desc"/>
+                <field name="is_short_close" invisible="1"/>
+                <field name="closer_date"/>
+            </xpath>
 
 
             <xpath expr="//field[@name='validity_date']" position="before">
                 <field name="l10n_in_gst_treatment"/>
                 <field name="partner_shipping_id"/>
                 <div colspan="2" style="border: 1px solid #000;">
-                    <field name="partner_shipping_id_street" string="" />
-                    <field name="partner_shipping_id_street2" string="" />
-                    <field name="partner_shipping_id_city" string="" />
-                    <field name="partner_shipping_id_state" string="" />
-                    <field name="partner_shipping_id_zip" string="" />
-                    <field name="partner_shipping_id_country" string="" />
+                    <field name="partner_shipping_id_street" string=""/>
+                    <field name="partner_shipping_id_street2" string=""/>
+                    <field name="partner_shipping_id_city" string=""/>
+                    <field name="partner_shipping_id_state" string=""/>
+                    <field name="partner_shipping_id_zip" string=""/>
+                    <field name="partner_shipping_id_country" string=""/>
                 </div>
             </xpath>
 
             <xpath expr="//field[@name='partner_invoice_id']" position="after">
                 <div colspan="2" style="border: 1px solid #000;">
-                    <field name="partner_invoice_id_street" string="" />
-                    <field name="partner_invoice_id_street2" string="" />
-                    <field name="partner_invoice_id_city" string="" />
-                    <field name="partner_invoice_id_state" string="" />
-                    <field name="partner_invoice_id_zip" string="" />
-                    <field name="partner_invoice_id_country" string="" />
+                    <field name="partner_invoice_id_street" string=""/>
+                    <field name="partner_invoice_id_street2" string=""/>
+                    <field name="partner_invoice_id_city" string=""/>
+                    <field name="partner_invoice_id_state" string=""/>
+                    <field name="partner_invoice_id_zip" string=""/>
+                    <field name="partner_invoice_id_country" string=""/>
                 </div>
-<!--                <field name="client_order_ref"/>-->
-<!--                <field name="event"/>-->
-                <field name="warehouse_id"  readonly="0" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
-                <field name="location_id" domain="[('warehouse_id','=',warehouse_id)]" attrs="{'readonly': [('state', 'not in', 'draft')]}" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
-                <field name="gstin_id" domain="[('is_gstin', '=', 'True')]" options="{'no_open': True, 'no_edit': True, 'no_create': True}" attrs="{'readonly': [('state', '=', 'sale')]}"/>
-                <field name="l10n_in_journal_id" domain="[('company_id', '=', company_id), ('type','=','sale')]" options="{'no_create': True}" attrs="{'invisible': [('country_code','!=', 'IN')]}"/>
+                <!--                <field name="client_order_ref"/>-->
+                <!--                <field name="event"/>-->
+                <field name="warehouse_id" readonly="0"
+                       options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
+                <field name="location_id" domain="[('warehouse_id','=',warehouse_id)]"
+                       attrs="{'readonly': [('state', 'not in', 'draft')]}"
+                       options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
+                <field name="gstin_id" domain="[('is_gstin', '=', 'True')]"
+                       options="{'no_open': True, 'no_edit': True, 'no_create': True}"
+                       attrs="{'readonly': [('state', '=', 'sale')]}"/>
+                <field name="l10n_in_journal_id" domain="[('company_id', '=', company_id), ('type','=','sale')]"
+                       options="{'no_create': True}" attrs="{'invisible': [('country_code','!=', 'IN')]}"/>
             </xpath>
-
 
 
             <!-- Second Box with a black line -->
@@ -416,7 +495,7 @@
 
                 <field name="client_order_ref" string="PO No"/>
                 <field name="event"/>
-<!--                <field name="no_of_cartons"/>-->
+                <!--                <field name="no_of_cartons"/>-->
                 <field name="is_fo" invisible="1"/>
             </xpath>
 
@@ -439,16 +518,23 @@
             </xpath>
             <xpath expr="//header" position="inside">
                 <!--                <button name="fo_action_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>-->
-                <button name="action_open_fo_wiz" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>
+                <button name="action_open_fo_wiz" string="Confirm" type="object" class="oe_highlight"
+                        attrs="{'invisible': ['|', ('is_fo', '!=', True), ('state', '=', 'done')]}"/>
             </xpath>
             <xpath expr="//button[@id='action_confirm']" position="attributes">
-                <attribute name="attrs">{'invisible':['|', ('state', 'not in', ['sent']), ('is_fo', '=', True)]}</attribute>
+                <attribute name="attrs">{'invisible':['|', ('state', 'not in', ['sent']), ('is_fo', '=', True)]}
+                </attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_cancel']" position="before">
+                <button name="short_close" type="object" string="Short Close" class="oe_highlight" attrs="{'invisible': [('is_short_close', '=', True)]}"/>
             </xpath>
             <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
-                <attribute name="attrs">{'invisible':['|', ('state', 'not in', ['draft']), ('is_fo', '=', True)]}</attribute>
+                <attribute name="attrs">{'invisible':['|', ('state', 'not in', ['draft']), ('is_fo', '=', True)]}
+                </attribute>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_fo_so" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('fo_so_count', '=', 0)]}">
+                <button name="action_view_fo_so" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                        attrs="{'invisible': [('fo_so_count', '=', 0)]}">
                     <field name="fo_so_count" widget="statinfo" string="SO"/>
                 </button>
             </xpath>
@@ -475,9 +561,9 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
 
-<!--               <xpath expr="//field[@name='ref']" position="after">-->
-<!--                <field name="shipping_id_credit"  attrs="{'invisible':[('move_type','!=','out_refund')]}"  options="{'no_create': True, 'no_open': True}"/>-->
-<!--            </xpath>-->
+            <!--               <xpath expr="//field[@name='ref']" position="after">-->
+            <!--                <field name="shipping_id_credit"  attrs="{'invisible':[('move_type','!=','out_refund')]}"  options="{'no_create': True, 'no_open': True}"/>-->
+            <!--            </xpath>-->
 
             <xpath expr="//field[@name='gstin_id']" position="attributes">
                 <attribute name="attrs">{"invisible": [["move_type","=","entry"]]}</attribute>
@@ -490,20 +576,26 @@
             </xpath>
 
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="cust_code" attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
+                <field name="cust_code"
+                       attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
                 <field name="ref" string="PO No" attrs="{'invisible':[('move_type', '!=', 'out_invoice')]}"/>
-                <field name="event" attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
-                <field name="type_s" string='Type' attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
+                <field name="event"
+                       attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
+                <field name="type_s" string='Type'
+                       attrs="{'invisible':[('move_type', '!=', 'out_invoice'),('move_type', '!=', 'in_invoice')]}"/>
                 <field name="no_of_cartons"/>
-                <field name="shipping_id_credit"  attrs="{'invisible':[('move_type','!=','out_refund')]}"  options="{'no_create': True, 'no_open': True}"/>
+                <field name="shipping_id_credit" attrs="{'invisible':[('move_type','!=','out_refund')]}"
+                       options="{'no_create': True, 'no_open': True}"/>
 
             </xpath>
-            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="after">
+            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='account_id']"
+                   position="after">
                 <field name="myntra_sku_code" optional="hide"/>
                 <field name="remarks" optional="hide"/>
             </xpath>
 
-            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
+            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/tree/field[@name='product_id']"
+                   position="after">
                 <field name="article_code" optional="hide"/>
                 <field name="ean_code" optional="hide"/>
                 <field name="size" optional="hide"/>
@@ -512,19 +604,19 @@
             </xpath>
 
             <!--            For adding partner address-->
-<!--            <xpath expr="//form/sheet/group/group[2]/div[1]"-->
-<!--                   position="after">-->
-<!--                <field name="partner_id" widget="res_partner_many2one" nolabel="1"-->
-<!--                       context="{-->
-<!--                                        'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,-->
-<!--                                        'show_address': 1, 'default_is_company': True, 'show_vat': True}"-->
-<!--                       domain="[('type', '!=', 'private'), ('company_id', 'in', (False, company_id))]"-->
-<!--                       options="{'no_create': True, 'no_edit': True, 'no_open': True}"-->
-<!--                       attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))]}"/>-->
-<!--            </xpath>-->
-<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='partner_id']" position="attributes">-->
-<!--                <attribute name="invisible">1</attribute>-->
-<!--            </xpath>-->
+            <!--            <xpath expr="//form/sheet/group/group[2]/div[1]"-->
+            <!--                   position="after">-->
+            <!--                <field name="partner_id" widget="res_partner_many2one" nolabel="1"-->
+            <!--                       context="{-->
+            <!--                                        'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False,-->
+            <!--                                        'show_address': 1, 'default_is_company': True, 'show_vat': True}"-->
+            <!--                       domain="[('type', '!=', 'private'), ('company_id', 'in', (False, company_id))]"-->
+            <!--                       options="{'no_create': True, 'no_edit': True, 'no_open': True}"-->
+            <!--                       attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))]}"/>-->
+            <!--            </xpath>-->
+            <!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='partner_id']" position="attributes">-->
+            <!--                <attribute name="invisible">1</attribute>-->
+            <!--            </xpath>-->
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="options">{"no_create":true}</attribute>
             </xpath>
@@ -532,10 +624,12 @@
             <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='fiscal_position_id']" position="attributes">
                 <attribute name="options">{"no_create":true}</attribute>
             </xpath>
-            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='product_id']" position="attributes">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='product_id']"
+                   position="attributes">
                 <attribute name="options">{"no_create":true}</attribute>
             </xpath>
-            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='product_uom_id']" position="attributes">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='product_uom_id']"
+                   position="attributes">
                 <attribute name="options">{"no_create":true}</attribute>
             </xpath>
 
@@ -553,10 +647,10 @@
             <!--                <field name="gstin_id" domain="[('is_gstin', '=', 'True')]" attrs="{'readonly': [('state', '=', 'posted')]}"/>-->
             <!--            </xpath>-->
 
-<!--            FOR SAPAT-->
-                <xpath expr="//header/button[@name='action_create_invoice']" position="replace">
-<!--                <button string="Create Bill" type="object" class="oe_highlight" name="open_vendorbill_wizard"/>-->
-                </xpath>
+            <!--            FOR SAPAT-->
+            <xpath expr="//header/button[@name='action_create_invoice']" position="replace">
+                <!--                <button string="Create Bill" type="object" class="oe_highlight" name="open_vendorbill_wizard"/>-->
+            </xpath>
 
 
             <xpath expr="//div[@name='date_planned_div']" position="after">
@@ -571,7 +665,8 @@
             <xpath expr="//field[@name='currency_id']" position="after">
                 <field name="warehouse_id" options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
             </xpath>
-            <xpath expr="//sheet//notebook/page[@name='products']/field[@name='order_line']/tree/field[@name='name']" position="after">
+            <xpath expr="//sheet//notebook/page[@name='products']/field[@name='order_line']/tree/field[@name='name']"
+                   position="after">
                 <field name="remark" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
@@ -619,6 +714,40 @@
         </field>
     </record>
 
+    <record id="reason_reason_view_form" model="ir.ui.view">
+        <field name="name">reason.reason.view.form</field>
+        <field name="model">reason.reason</field>
+        <field name="arch" type="xml">
+            <form string="Reason">
+                <sheet>
+
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="reason_reason_view_tree" model="ir.ui.view">
+        <field name="name">reason.reason.view.tree</field>
+        <field name="model">reason.reason</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="reason_reason_action" model="ir.actions.act_window">
+        <field name="name">Reason</field>
+        <field name="res_model">reason.reason</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_reason_reason"
+                action="icorets.reason_reason_action"
+                parent="sale.sale_order_menu"
+                sequence="53"/>
 
 
 
