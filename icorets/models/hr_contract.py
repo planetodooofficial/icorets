@@ -9,11 +9,13 @@ class Contract(models.Model):
     present_days = fields.Integer(string='Present Days', compute='_compute_present_days')
     expense = fields.Float(string='Expense')
     total_earned_ctc = fields.Float(string='Total Earned CTC', compute='_compute_total_earned_ctc')
+    extra_present_days = fields.Integer("Extra Present Days")
+    advance_payment = fields.Float("Advance Payment")
 
     @api.depends('total_wage_in_days', 'total_leave')
     def _compute_present_days(self):
         for record in self:
-            record.present_days = record.total_wage_in_days - record.total_leave
+            record.present_days = record.total_wage_in_days - record.total_leave + record.extra_present_days + record.x_studio_total_paid_leave
 
     # def action_calculate_present_days(self):
     #     self._compute_present_days()
