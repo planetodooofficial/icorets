@@ -70,8 +70,8 @@ class ProductVariantInherit(models.Model):
     bullet_point_4 = fields.Char(related='product_tmpl_id.bullet_point_4', string='Bullet Point 4')
     bullet_point_5 = fields.Char(related='product_tmpl_id.bullet_point_5', string='Bullet Point 5')
     description = fields.Char(related='product_tmpl_id.description', string='Description')
-    google_drive_link = fields.Char(related='product_tmpl_id.google_drive_link', string='Google Drive Link')
-    drop_box_link = fields.Char(related='product_tmpl_id.drop_box_link', string='Drop Box Link')
+    google_drive_link = fields.Char(string='Google Drive Link')
+    drop_box_link = fields.Char(string='Drop Box Link')
     country_origin = fields.Char(related='product_tmpl_id.country_origin', string='Country of Origin')
 
 
