@@ -1,0 +1,35 @@
+<odoo>
+    <record id="view_journal_partner_update_wizard_form" model="ir.ui.view">
+        <field name="name">journal.partner.update.wizard.form</field>
+        <field name="model">journal.partner.update.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Journal Partner Update Wizard">
+                <group>
+                    <field name="active_invoice_name"/>
+                    <field name="partner_id"/>
+                </group>
+                <footer>
+                    <button string="Update Partner" type="object" name="action_update_partner" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_journal_partner_update_wizard" model="ir.actions.act_window">
+        <field name="name">Journal Partner Update Wizard</field>
+        <field name="res_model">journal.partner.update.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_partner_id': active_id}</field>
+    </record>
+    <record id="action_update_partner_server" model="ir.actions.server">
+        <field name="name">Update Partner</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = record.open_update_partner_wizard()</field>
+    </record>
+</odoo>

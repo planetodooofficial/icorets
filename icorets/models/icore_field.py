@@ -214,6 +214,15 @@ class AccountMoveInheritClass(models.Model):
     #new selection field of address for credit note
     shipping_id_credit = fields.Many2one('res.partner', string='Ship To')
 
+    def open_update_partner_wizard(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Update Partner Wizard',
+            'res_model': 'journal.partner.update.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+        }
+
     @api.depends('invoice_line_ids.quantity')
     def _tot_line_qty(self):
         for move in self:
