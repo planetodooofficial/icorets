@@ -878,7 +878,7 @@ class SaleOrderLineInherit(models.Model):
     color = fields.Char(string='Color', related='product_id.color')
     tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
                                       compute="check_tax_amount", currency_field='currency_id')
-    sale_price_product = fields.Monetary(string='Product Sale Price', related='product_id.list_price')
+    sale_price_product = fields.Float(string='Product Sale Price', related='product_id.list_price')
 
     @api.depends('tax_id')
     def check_tax_amount(self):
