@@ -512,6 +512,7 @@
 
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="before">
+                <field name="sale_price_product" optional="hide"/>
                 <field name="article_code" optional="hide"/>
                 <field name="size" optional="hide"/>
                 <field name="color" optional="hide"/>

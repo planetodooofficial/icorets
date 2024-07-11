@@ -161,7 +161,7 @@
                                     </td>
                                     <td>
                                         <t t-esc="line.product_id.name"/><br/>
-                                        Color: <t t-esc="line.fetch_color()"/>
+                                        Color: <t t-esc="line.product_id.color"/>
                                     </td>
                                     <td style="text-align: left;width=20%">
                                         <t t-esc="line.remark"/>
@@ -170,7 +170,7 @@
                                         <t t-esc="line.hsn_c.hsnsac_code"/>
                                     </td>
                                     <td>
-                                        <t t-esc="line.fetch_size()"/>
+                                        <t t-esc="line.product_id.size"/>
                                     </td>
                                     <td>
                                         <t t-esc="int(line.product_qty)"/> <t t-esc="line.product_uom.name"/>
