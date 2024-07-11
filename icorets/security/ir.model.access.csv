@@ -10,3 +10,4 @@ locations_report,locations.report,model_locations_report,,1,1,1,1
 stock_variant_report,stock.variant.report,model_stock_variant_report,,1,1,1,1
 short_close,short.close,model_short_close,,1,1,1,1
 reason_reason,reason.reason,model_reason_reason,,1,1,1,1
+journal_partner_update_wizard,journal.partner.update.wizard,model_journal_partner_update_wizard,,1,1,1,1
