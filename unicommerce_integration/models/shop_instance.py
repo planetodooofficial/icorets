@@ -229,7 +229,7 @@ class ShopInstance(models.Model):
             raise UserError(
                 _("Shipping Charges Product Not Found! Please Create a Product with Default Code `SHIPPING_CHARGE`"))
         tax_obj = self.env['account.tax']
-        if not sales_channel_id:
+        if not shop_channel_id:
             raise UserError(_("Sales Channel Not Found! Please Create a Sales Channel !!"))
         for order_line in lines:
             product = product_obj.search([('default_code', '=', order_line['itemSku'])])
