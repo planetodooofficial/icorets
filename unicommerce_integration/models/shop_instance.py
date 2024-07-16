@@ -229,6 +229,8 @@ class ShopInstance(models.Model):
             raise UserError(
                 _("Shipping Charges Product Not Found! Please Create a Product with Default Code `SHIPPING_CHARGE`"))
         tax_obj = self.env['account.tax']
+        if not sales_channel_id:
+            raise UserError(_("Sales Channel Not Found! Please Create a Sales Channel !!"))
         for order_line in lines:
             product = product_obj.search([('default_code', '=', order_line['itemSku'])])
             tax = False
@@ -636,7 +638,7 @@ class ShopInstance(models.Model):
                 'price_unit': line.selling_price_without_taxes_and_discount - line.discount,
                 'tax_id': [(6, 0, [line.tax_id.id])] if line.tax_id else False,
                 'product_uom': uom_id.id,
-                'analytic_distribution': {f"{order.sales_channel_id.analytics_id.id}": 100},
+                'analytic_distribution': {f"{order.sales_channel_id.analytics_id.id}": 100} if order.sales_channel_id.analytics_id else False,
             }))
         return order_lines
 
