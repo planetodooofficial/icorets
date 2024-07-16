@@ -10,8 +10,20 @@
                 <field name="total_wage_in_days" string='Total Wage in Days'/>
                 <field name="total_leave" string='Total Leave'/>
                 <field name="present_days" string='Present Days'/>
+                <field name="extra_present_days"/>
                 <field name="expense" string='Expense'/>
                 <field name="total_earned_ctc" string='Total Earned CTC'/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="inherit_view_hr_contract_inheit_form" model="ir.ui.view">
+        <field name="name">inherit.hr.contract.form</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="l10n_in_hr_payroll.hr_contract_form_in_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='medical_insurance']" position="after">
+                <field name="advance_payment"/>
             </xpath>
         </field>
     </record>

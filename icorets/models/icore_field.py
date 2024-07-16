@@ -31,8 +31,9 @@ class ProductVariantInherit(models.Model):
 
 
 
-    variants_ean_code = fields.Char('EAN Code')
-    variant_article_code = fields.Char(string='Article Code')
+    variants_ean_code = fields.Char('EAN Code', tracking=True)
+    default_code = fields.Char('Internal Reference', index=True, tracking=True)
+    variant_article_code = fields.Char(string='Article Code', tracking=True)
     variants_asin = fields.Char('ASIN')
     variants_func_spo = fields.Char(related='product_tmpl_id.func_spo', string='Function / Sport')
     variants_gender = fields.Char(related='product_tmpl_id.gender', string='Gender')
@@ -62,6 +63,16 @@ class ProductVariantInherit(models.Model):
     package_dimension3 = fields.Char(related='product_tmpl_id.package_dimension3', string='Package Dimension (cm)')
     package_weight = fields.Char(related='product_tmpl_id.package_weight', string='Package Weight (gms)')
 
+    market_place_tittle = fields.Char(related='product_tmpl_id.market_place_tittle', string='Marketplace Tittle')
+    bullet_point_1 = fields.Char(related='product_tmpl_id.bullet_point_1', string='Bullet Point 1')
+    bullet_point_2 = fields.Char(related='product_tmpl_id.bullet_point_2', string='Bullet Point 2')
+    bullet_point_3 = fields.Char(related='product_tmpl_id.bullet_point_3', string='Bullet Point 3')
+    bullet_point_4 = fields.Char(related='product_tmpl_id.bullet_point_4', string='Bullet Point 4')
+    bullet_point_5 = fields.Char(related='product_tmpl_id.bullet_point_5', string='Bullet Point 5')
+    description = fields.Char(related='product_tmpl_id.description', string='Description')
+    google_drive_link = fields.Char(string='Google Drive Link')
+    drop_box_link = fields.Char(string='Drop Box Link')
+    country_origin = fields.Char(related='product_tmpl_id.country_origin', string='Country of Origin')
 
 
     # Inherited and removed domain
@@ -91,7 +102,7 @@ class ProductInherit(models.Model):
     material = fields.Char('Moc')
     brand_id = fields.Many2one('product.brand', 'Brand')
     occasion = fields.Char('Event')
-    style_code = fields.Char('Style Code')
+    style_code = fields.Char('Style Code', tracking=True)
     parent_buin = fields.Char('Parent buin')
     user_defined_miscallaneous1 = fields.Char('User Defined Miscallaneous1')
     user_defined_miscallaneous2 = fields.Char('User Defined Miscallaneous2')
@@ -101,13 +112,13 @@ class ProductInherit(models.Model):
     age_group = fields.Char(string='Age Group')
 
     product_net_weight = fields.Char('Product Net Weight (gms)')
-    product_dimension1 = fields.Char('Product Dimension (cm)')
-    product_dimension2 = fields.Char('Product Dimension (cm)')
-    product_dimension3 = fields.Char('Product Dimension (cm)')
-    package_dimension1 = fields.Char('Package Dimension (cm)')
-    package_dimension2 = fields.Char('Package Dimension (cm)')
-    package_dimension3 = fields.Char('Package Dimension (cm)')
-    package_weight = fields.Char('Package Weight (gms)')
+    product_dimension1 = fields.Char('Product Length (cm)')
+    product_dimension2 = fields.Char('Product Breadth (cm)')
+    product_dimension3 = fields.Char('Product Height (cm)')
+    package_dimension1 = fields.Char('Package Length (cm)')
+    package_dimension2 = fields.Char('Package Breadth (cm)')
+    package_dimension3 = fields.Char('Package Height (cm)')
+    package_weight = fields.Char('Package Gross Weight (gms)')
     # technical details
 
     manufactured_by = fields.Char('Manufactured By')
@@ -116,12 +127,24 @@ class ProductInherit(models.Model):
     width = fields.Float('width (Dimensions)')
     height = fields.Float('height (Dimensions)')
     weight = fields.Float('Weight (Dimensions)')
-    cntry_of_origin = fields.Char('Country of Origin')
     manufacture_year = fields.Date('Manufacture Year')
 
     func_spo = fields.Char('Function / Sport')
     gender = fields.Char('Gender')
     tech_feat = fields.Char('Technology / Features')
+
+    market_place_tittle = fields.Char('Marketplace Tittle')
+    bullet_point_1 = fields.Char('Bullet Point 1')
+    bullet_point_2 = fields.Char('Bullet Point 2')
+    bullet_point_3 = fields.Char('Bullet Point 3')
+    bullet_point_4 = fields.Char('Bullet Point 4')
+    bullet_point_5 = fields.Char('Bullet Point 5')
+    description = fields.Char('Description')
+    google_drive_link = fields.Char('Google Drive Link')
+    drop_box_link = fields.Char('Drop Box Link')
+    country_origin = fields.Char('Country of Origin')
+
+
 
     _sql_constraints = [
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
@@ -142,8 +165,14 @@ class ProductInherit(models.Model):
 
 class ProductBrand(models.Model):
     _name = "product.brand"
+    _rec_name = 'name'
 
     name = fields.Char('Brand Name')
+
+class ReasonReason(models.Model):
+    _name = 'reason.reason'
+
+    name = fields.Char(string='Reason')
 
 
 class AccountMoveInheritClass(models.Model):
@@ -184,6 +213,15 @@ class AccountMoveInheritClass(models.Model):
 
     #new selection field of address for credit note
     shipping_id_credit = fields.Many2one('res.partner', string='Ship To')
+
+    def open_update_partner_wizard(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Update Partner Wizard',
+            'res_model': 'journal.partner.update.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+        }
 
     @api.depends('invoice_line_ids.quantity')
     def _tot_line_qty(self):
@@ -383,6 +421,10 @@ class SaleOrderInherit(models.Model):
     partner_shipping_id_state = fields.Many2one('res.country.state','Del State', related='partner_shipping_id.state_id')
     partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
     partner_shipping_id_country = fields.Many2one('res.country','Del Country', related='partner_shipping_id.country_id')
+    reason_id = fields.Many2one('reason.reason')
+    desc = fields.Char('Description')
+    is_short_close = fields.Boolean()
+    closer_date = fields.Datetime()
 
     @api.depends('amount_total')
     def _amt_in_words(self):
@@ -401,6 +443,17 @@ class SaleOrderInherit(models.Model):
             'view_mode': 'tree,form',
             'views': [(False, 'list'), (False, 'form')],
             'domain': [('id', 'in', search_so.ids)],
+        }
+
+    def short_close(self):
+        view = self.env.ref('icorets.view_short_close_wizard')
+        return {
+            'name': 'Short Close',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'short.close',
+            'view_id': view.id,
+            'target': 'new',
         }
 
 
@@ -825,6 +878,7 @@ class SaleOrderLineInherit(models.Model):
     color = fields.Char(string='Color', related='product_id.color')
     tax_amount_line = fields.Monetary(string='Total Amount', readonly=True,
                                       compute="check_tax_amount", currency_field='currency_id')
+    sale_price_product = fields.Float(string='Product Sale Price', related='product_id.list_price')
 
     @api.depends('tax_id')
     def check_tax_amount(self):
@@ -1523,3 +1577,9 @@ class SaleOrderReport(models.AbstractModel):
                     sheet.write(row, col + 10, rec.product_uom_qty)
                     sheet.write(row, col + 11, rec.qty_invoiced)
                     row += 1
+
+class InheritProductAttribute(models.Model):
+    _inherit = 'product.attribute'
+
+    is_colour = fields.Boolean()
+    is_size = fields.Boolean()

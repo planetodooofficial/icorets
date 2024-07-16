@@ -35,7 +35,7 @@
             id="menu_stock_register_excel_report"
             name="Stock Register Excel Report"
             action="stock_register_excel_report_action"
-            parent="account.menu_finance_payables"
+            parent="stock.menu_warehouse_report"
             sequence="200"/>
 
 
