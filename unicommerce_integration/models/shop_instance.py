@@ -372,7 +372,7 @@ class ShopInstance(models.Model):
 
     def create_sales(self):
         # Get all orders that are in draft state
-        orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')])
+        orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')],limit=100)
         count = 0
         sale_orders = list()
         stock_location = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
