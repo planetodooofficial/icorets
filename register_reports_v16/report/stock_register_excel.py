@@ -53,6 +53,7 @@ class StockRegisterReport(models.AbstractModel):
         worksheet.write("AH1", "Quotation Qty")
         worksheet.write("AI1", "Confirmed SO qty")
         worksheet.write("AJ1", "PO Receipt Pending")
+        worksheet.write("AK1", "Cost Price")
 
         row = 1
 
@@ -91,10 +92,12 @@ class StockRegisterReport(models.AbstractModel):
             worksheet.write(row, 29, move_line_list[rec][2] + move_line_list[rec][7] or ' ', )
             worksheet.write(row, 30, move_line_list[rec][3] + move_line_list[rec][8] or ' ', )
             worksheet.write(row, 31, move_line_list[rec][4] + move_line_list[rec][9] or ' ', )
-            worksheet.write(row, 32, move_line_list[rec][4] + move_line_list[rec][9] + move_line_list[rec][3] + move_line_list[rec][8] + move_line_list[rec][2] + move_line_list[rec][7] or ' ', )
+            worksheet.write(row, 32, move_line_list[rec][4] + move_line_list[rec][9] + move_line_list[rec][3] +
+                            move_line_list[rec][8] + move_line_list[rec][2] + move_line_list[rec][7] or ' ', )
             worksheet.write(row, 33, move_line_list[rec][10] or ' ', )
             worksheet.write(row, 34, move_line_list[rec][11] or ' ', )
             worksheet.write(row, 35, move_line_list[rec][12] or ' ', )
+            worksheet.write(row, 36, search_product.standard_price or ' ', )
             row = row + 1
 
     def search_po(self, report_data):
@@ -110,8 +113,8 @@ class StockRegisterReport(models.AbstractModel):
             else:
                 all_category = self.env['product.category'].search([])
                 category = all_category.ids
-            search_mumbai = self.env['stock.warehouse'].search([('name','=','Mumbai')])
-            search_bhiwandi = self.env['stock.warehouse'].search([('name','=','Bhiwandi')])
+            search_mumbai = self.env['stock.warehouse'].search([('name', '=', 'Mumbai')])
+            search_bhiwandi = self.env['stock.warehouse'].search([('name', '=', 'Bhiwandi')])
             search_delhi = self.env['stock.warehouse'].search([('name', '=', 'Delhi Office')])
 
             # IN stock
@@ -119,7 +122,7 @@ class StockRegisterReport(models.AbstractModel):
                 ('product_id.categ_id.id', 'in', category),
                 ('location_id.usage', '=', 'supplier'),
                 ('location_dest_id.usage', '=', 'internal'),
-                ('location_dest_id.warehouse_id.id','in',[search_mumbai.id,search_bhiwandi.id,search_delhi.id]),
+                ('location_dest_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                 ('state', '=', 'done'),
                 ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)
             ])
@@ -135,7 +138,7 @@ class StockRegisterReport(models.AbstractModel):
             out_stock_moves = self.env['stock.move'].search([
                 ('product_id.categ_id.id', 'in', category),
                 ('location_id.usage', '=', 'internal'),
-                ('location_id.warehouse_id.id','in',[search_mumbai.id,search_bhiwandi.id,search_delhi.id]),
+                ('location_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                 ('location_dest_id.usage', '=', 'customer'),
                 ('state', '=', 'done'),
                 ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)
@@ -148,78 +151,107 @@ class StockRegisterReport(models.AbstractModel):
             total_out_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
                                                quantities_out_by_product}
 
-
             #     Opening Stock mum
 
             opening_moves_in_mumbai = self.env['stock.move'].search(['|',
-                ('location_id.warehouse_id', '=', False),  # Check if warehouse is not set
-                ('location_id.warehouse_id.id', '!=', search_mumbai.id),
-                ('location_dest_id.warehouse_id.id','=',search_mumbai.id),
-                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                ('date', '<', report_data.from_date)])
+                                                                     ('location_id.warehouse_id', '=', False),
+                                                                     # Check if warehouse is not set
+                                                                     ('location_id.warehouse_id.id', '!=',
+                                                                      search_mumbai.id),
+                                                                     ('location_dest_id.warehouse_id.id', '=',
+                                                                      search_mumbai.id),
+                                                                     ('state', '=', 'done'),
+                                                                     ('product_id.categ_id.id', 'in', category),
+                                                                     ('date', '<', report_data.from_date)])
             quantities_opening_in_mum_by_product = opening_moves_in_mumbai.read_group(
                 [('id', 'in', opening_moves_in_mumbai.ids)], ['product_id', 'product_qty'], ['product_id']
             )
-            total_opening_in_mum_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_opening_in_mum_by_product}
+            total_opening_in_mum_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                          quantities_opening_in_mum_by_product}
             opening_moves_out_mumbai = self.env['stock.move'].search(['|',
-                ('location_dest_id.warehouse_id','=',False),
-                ('location_dest_id.warehouse_id.id', '!=',search_mumbai.id),
-                ('location_id.warehouse_id', '=', search_mumbai.id),
-                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                ('date', '<', report_data.from_date)])
+                                                                      ('location_dest_id.warehouse_id', '=', False),
+                                                                      ('location_dest_id.warehouse_id.id', '!=',
+                                                                       search_mumbai.id),
+                                                                      ('location_id.warehouse_id', '=',
+                                                                       search_mumbai.id),
+                                                                      ('state', '=', 'done'),
+                                                                      ('product_id.categ_id.id', 'in', category),
+                                                                      ('date', '<', report_data.from_date)])
             quantities_opening_out_mum_by_product = opening_moves_out_mumbai.read_group(
                 [('id', 'in', opening_moves_out_mumbai.ids)], ['product_id', 'product_qty'], ['product_id']
             )
-            total_opening_out_mum_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_opening_out_mum_by_product}
-            mumbai_opening = {k: total_opening_in_mum_quantities_by_product.get(k, 0) - total_opening_out_mum_quantities_by_product.get(k, 0) for k in set(total_opening_in_mum_quantities_by_product) | set(total_opening_out_mum_quantities_by_product)}
+            total_opening_out_mum_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                           quantities_opening_out_mum_by_product}
+            mumbai_opening = {k: total_opening_in_mum_quantities_by_product.get(k,
+                                                                                0) - total_opening_out_mum_quantities_by_product.get(
+                k, 0) for k in set(total_opening_in_mum_quantities_by_product) | set(
+                total_opening_out_mum_quantities_by_product)}
 
             # bhiwandi opening
             opening_moves_in_bhiwandi = self.env['stock.move'].search(['|',
-                ('location_id.warehouse_id', '=', False),  # Check if warehouse is not set
-                ('location_id.warehouse_id.id', '!=', search_bhiwandi.id),
-                ('location_dest_id.warehouse_id.id','=',search_bhiwandi.id),
-                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                ('date', '<', report_data.from_date)])
+                                                                       ('location_id.warehouse_id', '=', False),
+                                                                       # Check if warehouse is not set
+                                                                       ('location_id.warehouse_id.id', '!=',
+                                                                        search_bhiwandi.id),
+                                                                       ('location_dest_id.warehouse_id.id', '=',
+                                                                        search_bhiwandi.id),
+                                                                       ('state', '=', 'done'),
+                                                                       ('product_id.categ_id.id', 'in', category),
+                                                                       ('date', '<', report_data.from_date)])
             quantities_opening_in_bhiwandi_by_product = opening_moves_in_mumbai.read_group(
                 [('id', 'in', opening_moves_in_bhiwandi.ids)], ['product_id', 'product_qty'], ['product_id'])
-            total_opening_in_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_opening_in_bhiwandi_by_product}
+            total_opening_in_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                               quantities_opening_in_bhiwandi_by_product}
             opening_moves_out_bhiwandi = self.env['stock.move'].search(['|',
-                ('location_dest_id.warehouse_id','=',False),
-                ('location_dest_id.warehouse_id.id', '!=',search_bhiwandi.id),
-                ('location_id.warehouse_id', '=', search_bhiwandi.id),
-                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                ('date', '<', report_data.from_date)])
+                                                                        ('location_dest_id.warehouse_id', '=', False),
+                                                                        ('location_dest_id.warehouse_id.id', '!=',
+                                                                         search_bhiwandi.id),
+                                                                        ('location_id.warehouse_id', '=',
+                                                                         search_bhiwandi.id),
+                                                                        ('state', '=', 'done'),
+                                                                        ('product_id.categ_id.id', 'in', category),
+                                                                        ('date', '<', report_data.from_date)])
 
-            quantities_opening_out_bhiwandi_by_product = opening_moves_out_bhiwandi.read_group([('id', 'in', opening_moves_out_bhiwandi.ids)], ['product_id', 'product_qty'], ['product_id'])
-            total_opening_out_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_opening_out_bhiwandi_by_product}
+            quantities_opening_out_bhiwandi_by_product = opening_moves_out_bhiwandi.read_group(
+                [('id', 'in', opening_moves_out_bhiwandi.ids)], ['product_id', 'product_qty'], ['product_id'])
+            total_opening_out_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                                quantities_opening_out_bhiwandi_by_product}
 
-            bhiwandi_opening = {k: total_opening_in_bhiwandi_quantities_by_product.get(k,0) - total_opening_out_bhiwandi_quantities_by_product.get(k, 0) for k in set(total_opening_in_bhiwandi_quantities_by_product) | set(total_opening_out_bhiwandi_quantities_by_product)}
+            bhiwandi_opening = {k: total_opening_in_bhiwandi_quantities_by_product.get(k,
+                                                                                       0) - total_opening_out_bhiwandi_quantities_by_product.get(
+                k, 0) for k in set(total_opening_in_bhiwandi_quantities_by_product) | set(
+                total_opening_out_bhiwandi_quantities_by_product)}
 
             #     Opening Stock delhi
 
-            opening_moves_in_delhi = self.env['stock.move'].search(['|',('location_id.warehouse_id', '=', False),
-                                                                     ('location_id.warehouse_id.id', '!=', search_delhi.id),
-                                                                     ('location_dest_id.warehouse_id.id', '=',search_delhi.id),
-                                                                     ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                                                                     ('date', '<', report_data.from_date)])
+            opening_moves_in_delhi = self.env['stock.move'].search(['|', ('location_id.warehouse_id', '=', False),
+                                                                    ('location_id.warehouse_id.id', '!=',
+                                                                     search_delhi.id),
+                                                                    ('location_dest_id.warehouse_id.id', '=',
+                                                                     search_delhi.id),
+                                                                    ('state', '=', 'done'),
+                                                                    ('product_id.categ_id.id', 'in', category),
+                                                                    ('date', '<', report_data.from_date)])
             quantities_opening_in_del_by_product = opening_moves_in_delhi.read_group(
                 [('id', 'in', opening_moves_in_delhi.ids)], ['product_id', 'product_qty'], ['product_id']
             )
             total_opening_in_del_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
                                                           quantities_opening_in_del_by_product}
             opening_moves_out_delhi = self.env['stock.move'].search(['|',
-                                                                      ('location_dest_id.warehouse_id', '=', False),
-                                                                      ('location_dest_id.warehouse_id.id', '!=',search_delhi.id),
-                                                                      ('location_id.warehouse_id', '=',search_delhi.id),
-                                                                      ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                                                                      ('date', '<', report_data.from_date)])
+                                                                     ('location_dest_id.warehouse_id', '=', False),
+                                                                     ('location_dest_id.warehouse_id.id', '!=',
+                                                                      search_delhi.id),
+                                                                     ('location_id.warehouse_id', '=', search_delhi.id),
+                                                                     ('state', '=', 'done'),
+                                                                     ('product_id.categ_id.id', 'in', category),
+                                                                     ('date', '<', report_data.from_date)])
             quantities_opening_out_del_by_product = opening_moves_out_delhi.read_group(
                 [('id', 'in', opening_moves_out_delhi.ids)], ['product_id', 'product_qty'], ['product_id']
             )
             total_opening_out_del_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
                                                            quantities_opening_out_del_by_product}
             delhi_opening = {k: total_opening_in_del_quantities_by_product.get(k,
-                                                                                0) - total_opening_out_del_quantities_by_product.get(
+                                                                               0) - total_opening_out_del_quantities_by_product.get(
                 k, 0) for k in set(total_opening_in_del_quantities_by_product) | set(
                 total_opening_out_del_quantities_by_product)}
 
@@ -231,9 +263,11 @@ class StockRegisterReport(models.AbstractModel):
                 ('product_id.categ_id.id', 'in', category),
                 ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)
             ])
-            quantities_return_by_product = return_stock_moves.read_group([('id', 'in', return_stock_moves.ids)], ['product_id', 'product_qty'], ['product_id'])
+            quantities_return_by_product = return_stock_moves.read_group([('id', 'in', return_stock_moves.ids)],
+                                                                         ['product_id', 'product_qty'], ['product_id'])
 
-            return_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_return_by_product}
+            return_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                            quantities_return_by_product}
 
             # Sale return
             # Purchase return
@@ -241,142 +275,180 @@ class StockRegisterReport(models.AbstractModel):
                 ('location_id.usage', '=', 'customer'),
                 ('location_dest_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
                 ('location_dest_id.usage', '=', 'internal'),
-                ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
+                ('state', '=', 'done'), ('product_id.categ_id.id', 'in', category),
                 ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)
             ])
-            quantities_sale_return_by_product = sale_return_stock_moves.read_group([('id', 'in', sale_return_stock_moves.ids)], ['product_id', 'product_qty'], ['product_id'])
-            sale_return_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_sale_return_by_product}
-
+            quantities_sale_return_by_product = sale_return_stock_moves.read_group(
+                [('id', 'in', sale_return_stock_moves.ids)], ['product_id', 'product_qty'], ['product_id'])
+            sale_return_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                 quantities_sale_return_by_product}
 
             # Closing stock Mumbai
             # Mumbai In Stock
             in_moves_mumbai = self.env['stock.move'].search(['|',
-                                                                     ('location_id.warehouse_id', '=', False),
-                                                                     ('location_id.warehouse_id.id', '!=',search_mumbai.id),
-                                                                     ('location_dest_id.warehouse_id.id', '=',search_mumbai.id),('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                                                                     ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)])
+                                                             ('location_id.warehouse_id', '=', False),
+                                                             ('location_id.warehouse_id.id', '!=', search_mumbai.id),
+                                                             (
+                                                             'location_dest_id.warehouse_id.id', '=', search_mumbai.id),
+                                                             ('state', '=', 'done'),
+                                                             ('product_id.categ_id.id', 'in', category),
+                                                             ('date', '>=', report_data.from_date),
+                                                             ('date', '<=', report_data.to_date)])
             quantities_in_mum_by_product = in_moves_mumbai.read_group(
                 [('id', 'in', in_moves_mumbai.ids)], ['product_id', 'product_qty'], ['product_id']
             )
-            total_in_mum_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_in_mum_by_product}
+            total_in_mum_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                  quantities_in_mum_by_product}
 
             # Out mumbai
             out_move_mumbai = self.env['stock.move'].search(['|',
                                                              ('location_dest_id.warehouse_id', '=', False),
-                                                             ('location_dest_id.warehouse_id.id', '!=',search_mumbai.id),('product_id.categ_id.id', 'in', category),
-                                                             ('location_id.warehouse_id', '=',search_mumbai.id),('state', '=', 'done'),
-                                                             ('date', '>=', report_data.from_date), ('date', '<=', report_data.to_date)])
+                                                             ('location_dest_id.warehouse_id.id', '!=',
+                                                              search_mumbai.id),
+                                                             ('product_id.categ_id.id', 'in', category),
+                                                             ('location_id.warehouse_id', '=', search_mumbai.id),
+                                                             ('state', '=', 'done'),
+                                                             ('date', '>=', report_data.from_date),
+                                                             ('date', '<=', report_data.to_date)])
             out_mum_by_product = out_move_mumbai.read_group(
                 [('id', 'in', out_move_mumbai.ids)], ['product_id', 'product_qty'], ['product_id']
             )
             out_mum_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in out_mum_by_product}
 
-            mumbai_in_out = {k: total_in_mum_quantities_by_product.get(k, 0) - out_mum_quantities_by_product.get(k, 0) for k in set(total_in_mum_quantities_by_product) | set(out_mum_quantities_by_product)}
+            mumbai_in_out = {k: total_in_mum_quantities_by_product.get(k, 0) - out_mum_quantities_by_product.get(k, 0)
+                             for k in set(total_in_mum_quantities_by_product) | set(out_mum_quantities_by_product)}
 
             # Bhiwandi In Stock
             in_moves_bhiwandi = self.env['stock.move'].search(['|',
-                                                             ('location_id.warehouse_id', '=', False),
-                                                             ('location_id.warehouse_id.id', '!=', search_bhiwandi.id),
-                                                             ('location_dest_id.warehouse_id.id', '=', search_bhiwandi.id),('product_id.categ_id.id', 'in', category),
-                                                             ('state', '=', 'done'),
-                                                             ('date', '>=', report_data.from_date),
-                                                             ('date', '<=', report_data.to_date)])
-            quantities_in_bhiwandi_by_product = in_moves_bhiwandi.read_group([('id', 'in', in_moves_bhiwandi.ids)], ['product_id', 'product_qty'], ['product_id'])
-            total_in_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in quantities_in_bhiwandi_by_product}
+                                                               ('location_id.warehouse_id', '=', False),
+                                                               (
+                                                               'location_id.warehouse_id.id', '!=', search_bhiwandi.id),
+                                                               ('location_dest_id.warehouse_id.id', '=',
+                                                                search_bhiwandi.id),
+                                                               ('product_id.categ_id.id', 'in', category),
+                                                               ('state', '=', 'done'),
+                                                               ('date', '>=', report_data.from_date),
+                                                               ('date', '<=', report_data.to_date)])
+            quantities_in_bhiwandi_by_product = in_moves_bhiwandi.read_group([('id', 'in', in_moves_bhiwandi.ids)],
+                                                                             ['product_id', 'product_qty'],
+                                                                             ['product_id'])
+            total_in_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                       quantities_in_bhiwandi_by_product}
 
             # Out mumbai
             out_move_bhiwandi = self.env['stock.move'].search(['|',
-                                                             ('location_dest_id.warehouse_id', '=', False),
-                                                             ('location_dest_id.warehouse_id.id', '!=',search_bhiwandi.id),('product_id.categ_id.id', 'in', category),
-                                                             ('location_id.warehouse_id', '=', search_bhiwandi.id),
-                                                             ('state', '=', 'done'),
-                                                             ('date', '>=', report_data.from_date),
-                                                             ('date', '<=', report_data.to_date)])
+                                                               ('location_dest_id.warehouse_id', '=', False),
+                                                               ('location_dest_id.warehouse_id.id', '!=',
+                                                                search_bhiwandi.id),
+                                                               ('product_id.categ_id.id', 'in', category),
+                                                               ('location_id.warehouse_id', '=', search_bhiwandi.id),
+                                                               ('state', '=', 'done'),
+                                                               ('date', '>=', report_data.from_date),
+                                                               ('date', '<=', report_data.to_date)])
             out_bhiwandi_by_product = out_move_bhiwandi.read_group(
                 [('id', 'in', out_move_bhiwandi.ids)], ['product_id', 'product_qty'], ['product_id']
             )
-            out_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in out_bhiwandi_by_product}
+            out_bhiwandi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
+                                                  out_bhiwandi_by_product}
 
-            bhiwandi_in_out = {k: total_in_bhiwandi_quantities_by_product.get(k, 0) - out_bhiwandi_quantities_by_product.get(k, 0)
-                             for k in set(total_in_bhiwandi_quantities_by_product) | set(out_bhiwandi_quantities_by_product)}
+            bhiwandi_in_out = {
+                k: total_in_bhiwandi_quantities_by_product.get(k, 0) - out_bhiwandi_quantities_by_product.get(k, 0)
+                for k in set(total_in_bhiwandi_quantities_by_product) | set(out_bhiwandi_quantities_by_product)}
 
             # Delhi In Stock
             in_moves_delhi = self.env['stock.move'].search(['|',
-                                                               ('location_id.warehouse_id', '=', False),
-                                                               ('location_id.warehouse_id.id', '!=', search_delhi.id),
-                                                               ('location_dest_id.warehouse_id.id', '=',search_delhi.id),
-                                                               ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                                                               ('date', '>=', report_data.from_date),
-                                                               ('date', '<=', report_data.to_date)])
+                                                            ('location_id.warehouse_id', '=', False),
+                                                            ('location_id.warehouse_id.id', '!=', search_delhi.id),
+                                                            ('location_dest_id.warehouse_id.id', '=', search_delhi.id),
+                                                            ('state', '=', 'done'),
+                                                            ('product_id.categ_id.id', 'in', category),
+                                                            ('date', '>=', report_data.from_date),
+                                                            ('date', '<=', report_data.to_date)])
             quantities_in_delhi_by_product = in_moves_delhi.read_group([('id', 'in', in_moves_delhi.ids)],
-                                                                             ['product_id', 'product_qty'],
-                                                                             ['product_id'])
+                                                                       ['product_id', 'product_qty'],
+                                                                       ['product_id'])
             total_in_delhi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
-                                                       quantities_in_delhi_by_product}
+                                                    quantities_in_delhi_by_product}
 
             # Out mumbai
             out_move_delhi = self.env['stock.move'].search(['|',
-                                                               ('location_dest_id.warehouse_id', '=', False),
-                                                               ('location_dest_id.warehouse_id.id', '!=',search_delhi.id),
-                                                               ('location_id.warehouse_id', '=', search_delhi.id),
-                                                               ('state', '=', 'done'),('product_id.categ_id.id', 'in', category),
-                                                               ('date', '>=', report_data.from_date),
-                                                               ('date', '<=', report_data.to_date)])
+                                                            ('location_dest_id.warehouse_id', '=', False),
+                                                            ('location_dest_id.warehouse_id.id', '!=', search_delhi.id),
+                                                            ('location_id.warehouse_id', '=', search_delhi.id),
+                                                            ('state', '=', 'done'),
+                                                            ('product_id.categ_id.id', 'in', category),
+                                                            ('date', '>=', report_data.from_date),
+                                                            ('date', '<=', report_data.to_date)])
             out_delhi_by_product = out_move_delhi.read_group(
                 [('id', 'in', out_move_delhi.ids)], ['product_id', 'product_qty'], ['product_id']
             )
             out_delhi_quantities_by_product = {data['product_id'][0]: data['product_qty'] for data in
-                                                  out_delhi_by_product}
+                                               out_delhi_by_product}
 
             delhi_in_out = {
                 k: total_in_delhi_quantities_by_product.get(k, 0) - out_delhi_quantities_by_product.get(k, 0)
                 for k in set(total_in_delhi_quantities_by_product) | set(out_delhi_quantities_by_product)}
 
-
             # Quotation Quantity
-            draft_sale_order_line = self.env['sale.order.line'].search([('create_date', '>=', report_data.from_date), ('create_date', '<=', report_data.to_date),
-                                                                        ('product_id.categ_id.id', 'in', category),
-                                                                        ('order_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
-                                                                        ('order_id.state', '=', 'draft')])
+            draft_sale_order_line = self.env['sale.order.line'].search(
+                [('create_date', '>=', report_data.from_date), ('create_date', '<=', report_data.to_date),
+                 ('product_id.categ_id.id', 'in', category),
+                 ('order_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
+                 ('order_id.state', '=', 'draft')])
 
             draft_sale_order_line_by_product = draft_sale_order_line.read_group(
                 [('id', 'in', draft_sale_order_line.ids)], ['product_id', 'product_uom_qty'], ['product_id']
             )
 
-            draft_sale_order_line_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in draft_sale_order_line_by_product}
+            draft_sale_order_line_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in
+                                                           draft_sale_order_line_by_product}
 
             # Done Quantity
-            done_sale_order_line = self.env['sale.order.line'].search([('create_date', '>=', report_data.from_date), ('create_date', '<=', report_data.to_date),('product_id.categ_id.id', 'in', category),
-                                                                        ('order_id.warehouse_id.id', 'in',[search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
-                                                                        ('order_id.state', 'in', ['sale','done'])])
+            done_sale_order_line = self.env['sale.order.line'].search(
+                [('create_date', '>=', report_data.from_date), ('create_date', '<=', report_data.to_date),
+                 ('product_id.categ_id.id', 'in', category),
+                 ('order_id.warehouse_id.id', 'in', [search_mumbai.id, search_bhiwandi.id, search_delhi.id]),
+                 ('order_id.state', 'in', ['sale', 'done'])])
 
-            done_sale_order_line_by_product = done_sale_order_line.read_group([('id', 'in', done_sale_order_line.ids)], ['product_id', 'product_uom_qty'], ['product_id'])
+            done_sale_order_line_by_product = done_sale_order_line.read_group([('id', 'in', done_sale_order_line.ids)],
+                                                                              ['product_id', 'product_uom_qty'],
+                                                                              ['product_id'])
 
-            done_sale_order_line_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in done_sale_order_line_by_product}
+            done_sale_order_line_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in
+                                                          done_sale_order_line_by_product}
 
             # quotation receipt
 
             draft_stock_move = self.env['stock.move'].search([('create_date', '<=', report_data.to_date),
-                                                              ('picking_id', '!=', False),('product_id.categ_id.id', 'in', category),
+                                                              ('picking_id', '!=', False),
+                                                              ('product_id.categ_id.id', 'in', category),
                                                               ('picking_id.state', 'not in', ['cancel', 'done']),
-                                                              ('picking_type_id.warehouse_id.id', 'in',[search_mumbai.id, search_bhiwandi.id, search_delhi.id])])
+                                                              ('picking_type_id.warehouse_id.id', 'in',
+                                                               [search_mumbai.id, search_bhiwandi.id,
+                                                                search_delhi.id])])
 
             draft_stock_move_by_product = draft_stock_move.read_group([('id', 'in', draft_stock_move.ids)],
-                                                                              ['product_id', 'product_uom_qty'],
-                                                                              ['product_id'])
+                                                                      ['product_id', 'product_uom_qty'],
+                                                                      ['product_id'])
 
-            draft_stock_move_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in draft_stock_move_by_product}
+            draft_stock_move_quantities_by_product = {data['product_id'][0]: data['product_uom_qty'] for data in
+                                                      draft_stock_move_by_product}
 
-
-
-
-            all_keys = set().union(total_quantities_by_product, total_out_quantities_by_product,mumbai_opening,bhiwandi_opening,delhi_opening,return_quantities_by_product,sale_return_quantities_by_product,mumbai_in_out
-                                   ,bhiwandi_in_out,delhi_in_out,draft_sale_order_line_quantities_by_product, done_sale_order_line_quantities_by_product, draft_stock_move_quantities_by_product)
+            all_keys = set().union(total_quantities_by_product, total_out_quantities_by_product, mumbai_opening,
+                                   bhiwandi_opening, delhi_opening, return_quantities_by_product,
+                                   sale_return_quantities_by_product, mumbai_in_out
+                                   , bhiwandi_in_out, delhi_in_out, draft_sale_order_line_quantities_by_product,
+                                   done_sale_order_line_quantities_by_product, draft_stock_move_quantities_by_product)
 
             # Populate values for each key in dictionary e
             for key in all_keys:
                 all_data[key] = [total_quantities_by_product.get(key, 0), total_out_quantities_by_product.get(key, 0),
-                                 mumbai_opening.get(key, 0),bhiwandi_opening.get(key,0),delhi_opening.get(key,0),return_quantities_by_product.get(key,0),sale_return_quantities_by_product.get(key,0),mumbai_in_out.get(key,0),bhiwandi_in_out.get(key,0),
-                                 delhi_in_out.get(key,0),draft_sale_order_line_quantities_by_product.get(key,0),done_sale_order_line_quantities_by_product.get(key,0),draft_stock_move_quantities_by_product.get(key,0)]
+                                 mumbai_opening.get(key, 0), bhiwandi_opening.get(key, 0), delhi_opening.get(key, 0),
+                                 return_quantities_by_product.get(key, 0),
+                                 sale_return_quantities_by_product.get(key, 0), mumbai_in_out.get(key, 0),
+                                 bhiwandi_in_out.get(key, 0),
+                                 delhi_in_out.get(key, 0), draft_sale_order_line_quantities_by_product.get(key, 0),
+                                 done_sale_order_line_quantities_by_product.get(key, 0),
+                                 draft_stock_move_quantities_by_product.get(key, 0)]
 
         return all_data

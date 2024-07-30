@@ -268,7 +268,8 @@ class DownloadReport(Controller):
             key_col += 1
             val_col += 1
 
-        writer.save()
+        # writer.save()
+        writer.close()
         out = fp.getvalue()
         pdfhttpheaders = [('Content-Type', 'application/octet-stream'),
                           ('Content-Disposition', content_disposition(f"Sales and Return Register Report.xlsx"))]

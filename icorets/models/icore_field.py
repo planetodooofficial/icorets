@@ -406,6 +406,7 @@ class SaleOrderInherit(models.Model):
     fo_id = fields.Many2one("sale.order", string="FO ID")
     fo_so_count = fields.Integer()
     gstin_id = fields.Many2one('res.partner', 'GSTIN')
+    employee_id = fields.Many2one('hr.employee', 'Employee')
 
     # Related fields for address
     partner_invoice_id_street = fields.Char('Inv Street', related='partner_invoice_id.street')
