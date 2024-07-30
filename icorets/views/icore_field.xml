@@ -437,7 +437,7 @@
                 <field name="closer_date"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="employee_id" string="Employee"/>
+                <field name="employee_id" string="Employee" options="{'no_create': True,'no_edit': True}"/>
             </xpath>
 
             <xpath expr="//field[@name='validity_date']" position="before">
