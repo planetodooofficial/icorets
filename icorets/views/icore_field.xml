@@ -178,12 +178,12 @@
                             <field name="product_dimension1"/>
                             <field name="product_dimension2"/>
                             <field name="product_dimension3"/>
-                                                        <field name="market_place_tittle"/>
-                                                        <field name="bullet_point_1"/>
-                                                        <field name="bullet_point_2"/>
-                                                        <field name="bullet_point_3"/>
-                                                        <field name="bullet_point_4"/>
-                                                        <field name="bullet_point_5"/>
+                            <field name="market_place_tittle"/>
+                            <field name="bullet_point_1"/>
+                            <field name="bullet_point_2"/>
+                            <field name="bullet_point_3"/>
+                            <field name="bullet_point_4"/>
+                            <field name="bullet_point_5"/>
                             <!--                            <field name="bigbasket"/>-->
                         </group>
                         <group>
@@ -436,7 +436,9 @@
                 <field name="is_short_close" invisible="1"/>
                 <field name="closer_date"/>
             </xpath>
-
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="employee_id" string="Employee"/>
+            </xpath>
 
             <xpath expr="//field[@name='validity_date']" position="before">
                 <field name="l10n_in_gst_treatment"/>
@@ -527,7 +529,8 @@
                 </attribute>
             </xpath>
             <xpath expr="//header/button[@name='action_cancel']" position="before">
-                <button name="short_close" type="object" string="Short Close" class="oe_highlight" attrs="{'invisible': [('is_short_close', '=', True)]}"/>
+                <button name="short_close" type="object" string="Short Close" class="oe_highlight"
+                        attrs="{'invisible': [('is_short_close', '=', True)]}"/>
             </xpath>
             <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
                 <attribute name="attrs">{'invisible':['|', ('state', 'not in', ['draft']), ('is_fo', '=', True)]}
@@ -746,10 +749,9 @@
         <field name="view_mode">tree,form</field>
     </record>
     <menuitem id="menu_reason_reason"
-                action="icorets.reason_reason_action"
-                parent="sale.sale_order_menu"
-                sequence="53"/>
-
+              action="icorets.reason_reason_action"
+              parent="sale.sale_order_menu"
+              sequence="53"/>
 
 
 </odoo>
