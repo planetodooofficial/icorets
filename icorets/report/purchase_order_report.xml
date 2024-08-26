@@ -330,6 +330,7 @@
             <div style="position: absolute;top: 10px;left: 990px;width: 300px;font-size: 14px">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
                 <b>PO Date :</b> <span t-field="o.x_studio_po_date" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                <b>Payment Terms :</b> <span t-field="o.payment_term_id.name" t-if="o.payment_term_id"/><br/>
                 <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 <b>Approved By :</b> <t t-esc="request.env.user.name"/>
             </div>
