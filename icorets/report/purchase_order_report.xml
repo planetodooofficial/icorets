@@ -266,12 +266,12 @@
                             <!--                            </tr>-->
                             <tr style="border:1px solid black">
                                 <td style="width:50%;border:1px solid black">PAYMENT TERM</td>
-                                <td style="text-align:center;width:50%;border:1px solid black">For iICOREts Private
+                                <td style="text-align:center;width:50%;border:1px solid black">For iCOREts Private
                                     Limites
                                 </td>
                             </tr>
                             <tr style="border:1px solid black">
-                                <td style="height:100px;border:1px solid black;vertical-align: top"></td>
+                                <td style="height:100px;border:1px solid black;vertical-align: top"><span t-field="o.payment_term_id.name" t-if="o.payment_term_id"/></td>
                                 <td style="height:100px;border:1px solid black"></td>
                             </tr>
 
@@ -330,7 +330,6 @@
             <div style="position: absolute;top: 10px;left: 990px;width: 300px;font-size: 14px">
                 <b>PO Number :</b> <t t-esc="o.name"/><br/>
                 <b>PO Date :</b> <span t-field="o.x_studio_po_date" t-options='{"format": "dd/MM/yyyy"}'/><br/>
-                <b>Payment Terms :</b> <span t-field="o.payment_term_id.name" t-if="o.payment_term_id"/><br/>
                 <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
                 <b>Approved By :</b> <t t-esc="request.env.user.name"/>
             </div>
