@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <record id="paperformat_batch_deposit" model="report.paperformat">
-        <field name="name">Flipkart</field>
-        <field name="default" eval="False"/>
-        <field name="format">A4</field>
-        <field name="page_height">0</field>
-        <field name="page_width">0</field>
-        <field name="orientation">Portrait</field>
-        <field name="margin_top">30</field>
-        <field name="margin_bottom">10</field>
-        <field name="margin_left">5</field>
-        <field name="margin_right">5</field>
-        <field name="header_line" eval="False"/>
-        <field name="header_spacing">25</field>
-        <field name="dpi">90</field>
-    </record>
+
+
+
+<!--    <record id="paperformat_batch_deposit" model="report.paperformat">-->
+<!--        <field name="name">Swiggy Instamart</field>-->
+<!--        <field name="default" eval="False"/>-->
+<!--        <field name="format">A4</field>-->
+<!--        <field name="page_height">0</field>-->
+<!--        <field name="page_width">0</field>-->
+<!--        <field name="orientation">Portrait</field>-->
+<!--        <field name="margin_top">30</field>-->
+<!--        <field name="margin_bottom">10</field>-->
+<!--        <field name="margin_left">5</field>-->
+<!--        <field name="margin_right">5</field>-->
+<!--        <field name="header_line" eval="False"/>-->
+<!--        <field name="header_spacing">25</field>-->
+<!--        <field name="dpi">90</field>-->
+<!--    </record>-->
 
 <!--    Landscape-->
-     <record id="paperformat_batch_deposit_flipkart" model="report.paperformat">
+     <record id="paperformat_batch_deposit_swiggy_insta" model="report.paperformat">
         <field name="name">Tax Invoice</field>
         <field name="default" eval="False"/>
         <field name="format">A4</field>
@@ -33,28 +36,28 @@
         <field name="dpi">90</field>
     </record>
 
-    <record id="flipkart_tax_invoice_report" model="ir.actions.report">
-        <field name="name">Tax Invoice - Flipkart</field>
+    <record id="swiggy_tax_invoice_report" model="ir.actions.report">
+        <field name="name">Tax Invoice - Swiggy Instamart</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-html</field>
-        <field name="report_name">icorets.custom_invoice_report_flipkart</field>
-        <field name="report_file">icorets.custom_invoice_report_flipkart</field>
+        <field name="report_name">icorets.custom_invoice_report_swiggy_insta</field>
+        <field name="report_file">icorets.custom_invoice_report_swiggy_insta</field>
         <field name="print_report_name">(object._get_report_base_filename())</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_flipkart"/>
+        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit_swiggy_insta"/>
     </record>
 
-    <template id="custom_invoice_report_flipkart">
+    <template id="custom_invoice_report_swiggy_insta">
         <t t-call="web.html_container">
                 <t t-foreach="docs.filtered(lambda x: x.move_type == 'out_invoice')" t-as="doc">
-                    <t t-call="icorets.tax_invoice_flipkart_report_original" t-lang="doc.partner_id.lang"/>
-<!--                    <t t-call="icorets.tax_invoice_flipkart_report_duplicate" t-lang="doc.partner_id.lang"/>-->
-<!--                    <t t-call="icorets.tax_invoice_flipkart_report_triplicate" t-lang="doc.partner_id.lang"/>-->
+                    <t t-call="icorets.tax_invoice_swiggy_insta_report_original" t-lang="doc.partner_id.lang"/>
+<!--                    <t t-call="icorets.tax_invoice_swiggy_insta_report_duplicate" t-lang="doc.partner_id.lang"/>-->
+<!--                    <t t-call="icorets.tax_invoice_swiggy_insta_report_triplicate" t-lang="doc.partner_id.lang"/>-->
                 </t>
         </t>
     </template>
 
-    <template id="tax_invoice_flipkart_report_original">
+    <template id="tax_invoice_swiggy_insta_report_original">
            <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -238,6 +241,9 @@
                                     <strong>Article Code</strong>
                                 </th>
                                 <th class="text-center">
+                                    <strong>Swiggy Code</strong>
+                                </th>
+                                <th class="text-center">
                                     <strong>FSN</strong>
                                 </th>
                                 <th class="text-center">
@@ -281,6 +287,9 @@
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.variant_article_code"/>
+                                </td>
+                                <td>
+                                    <t t-esc="line.product_id.swiggy"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.variants_fsn"/>
@@ -464,7 +473,7 @@
             </t>
         </t>
     </template>
-    <template id="tax_invoice_flipkart_report_duplicate">
+    <template id="tax_invoice_swiggy_insta_report_duplicate">
            <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -858,7 +867,7 @@
             </t>
         </t>
     </template>
-    <template id="tax_invoice_flipkart_report_triplicate">
+    <template id="tax_invoice_swiggy_insta_report_triplicate">
            <t t-foreach="docs" t-as="o">
             <t t-call="icorets.report_invoice_layout">
                 <style>
@@ -1044,6 +1053,9 @@
                                     <strong>Article Code</strong>
                                 </th>
                                 <th class="text-center">
+                                    <strong>Swiggy Code</strong>
+                                </th>
+                                <th class="text-center">
                                     <strong>Size</strong>
                                 </th>
                                 <th class="text-center" width="10%">
@@ -1084,6 +1096,9 @@
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.variant_article_code"/>
+                                </td>
+                                <td>
+                                    <t t-esc="line.product_id.swiggy"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.fetch_size()"/>
@@ -1253,81 +1268,4 @@
         </t>
     </template>
 
-        <!--    #header and layout-->
-    <template id="external_layout_stripped_invoice">
-<!--        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">-->
-
-<!--             <table style="width: 100%;border: 0px !important">-->
-<!--                <tr>-->
-<!--                    <td style="width:35%;float: left;vertical-align: bottom;border-right 0px; !important;border-left 0px; !important;border-top 0px; !important">-->
-<!--                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 60px;width: 220px;" alt="Logo"/>-->
-<!--                    </td>-->
-<!--                    <td style="vertical-align: bottom;border 0px; !important;width:35%;font-weight: bold;text-align: center; font-size: 16px;">-->
-<!--                        TAX INVOICE-->
-<!--                    </td>-->
-<!--                    <td style="vertical-align: bottom;border 0px; !important;width:35%;font-weight: bold;text-align: right; font-size: 16px;">-->
-<!--                        <span>Ref :</span>  <span t-field="o.name"/>-->
-
-<!--                    </td>-->
-<!--                </tr>-->
-<!--            </table>-->
-
-<!--        </div>-->
-        <div t-attf-class="header o_company_#{company.id}_layout">
-
-            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 60px;width: 220px;margin-top: 13px" alt="Logo"/>
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            <span style="text-align: right;"><b></b></span>
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-            &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-<!--            <span style="text-align: right; padding-left: 10%;">Ref :</span>  <span t-field="o.name"/>-->
-
-        </div>
-
-
-        <div t-attf-class="article o_report_layout_striped o_company_#{company.id}_layout"
-             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
-             t-att-data-oe-lang="o and o.env.context.get('lang')">
-            <div>
-
-               </div>
-                <t t-if="o.state == 'cancel'">
-                    <div class="backgroundimage" style="position:absolute;opacity:0.50;z-index:1000;transform:rotate(300deg);-webkit-transform:rotate(300deg);width:135%;">
-                        <p style="font-size:100px;color:red;">CANCELLED</p>
-                    </div>
-                </t>
-
-            <t t-raw="0"/>
-        </div>
-        <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
-            <div class="text-center">
-                <div t-field="company.website"/>
-                <div t-if="report_type == 'pdf'">
-                    Page: <span class="page"/> / <span class="topage"/>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="report_invoice_layout">
-        <t t-if="not o" t-set="o" t-value="doc"/>
-        <t t-if="not company">
-            <!-- Multicompany -->
-            <t t-if="company_id">
-                <t t-set="company" t-value="company_id"/>
-            </t>
-            <t t-elif="o and 'company_id' in o">
-                <t t-set="company" t-value="o.company_id.sudo()"/>
-            </t>
-            <t t-else="else">
-                <t t-set="company" t-value="res_company"/>
-            </t>
-        </t>
-
-        <t t-call="icorets.external_layout_stripped_invoice">
-            <t t-raw="0"/>
-        </t>
-    </template>
-</odoo>
-
+    </odoo>
