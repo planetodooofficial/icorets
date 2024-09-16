@@ -372,7 +372,7 @@ class ShopInstance(models.Model):
 
     def create_sales(self):
         # Get all orders that are in draft state
-        orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')],limit=100)
+        orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')], limit=100)
         count = 0
         sale_orders = list()
         stock_location = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
@@ -532,7 +532,11 @@ class ShopInstance(models.Model):
         partner_obj = self.env['res.partner']
         partner_data = partner_data.read()[0]
         state_id = self.get_state_id(partner_data.get('billing_state'))
-        partner_id = partner_obj.search([('is_website_partner', '=', True), ('state_id', '=', state_id)], limit=1)
+        sales_channel_id = partner_data.get('sales_channel_id')
+        if sales_channel_id:
+            sales_channel_id = sales_channel_id[0]
+        partner_id = partner_obj.search([('shop_sales_channel_id', '=', sales_channel_id), ('state_id', '=', state_id)],
+                                        limit=1)
         if not partner_id:
             if not state_id:
                 search_export_partner = partner_obj.search([('name', '=', 'playR Website - B2C - Export')])
@@ -638,7 +642,8 @@ class ShopInstance(models.Model):
                 'price_unit': line.selling_price_without_taxes_and_discount - line.discount,
                 'tax_id': [(6, 0, [line.tax_id.id])] if line.tax_id else False,
                 'product_uom': uom_id.id,
-                'analytic_distribution': {f"{order.sales_channel_id.analytics_id.id}": 100} if order.sales_channel_id.analytics_id else False,
+                'analytic_distribution': {
+                    f"{order.sales_channel_id.analytics_id.id}": 100} if order.sales_channel_id.analytics_id else False,
             }))
         return order_lines
 
