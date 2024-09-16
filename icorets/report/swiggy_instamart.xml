@@ -1047,6 +1047,9 @@
                                     <strong>Article Code</strong>
                                 </th>
                                 <th class="text-center">
+                                    <strong>Swiggy Code</strong>
+                                </th>
+                                <th class="text-center">
                                     <strong>Size</strong>
                                 </th>
                                 <th class="text-center" width="10%">
@@ -1087,6 +1090,9 @@
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.variant_article_code"/>
+                                </td>
+                                <td>
+                                    <t t-esc="line.product_id.swiggy"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.fetch_size()"/>

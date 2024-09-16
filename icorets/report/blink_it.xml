@@ -241,6 +241,9 @@
                                     <strong>Article Code</strong>
                                 </th>
                                 <th class="text-center">
+                                    <strong>Blink IT Code</strong>
+                                </th>
+                                <th class="text-center">
                                     <strong>FSN</strong>
                                 </th>
                                 <th class="text-center">
@@ -284,6 +287,9 @@
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.variant_article_code"/>
+                                </td>
+                                 <td>
+                                    <t t-esc="line.product_id.blinkit"/>
                                 </td>
                                 <td>
                                     <t t-esc="line.product_id.variants_fsn"/>
