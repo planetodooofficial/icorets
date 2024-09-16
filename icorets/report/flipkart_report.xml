@@ -341,7 +341,7 @@
                             </tr>
                         </t>
                                                 <tr>
-                            <td colspan="7">
+                            <td colspan="8">
                                 Total
                             </td>
                             <td style="text-align: center">
@@ -393,14 +393,14 @@
                     <!--                    <table>-->
                     <!--                        <tr>-->
                     <!--                            <td style="border: 0px">-->
-                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :-
-                        <t t-if="doc.currency_id.name == 'INR'">
-                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only
-                        </t>
-                        <t t-else="">
-                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only
-                        </t>
-                    </strong>
+<!--                    <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :- -->
+<!--                        <t t-if="doc.currency_id.name == 'INR'">-->
+<!--                            <span style="text-transform: capitalize;font-size: 12px" t-esc="doc.check_amount_in_words.replace(',', '')"/> only-->
+<!--                        </t>-->
+<!--                        <t t-else="">-->
+<!--                            <span style="font-size: 12px" t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/> only-->
+<!--                        </t>-->
+<!--                    </strong>-->
 
                     <table style="width:100%;margin-top: 10px;page-break-inside: avoid;">
                         <tr style="border:1px solid black;">
