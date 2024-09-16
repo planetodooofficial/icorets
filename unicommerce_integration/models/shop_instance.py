@@ -485,7 +485,7 @@ class ShopInstance(models.Model):
 
         # Batch process deliveries
         for sale_order in sale_orders:
-            if sale_order.state == "sale":
+            if sale_order.state == "sale" and not sale_order.sales_channel_id.is_no_invoice:
                 search_delivery = self.env["stock.picking"].search([('origin', '=', sale_order.name)])
                 search_delivery.write({'dump_sequence': dump_sequence})
 
