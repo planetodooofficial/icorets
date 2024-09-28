@@ -6,8 +6,8 @@
         <field name="arch" type="xml">
             <form string="Fetch Missing Orders">
                 <group>
-                    <field name="shop_instance_id" options="{'no_open': True, 'no_create': True}"/>
-                    <field name="order_id"/>
+                    <field name="shop_instance_id" options="{'no_open': True, 'no_create': True}" required="True"/>
+                    <field name="order_id" required="True"/>
                     <field name="order_in_system_id" invisible="1"/>
                 </group>
                 <footer>
