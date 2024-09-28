@@ -139,6 +139,13 @@ class ShopInstance(models.Model):
                     for return_order in order['returns']:
                         if return_order['statusCode'] in ['COMPLETE', 'RETURNED']:
                             update_orders.append(order)
+            elif order.get('returns', False):  # incase a new order has a return dictionary and it's status is completed
+                for return_order in order['returns']:
+                    if return_order['statusCode'] in ['COMPLETE', 'RETURNED']:
+                        update_orders.append(order)
+                        new_orders.append(order)
+                    else:
+                        new_orders.append(order)
             else:
                 new_orders.append(order)
         for order in new_orders:
@@ -831,6 +838,18 @@ class ShopInstance(models.Model):
     #                                                                                   })
     #     payment_id._create_payments()
     #     return payment_id
+
+    def fetch_missing_orders(self):
+        """ Call the missing order wizard"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Fetch Missing Orders',
+            'res_model': 'fetch.missing.orders',
+            'view_mode': 'form',
+            'context': {'default_shop_instance_id': self.id},
+            'target': 'new',
+
+        }
 
     def sync_odoo_inventory(self):
         """ Sync the inventory of the products from the shop instance to the Odoo """

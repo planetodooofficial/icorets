@@ -15,6 +15,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/crons.xml',
+        'wizard/fetch_missing_orders.xml',
         'views/unicommerce_orders_view.xml',
         'views/shop_instance_view.xml',
         'views/shop_import_logs_view.xml',

@@ -4,3 +4,4 @@ access_unicommerce_order_line,unicommerce.order.line,model_unicommerce_order_lin
 access_shop_instance,shop.instance,model_shop_instance,,1,1,1,1
 access_shop_import_logs,shop.import.logs,model_shop_import_logs,,1,1,1,1
 access_shop_sales_channel,shop.sales.channel,model_shop_sales_channel,,1,1,1,1
+access_fetch_missing_orders,fetch.missing.orders,model_fetch_missing_orders,,1,1,1,1
