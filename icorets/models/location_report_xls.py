@@ -120,34 +120,41 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 30, 'IHO Stock', bold)
         sheet.write(0, 31, 'Bhiwandi Stock', bold)
         sheet.write(0, 32, 'Delhi Stock', bold)
-        sheet.write(0, 33, 'Customer Location', bold)
-        sheet.write(0, 34, 'Vendor Location', bold)
-        sheet.write(0, 35, 'Virtual Locations/Inventory adjustment', bold)
-        sheet.write(0, 36, 'Virtual Locations/Scrap', bold)
-        sheet.write(0, 37, 'Virtual Locations/Production', bold)
-        sheet.write(0, 38, 'Total Qty', bold)
-        sheet.write(0, 39, 'Quotation Qty', bold)
-        sheet.write(0, 40, 'Confirmed SO qty', bold)
-        sheet.write(0, 41, 'FREE TO USE', bold)
-        sheet.write(0, 42, 'PO Receipt Pending', bold)
-        sheet.write(0, 43, 'To Replenish', bold)
-        sheet.write(0, 44, 'Bullet Point 1', bold)
-        sheet.write(0, 45, 'Bullet Point 2', bold)
-        sheet.write(0, 46, 'Bullet Point 3', bold)
-        sheet.write(0, 47, 'Bullet Point 4', bold)
-        sheet.write(0, 48, 'Bullet Point 5', bold)
-        sheet.write(0, 49, 'Description', bold)
-        sheet.write(0, 50, 'Google Drive Link', bold)
-        sheet.write(0, 51, 'Drop Box Link', bold)
-        sheet.write(0, 52, 'Country of Origin', bold)
-        sheet.write(0, 53, 'Product Net Weight (gms)', bold)
-        sheet.write(0, 54, 'Product Length (cm)', bold)
-        sheet.write(0, 55, 'Product Breadth (cm)', bold)
-        sheet.write(0, 56, 'Product Height (cm)', bold)
-        sheet.write(0, 57, 'Package Gross Weight (gms)', bold)
-        sheet.write(0, 58, 'Package Length (cm)', bold)
-        sheet.write(0, 59, 'Package Breadth (cm)', bold)
-        sheet.write(0, 60, 'Package Height (cm)', bold)
+        sheet.write(0, 33, 'BHU Stock', bold)
+        sheet.write(0, 34, 'DHASA Stock', bold)
+        sheet.write(0, 35, 'ELM Stock', bold)
+        sheet.write(0, 36, 'JSP Stock', bold)
+        sheet.write(0, 37, 'JWD Stock', bold)
+        sheet.write(0, 38, 'RCP Stock', bold)
+        sheet.write(0, 39, 'UPW Stock', bold)
+        sheet.write(0, 40, 'Customer Location', bold)
+        sheet.write(0, 41, 'Vendor Location', bold)
+        sheet.write(0, 42, 'Virtual Locations/Inventory adjustment', bold)
+        sheet.write(0, 43, 'Virtual Locations/Scrap', bold)
+        sheet.write(0, 44, 'Virtual Locations/Production', bold)
+        sheet.write(0, 45, 'Total Qty', bold)
+        sheet.write(0, 46, 'Quotation Qty', bold)
+        sheet.write(0, 47, 'Confirmed SO qty', bold)
+        sheet.write(0, 48, 'FREE TO USE', bold)
+        sheet.write(0, 49, 'PO Receipt Pending', bold)
+        sheet.write(0, 50, 'To Replenish', bold)
+        sheet.write(0, 51, 'Bullet Point 1', bold)
+        sheet.write(0, 52, 'Bullet Point 2', bold)
+        sheet.write(0, 53, 'Bullet Point 3', bold)
+        sheet.write(0, 54, 'Bullet Point 4', bold)
+        sheet.write(0, 55, 'Bullet Point 5', bold)
+        sheet.write(0, 56, 'Description', bold)
+        sheet.write(0, 57, 'Google Drive Link', bold)
+        sheet.write(0, 58, 'Drop Box Link', bold)
+        sheet.write(0, 59, 'Country of Origin', bold)
+        sheet.write(0, 60, 'Product Net Weight (gms)', bold)
+        sheet.write(0, 61, 'Product Length (cm)', bold)
+        sheet.write(0, 62, 'Product Breadth (cm)', bold)
+        sheet.write(0, 63, 'Product Height (cm)', bold)
+        sheet.write(0, 64, 'Package Gross Weight (gms)', bold)
+        sheet.write(0, 65, 'Package Length (cm)', bold)
+        sheet.write(0, 66, 'Package Breadth (cm)', bold)
+        sheet.write(0, 67, 'Package Height (cm)', bold)
         # sheet.write(0, 30, '(Onhand + incoming) - outgoing', bold)
         # sheet.write(0, 31, '(Onhand + incoming) - outgoing(With_Qtn)', bold)
         sheet.freeze_panes(1, 0)
@@ -193,6 +200,13 @@ class LocationReport(models.AbstractModel):
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
+                'BHU Stock': '',
+                'DHASA Stock': '',
+                'ELM Stock': '',
+                'JSP Stock': '',
+                'JWD Stock': '',
+                'RCP Stock': '',
+                'UPW Stock': '',
                 'Customer Location': '',
                 'Vendor Location': '',
                 'Virtual Locations/Inventory adjustment': '',
@@ -237,6 +251,20 @@ class LocationReport(models.AbstractModel):
                     product_data[product_id]['Bhiwandi Stock'] = quant.quantity
                 elif quant.location_id.location_id.name == 'DEL':
                     product_data[product_id]['Delhi Stock'] = quant.quantity
+                elif quant.location_id.location_id.name == 'BHU':
+                    product_data[product_id]['BHU Stock'] = quant.quantity
+                elif quant.location_id.location_id.name == 'DHASA':
+                    product_data[product_id]['DHASA Stock'] = quant.quantity
+                elif quant.location_id.location_id.name == 'ELM':
+                    product_data[product_id]['ELM Stock'] = quant.quantity
+                elif quant.location_id.location_id.name == 'JSP':
+                    product_data[product_id]['JSP Stock'] = quant.quantity
+                elif quant.location_id.location_id.name == 'JWD':
+                    product_data[product_id]['JWD Stock'] = quant.quantity
+                elif quant.location_id.location_id.name == 'RCP':
+                    product_data[product_id]['RCP Stock'] = quant.quantity
+                elif quant.location_id.location_id.name == 'UPW':
+                    product_data[product_id]['UPW Stock'] = quant.quantity
                 elif quant.location_id.name == 'Customers':
                     product_data[product_id]['Customer Location'] = quant.quantity
                 elif quant.location_id.name == 'Vendors':
@@ -357,36 +385,43 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 30, data['IHO Stock'])
             sheet.write(row, col + 31, data['Bhiwandi Stock'])
             sheet.write(row, col + 32, data['Delhi Stock'])
-            sheet.write(row, col + 33, data['Customer Location'])
-            sheet.write(row, col + 34, data['Vendor Location'])
-            sheet.write(row, col + 35, data['Virtual Locations/Inventory adjustment'])
-            sheet.write(row, col + 36, data['Virtual Locations/Scrap'])
-            sheet.write(row, col + 37, data['Virtual Locations/Production'])
-            sheet.write(row, col + 38, data['Total'])
-            sheet.write(row, col + 39, data['Quotation Qty'])
-            sheet.write(row, col + 40, data['Confirmed SO qty'])
-            sheet.write(row, col + 41, data['FREE TO USE'])
-            sheet.write(row, col + 42, data['PO Receipt Pending'])
-            sheet.write(row, col + 43, data['To Replenish'])
+            sheet.write(row, col + 33, data['BHU Stock'])
+            sheet.write(row, col + 34, data['DHASA Stock'])
+            sheet.write(row, col + 35, data['ELM Stock'])
+            sheet.write(row, col + 36, data['JSP Stock'])
+            sheet.write(row, col + 37, data['JWD Stock'])
+            sheet.write(row, col + 38, data['RCP Stock'])
+            sheet.write(row, col + 39, data['UPW Stock'])
+            sheet.write(row, col + 40, data['Customer Location'])
+            sheet.write(row, col + 41, data['Vendor Location'])
+            sheet.write(row, col + 42, data['Virtual Locations/Inventory adjustment'])
+            sheet.write(row, col + 43, data['Virtual Locations/Scrap'])
+            sheet.write(row, col + 44, data['Virtual Locations/Production'])
+            sheet.write(row, col + 45, data['Total'])
+            sheet.write(row, col + 46, data['Quotation Qty'])
+            sheet.write(row, col + 47, data['Confirmed SO qty'])
+            sheet.write(row, col + 48, data['FREE TO USE'])
+            sheet.write(row, col + 49, data['PO Receipt Pending'])
+            sheet.write(row, col + 50, data['To Replenish'])
 
-            sheet.write(row, col + 44, data['Bullet Point 1'])
-            sheet.write(row, col + 45, data['Bullet Point 2'])
-            sheet.write(row, col + 46, data['Bullet Point 3'])
-            sheet.write(row, col + 47, data['Bullet Point 4'])
-            sheet.write(row, col + 48, data['Bullet Point 5'])
-            sheet.write(row, col + 49, data['Description'])
-            sheet.write(row, col + 50, data['Google Drive Link'])
-            sheet.write(row, col + 51, data['Drop Box Link'])
-            sheet.write(row, col + 52, data['Country of Origin'])
+            sheet.write(row, col + 51, data['Bullet Point 1'])
+            sheet.write(row, col + 52, data['Bullet Point 2'])
+            sheet.write(row, col + 53, data['Bullet Point 3'])
+            sheet.write(row, col + 54, data['Bullet Point 4'])
+            sheet.write(row, col + 55, data['Bullet Point 5'])
+            sheet.write(row, col + 56, data['Description'])
+            sheet.write(row, col + 57, data['Google Drive Link'])
+            sheet.write(row, col + 58, data['Drop Box Link'])
+            sheet.write(row, col + 59, data['Country of Origin'])
 
-            sheet.write(row, col + 53, data['Product Net Weight (gms)'])
-            sheet.write(row, col + 54, data['Product Length (cm)'])
-            sheet.write(row, col + 55, data['Product Breadth (cm)'])
-            sheet.write(row, col + 56, data['Product Height (cm)'])
-            sheet.write(row, col + 57, data['Package Gross Weight (gms)'])
-            sheet.write(row, col + 58, data['Package Length (cm)'])
-            sheet.write(row, col + 59, data['Package Breadth (cm)'])
-            sheet.write(row, col + 60, data['Package Height (cm)'])
+            sheet.write(row, col + 60, data['Product Net Weight (gms)'])
+            sheet.write(row, col + 61, data['Product Length (cm)'])
+            sheet.write(row, col + 62, data['Product Breadth (cm)'])
+            sheet.write(row, col + 63, data['Product Height (cm)'])
+            sheet.write(row, col + 64, data['Package Gross Weight (gms)'])
+            sheet.write(row, col + 65, data['Package Length (cm)'])
+            sheet.write(row, col + 66, data['Package Breadth (cm)'])
+            sheet.write(row, col + 67, data['Package Height (cm)'])
             # sheet.write(row, col +30, data['(Onhand + incoming) - outgoing'])
             # sheet.write(row, col + 31, data['(Onhand + incoming) - outgoing(With_Qtn)'])
 
