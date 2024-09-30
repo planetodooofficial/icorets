@@ -184,6 +184,11 @@ class LocationReport(models.AbstractModel):
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
+                'Customer Location': '',
+                'Vendor Location': '',
+                'Virtual Locations/Inventory adjustment': '',
+                'Virtual Locations/Scrap': '',
+                'Virtual Locations/Production': '',
                 'Total': product.qty_available or '',
                 'To Replenish': 0,
                 '(Onhand + incoming) - outgoing': product.virtual_available or '',
@@ -223,6 +228,18 @@ class LocationReport(models.AbstractModel):
                     product_data[product_id]['Bhiwandi Stock'] = quant.quantity
                 elif quant.location_id.location_id.name == 'DEL':
                     product_data[product_id]['Delhi Stock'] = quant.quantity
+                elif quant.location_id.name == 'Customers':
+                    product_data[product_id]['Customer Location'] = quant.quantity
+                elif quant.location_id.name == 'Vendors':
+                    product_data[product_id]['Vendor Location'] = quant.quantity
+                elif quant.location_id.name == 'Inventory adjustment':
+                    product_data[product_id]['Virtual Locations/Inventory adjustment'] = quant.quantity
+                elif quant.location_id.name == 'Scrap':
+                    product_data[product_id]['Virtual Locations/Scrap'] = quant.quantity
+                elif quant.location_id.name == 'Production':
+                    product_data[product_id]['Virtual Locations/Production'] = quant.quantity
+
+
 
             #Find quotations related to the product
 
@@ -285,7 +302,7 @@ class LocationReport(models.AbstractModel):
                 order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
                 if order_line.product_id.id == product_id)
 
-            # Total outgoing quantity
+            # Total outgoing quantityy
             outgoing_qty = product.outgoing_qty + quotation_outgoing_qty
 
             incoming_qty = product.incoming_qty
@@ -331,31 +348,36 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 30, data['IHO Stock'])
             sheet.write(row, col + 31, data['Bhiwandi Stock'])
             sheet.write(row, col + 32, data['Delhi Stock'])
-            sheet.write(row, col + 33, data['Total'])
-            sheet.write(row, col + 34, data['Quotation Qty'])
-            sheet.write(row, col + 35, data['Confirmed SO qty'])
-            sheet.write(row, col + 36, data['FREE TO USE'])
-            sheet.write(row, col + 37, data['PO Receipt Pending'])
-            sheet.write(row, col + 38, data['To Replenish'])
+            sheet.write(row, col + 33, data['Customer Location'])
+            sheet.write(row, col + 34, data['Vendor Location'])
+            sheet.write(row, col + 35, data['Virtual Locations/Inventory adjustment'])
+            sheet.write(row, col + 36, data['Virtual Locations/Scrap'])
+            sheet.write(row, col + 37, data['Virtual Locations/Production'])
+            sheet.write(row, col + 38, data['Total'])
+            sheet.write(row, col + 39, data['Quotation Qty'])
+            sheet.write(row, col + 40, data['Confirmed SO qty'])
+            sheet.write(row, col + 41, data['FREE TO USE'])
+            sheet.write(row, col + 42, data['PO Receipt Pending'])
+            sheet.write(row, col + 43, data['To Replenish'])
 
-            sheet.write(row, col + 39, data['Bullet Point 1'])
-            sheet.write(row, col + 40, data['Bullet Point 2'])
-            sheet.write(row, col + 41, data['Bullet Point 3'])
-            sheet.write(row, col + 42, data['Bullet Point 4'])
-            sheet.write(row, col + 43, data['Bullet Point 5'])
-            sheet.write(row, col + 44, data['Description'])
-            sheet.write(row, col + 45, data['Google Drive Link'])
-            sheet.write(row, col + 46, data['Drop Box Link'])
-            sheet.write(row, col + 47, data['Country of Origin'])
+            sheet.write(row, col + 44, data['Bullet Point 1'])
+            sheet.write(row, col + 45, data['Bullet Point 2'])
+            sheet.write(row, col + 46, data['Bullet Point 3'])
+            sheet.write(row, col + 47, data['Bullet Point 4'])
+            sheet.write(row, col + 48, data['Bullet Point 5'])
+            sheet.write(row, col + 49, data['Description'])
+            sheet.write(row, col + 50, data['Google Drive Link'])
+            sheet.write(row, col + 51, data['Drop Box Link'])
+            sheet.write(row, col + 52, data['Country of Origin'])
 
-            sheet.write(row, col + 48, data['Product Net Weight (gms)'])
-            sheet.write(row, col + 49, data['Product Length (cm)'])
-            sheet.write(row, col + 50, data['Product Breadth (cm)'])
-            sheet.write(row, col + 51, data['Product Height (cm)'])
-            sheet.write(row, col + 52, data['Package Gross Weight (gms)'])
-            sheet.write(row, col + 53, data['Package Length (cm)'])
-            sheet.write(row, col + 54, data['Package Breadth (cm)'])
-            sheet.write(row, col + 55, data['Package Height (cm)'])
+            sheet.write(row, col + 53, data['Product Net Weight (gms)'])
+            sheet.write(row, col + 54, data['Product Length (cm)'])
+            sheet.write(row, col + 55, data['Product Breadth (cm)'])
+            sheet.write(row, col + 56, data['Product Height (cm)'])
+            sheet.write(row, col + 57, data['Package Gross Weight (gms)'])
+            sheet.write(row, col + 58, data['Package Length (cm)'])
+            sheet.write(row, col + 59, data['Package Breadth (cm)'])
+            sheet.write(row, col + 60, data['Package Height (cm)'])
             # sheet.write(row, col +30, data['(Onhand + incoming) - outgoing'])
             # sheet.write(row, col + 31, data['(Onhand + incoming) - outgoing(With_Qtn)'])
 
