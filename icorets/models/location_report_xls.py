@@ -214,7 +214,7 @@ class LocationReport(models.AbstractModel):
 
             }
 
-            stock_quants = product.stock_quant_ids.filtered(lambda q: q.location_id.usage == 'internal')
+            stock_quants = product.stock_quant_ids.filtered(lambda q: q.location_id.usage != 'view')
 
             for quant in stock_quants:
                 if quant.location_id.location_id.name == 'IHO':
