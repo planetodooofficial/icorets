@@ -27,6 +27,7 @@
                     <button name="get_orders" string="Get Orders" type="object" class="oe_highlight"/>
                     <button name="create_sales" string="Create Sales" type="object" class="oe_highlight"/>
                     <button name="create_returns_sales" string="Create Returns" type="object" class="oe_highlight"/>
+                    <button name="fetch_missing_orders" string="Fetch Missing Orders" type="object" class="oe_highlight"/>
                 </header>
                 <sheet>
                     <group>
