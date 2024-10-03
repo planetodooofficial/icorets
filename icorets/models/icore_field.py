@@ -192,7 +192,7 @@ class AccountMoveInheritClass(models.Model):
 
     ])
     cust_code = fields.Char("Code", compute="_compute_cust_code", store=True)
-    tot_line_qty = fields.Integer(string="Total Line Qty",compute="_tot_line_qty")
+    tot_line_qty = fields.Integer(string="Total Line Qty", compute="_tot_line_qty")
 
     # Related fields for address
     partner_id_street = fields.Char('Inv Street', related='partner_id.street')
@@ -206,7 +206,7 @@ class AccountMoveInheritClass(models.Model):
     partner_shipping_id_street2 = fields.Char('Del Street2', related='partner_shipping_id.street2')
     partner_shipping_id_city = fields.Char('Del City', related='partner_shipping_id.city')
     partner_shipping_id_state = fields.Many2one('res.country.state', 'Del State',
-                                                related='partner_shipping_id.state_id')
+                                                    related='partner_shipping_id.state_id')
     partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
     partner_shipping_id_country = fields.Many2one('res.country', 'Del Country',
                                                   related='partner_shipping_id.country_id')
