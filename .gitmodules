@@ -2,3 +2,8 @@
 	path = planetodooofficial/accounting_planetodoo_v16
 	url = git@github.com:planetodooofficial/accounting_planetodoo_v16.git
 	branch = master
+
+[submodule "geotechnosoft/icoregeo"]
+	path = geotechnosoft/icoregeo
+	url = git@github.com:geotechnosoft/icoregeo.git
+	branch = staging
