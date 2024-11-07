@@ -118,6 +118,7 @@ class DownloadReport(Controller):
                         'MRP': invoice_line.product_id.list_price,
                         'Article Code': invoice_line.article_code,
                         'SO Number': invoice_line.move_id.invoice_origin,
+                        'PO Number': invoice_line.move_id.ref if invoice_line.move_id.move_type != 'out_refund' else invoice_line.move_id.reversed_entry_id.ref,
                         # 'Article Code': invoice_line.product_id.article_code,
                         'SKU': invoice_line.product_id.default_code,
                         'EAN': invoice_line.product_id.barcode,
