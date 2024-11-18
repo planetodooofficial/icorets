@@ -412,13 +412,14 @@ class ShopInstance(models.Model):
                     'client_order_ref': order.displayOrderCode,
                 }
                 logger.info(vals_list)
-                sale_order = self.env['sale.order'].create(vals_list)
-                # Update order state to "done"
-                sale_order.set_order_line()
-                order.order_state = 'done'
-                order.name = sale_order.id
-                sale_orders.append(sale_order)
-                count += 1
+                if partner_id:
+                    sale_order = self.env['sale.order'].create(vals_list)
+                    # Update order state to "done"
+                    sale_order.set_order_line()
+                    order.order_state = 'done'
+                    order.name = sale_order.id
+                    sale_orders.append(sale_order)
+                    count += 1
             if orders:
                 self.sale_order_confirm_batch(sale_orders, "unicommerce", orders[0].code)
                 # payments = [self.create_payments_entries(order, order.sales_channel_id) for order in sale_orders if
