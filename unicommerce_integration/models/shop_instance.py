@@ -67,7 +67,9 @@ class ShopInstance(models.Model):
             if fetch_orders.status_code != 200:
                 self.generate_exception_log(message=fetch_orders.json(), start_date=start_date,
                                             end_date=fields.Datetime.now(), count=1, state='exception')
-                raise UserError(_(fetch_orders.json().get("errors", [])[0]["message"]))
+                orders_list = fetch_orders.json() 
+                if orders_list.get("errors", []):
+                    raise UserError(_(fetch_orders.json().get("errors", [])[0]["message"]))
             elif fetch_orders.status_code == 200:
                 orders_list = fetch_orders.json()
                 if orders_list.get("errors", []):
