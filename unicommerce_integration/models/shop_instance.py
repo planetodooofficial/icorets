@@ -598,25 +598,26 @@ class ShopInstance(models.Model):
             billing_partner = partner_obj.create(billing_partner_data)
         
             # Prepare data for shipping partner
-            shipping_partner_data = {
-                'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
-                'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
-                'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
-                'city': partner_data.get('shipping_city') or partner_data.get('billing_city'),
-                'state_id': self.get_state_id(partner_data.get('shipping_state') or partner_data.get('billing_state')),
-                'country_id': self.get_country_id(
-                    partner_data.get('shipping_country') or partner_data.get('billing_country')),
-                'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
-                'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
-                'email': partner_data.get('shipping_email') or partner_data.get('billing_email'),
-                'is_company': is_business,
-                'type': 'delivery',
-                'parent_id': billing_partner.id,
-            }
+            if partner_data.get('shipping_name') != partner_data.get('billing_name'):
+                shipping_partner_data = {
+                    'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
+                    'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
+                    'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
+                    'city': partner_data.get('shipping_city') or partner_data.get('billing_city'),
+                    'state_id': self.get_state_id(partner_data.get('shipping_state') or partner_data.get('billing_state')),
+                    'country_id': self.get_country_id(
+                        partner_data.get('shipping_country') or partner_data.get('billing_country')),
+                    'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
+                    'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
+                    'email': partner_data.get('shipping_email') or partner_data.get('billing_email'),
+                    'is_company': is_business,
+                    'type': 'delivery',
+                    'parent_id': billing_partner.id,
+                }
         
-            # Create shipping partner
-            shipping_partner = partner_obj.create(shipping_partner_data)
-            logger.info(f"Created shipping partner: {shipping_partner}")
+                # Create shipping partner
+                shipping_partner = partner_obj.create(shipping_partner_data)
+                logger.info(f"Created shipping partner: {shipping_partner}")
             # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
             return billing_partner
         else:
