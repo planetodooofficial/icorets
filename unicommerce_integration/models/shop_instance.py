@@ -397,6 +397,8 @@ class ShopInstance(models.Model):
                 #     [('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
                 # shipping_id = self.env['res.partner'].search(
                 #     [('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
+                if partner_id.phone == 'null':
+                    partner_id.phone = '9999999999'
                 vals_list = {
                     'partner_id': partner_id.id,
                     'order_line': self.create_order_lines(order),
