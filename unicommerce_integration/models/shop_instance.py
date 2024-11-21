@@ -577,7 +577,7 @@ class ShopInstance(models.Model):
         partner = partner_obj.search([('name', '=', partner_data.get('billing_name')),
                                       ('state_id.code', '=', partner_data.get('billing_state')),
                                       ('country_id.code', '=', partner_data.get('billing_country'))], limit=1)
-        Prepare data for billing partner
+        # Prepare data for billing partner
         if not partner:
             billing_partner_data = {
                 'name': partner_data.get('billing_name'),
