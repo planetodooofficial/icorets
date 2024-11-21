@@ -591,7 +591,7 @@ class ShopInstance(models.Model):
                 'email': partner_data.get('billing_email'),
                 'is_company': is_business,
                 'vat': partner_data.get('customerGSTIN') if is_business else False,
-                'l10n_in_gst_treatment': 'registered' if is_business else False,
+                'l10n_in_gst_treatment': 'regular' if is_business else False,
             }
         
             # Create billing partner
