@@ -564,61 +564,61 @@ class ShopInstance(models.Model):
                     })
                 return partner_id
 
-        # # Determine if the partner is a business based on GSTIN
-        # is_business = bool(partner_data.get('customerGSTIN'))
-        #
-        # # search for the partner in case the is_business is true
-        # if is_business:
-        #     partner = partner_obj.search([('vat', '=', partner_data.get('customerGSTIN'))], limit=1)
-        #     if partner:
-        #         return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
-        # partner = partner_obj.search([('name', '=', partner_data.get('billing_name')),
-        #                               ('state_id.code', '=', partner_data.get('billing_state')),
-        #                               ('country_id.code', '=', partner_data.get('billing_country'))], limit=1)
-        # Prepare data for billing partner
-        # if not partner:
-        #     billing_partner_data = {
-        #         'name': partner_data.get('billing_name'),
-        #         'street': partner_data.get('billing_addressLine1'),
-        #         'street2': partner_data.get('billing_addressLine2'),
-        #         'city': partner_data.get('billing_city'),
-        #         'state_id': self.get_state_id(partner_data.get('billing_state')),
-        #         'country_id': self.get_country_id(partner_data.get('billing_country')),
-        #         'zip': partner_data.get('billing_pincode'),
-        #         'phone': partner_data.get('billing_phone'),
-        #         'email': partner_data.get('billing_email'),
-        #         'is_company': is_business,
-        #         'vat': partner_data.get('customerGSTIN') if is_business else False,
-        #         'l10n_in_gst_treatment': 'registered' if is_business else False,
-        #     }
-        #
-        #     # Create billing partner
-        #     billing_partner = partner_obj.create(billing_partner_data)
-        #
-        #     # Prepare data for shipping partner
-        #     shipping_partner_data = {
-        #         'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
-        #         'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
-        #         'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
-        #         'city': partner_data.get('shipping_city') or partner_data.get('billing_city'),
-        #         'state_id': self.get_state_id(partner_data.get('shipping_state') or partner_data.get('billing_state')),
-        #         'country_id': self.get_country_id(
-        #             partner_data.get('shipping_country') or partner_data.get('billing_country')),
-        #         'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
-        #         'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
-        #         'email': partner_data.get('shipping_email') or partner_data.get('billing_email'),
-        #         'is_company': is_business,
-        #         'type': 'delivery',
-        #         'parent_id': billing_partner.id,
-        #     }
-        #
-        #     # Create shipping partner
-        #     shipping_partner = partner_obj.create(shipping_partner_data)
-        #     logger.info(f"Created shipping partner: {shipping_partner}")
-        #     # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
-        #     return billing_partner
-        # else:
-        #     # return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+        # Determine if the partner is a business based on GSTIN
+        is_business = bool(partner_data.get('customerGSTIN'))
+        
+        # search for the partner in case the is_business is true
+        if is_business:
+            partner = partner_obj.search([('vat', '=', partner_data.get('customerGSTIN'))], limit=1)
+            if partner:
+                return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+        partner = partner_obj.search([('name', '=', partner_data.get('billing_name')),
+                                      ('state_id.code', '=', partner_data.get('billing_state')),
+                                      ('country_id.code', '=', partner_data.get('billing_country'))], limit=1)
+        Prepare data for billing partner
+        if not partner:
+            billing_partner_data = {
+                'name': partner_data.get('billing_name'),
+                'street': partner_data.get('billing_addressLine1'),
+                'street2': partner_data.get('billing_addressLine2'),
+                'city': partner_data.get('billing_city'),
+                'state_id': self.get_state_id(partner_data.get('billing_state')),
+                'country_id': self.get_country_id(partner_data.get('billing_country')),
+                'zip': partner_data.get('billing_pincode'),
+                'phone': partner_data.get('billing_phone'),
+                'email': partner_data.get('billing_email'),
+                'is_company': is_business,
+                'vat': partner_data.get('customerGSTIN') if is_business else False,
+                'l10n_in_gst_treatment': 'registered' if is_business else False,
+            }
+        
+            # Create billing partner
+            billing_partner = partner_obj.create(billing_partner_data)
+        
+            # Prepare data for shipping partner
+            shipping_partner_data = {
+                'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
+                'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
+                'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
+                'city': partner_data.get('shipping_city') or partner_data.get('billing_city'),
+                'state_id': self.get_state_id(partner_data.get('shipping_state') or partner_data.get('billing_state')),
+                'country_id': self.get_country_id(
+                    partner_data.get('shipping_country') or partner_data.get('billing_country')),
+                'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
+                'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
+                'email': partner_data.get('shipping_email') or partner_data.get('billing_email'),
+                'is_company': is_business,
+                'type': 'delivery',
+                'parent_id': billing_partner.id,
+            }
+        
+            # Create shipping partner
+            shipping_partner = partner_obj.create(shipping_partner_data)
+            logger.info(f"Created shipping partner: {shipping_partner}")
+            # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
+            return billing_partner
+        else:
+            return partner
         return partner_id
 
     def get_state_id(self, state_name, country_code=None):
