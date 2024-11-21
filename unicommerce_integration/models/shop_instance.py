@@ -573,7 +573,7 @@ class ShopInstance(models.Model):
         if is_business:
             partner = partner_obj.search([('vat', '=', partner_data.get('customerGSTIN'))], limit=1)
             if partner:
-                return partner, partner.child_ids.filtered(lambda r: r.type == 'delivery')
+                return partner
         partner = partner_obj.search([('name', '=', partner_data.get('billing_name')),
                                       ('state_id.code', '=', partner_data.get('billing_state')),
                                       ('country_id.code', '=', partner_data.get('billing_country'))], limit=1)
