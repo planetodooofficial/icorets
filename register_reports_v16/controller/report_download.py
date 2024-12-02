@@ -106,6 +106,11 @@ class DownloadReport(Controller):
             for invoice_line in invoices.invoice_line_ids.filtered(lambda line: not line.display_type in ['line_section', 'line_note']):
                 taxes = invoice_line.move_id.tax_totals
                 un_tax_amt, total_amt = taxes.get('amount_untaxed'), taxes.get('amount_total')
+                pod_status = ''
+                if invoice_line.move_id.pod_document_id:
+                    pod_status = 'POD Received'
+                else:
+                    pod_status = 'POD Not Received'
                 data = {'Invoice NO': invoice_line.move_id.name, 'Invoice Date': invoice_line.move_id.date,
                         'Salesperson': invoice_line.move_id.invoice_user_id.name,
                         'Customer': invoice_line.move_id.partner_id.name,
@@ -130,8 +135,8 @@ class DownloadReport(Controller):
                         'SubClass': invoice_line.product_id.categ_id.name,
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity, 
-                        # 'GRN Quantity': invoice_line.sale_line_ids.qty_delivered,
-                        # 'PODs Status': pod_status,
+                        'GRN Quantity': invoice_line.sale_line_ids.qty_delivered,
+                        'PODs Status': pod_status,
                         'Unit Price': invoice_line.price_unit,
                         'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
