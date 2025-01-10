@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_grn_details_data_invoice_tree" model="ir.ui.view">
+        <field name="name">grn.details.data.tree</field>
+        <field name="model">grn.details.data</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="invoice_no"/>
+                <field name="invoice_date"/>
+                <field name="salesperson"/>
+                <field name="customer"/>
+                <field name="city"/>
+                <field name="state"/>
+                <field name="pin"/>
+                <field name="gst_no"/>
+                <field name="analytic"/>
+                <field name="product"/>
+                <field name="mrp"/>
+                <field name="article_code"/>
+                <field name="so_number"/>
+                <field name="po_number"/>
+                <field name="sku"/>
+                <field name="ean"/>
+                <field name="brand"/>
+                <field name="uom"/>
+                <field name="size"/>
+                <field name="color"/>
+                <field name="invoice_class"/>
+                <field name="subclass"/>
+                <field name="quantity"/>
+                <field name="grn_quantity"/>
+                <field name="shortage"/>
+                <field name="transporter"/>
+                <field name="delivery_status"/>
+                <field name="delivery_date"/>
+                <field name="pod_status"/>
+                <field name="remark"/>
+                <field name="unit_price"/>
+                <field name="discount"/>
+                <field name="price_subtotal"/>
+                <field name="taxes"/>
+                <field name="bill_net_amt"/>
+                <field name="price_total"/>
+                <field name="invoice_untaxed_amt"/>
+                <field name="invoice_tax_amount"/>
+                <field name="invoice_total_amt"/>
+                <field name="total_sgst" optional="hide"/>
+                <field name="total_cgst" optional="hide"/>
+                <field name="sgst_sale_2_5_mh" optional="hide"/>
+                <field name="cgst_sale_2_5_mh" optional="hide"/>
+                <field name="total_igst" optional="hide"/>
+                <field name="igst_12_output_mh" optional="hide"/>
+                <field name="igst_5_output_mh" optional="hide"/>
+                <field name="sgst_sale_6_mh" optional="hide"/>
+                <field name="cgst_sale_6_mh" optional="hide"/>
+                <field name="sgst_sale_9_mh" optional="hide"/>
+                <field name="cgst_sale_9_mh" optional="hide"/>
+                <field name="igst_18_output_mh" optional="hide"/>
+                <field name="igst_5_output_dl" optional="hide"/>
+                <field name="sgst_sale_9" optional="hide"/>
+                <field name="cgst_sale_9" optional="hide"/>
+                <field name="igst_18" optional="hide"/>
+                <field name="igst_0_output_mh" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_grn_details_data_invoice" model="ir.actions.act_window">
+        <field name="name">GRN Details Report</field>
+        <field name="res_model">grn.details.data</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_grn_details_reports"
+              name="GRN Details Reports"
+              parent="stock.menu_warehouse_report"
+              action="action_grn_details_data_invoice"
+              sequence="191"/>
+
+
+</odoo>

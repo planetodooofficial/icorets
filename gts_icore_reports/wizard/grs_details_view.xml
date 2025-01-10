@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Form View for GRN Details -->
+    <record id="view_grn_details_form" model="ir.ui.view">
+        <field name="name">grn.details.form</field>
+        <field name="model">grn.details</field>
+        <field name="arch" type="xml">
+            <form string="GRN Details">
+                <sheet>
+                    <group>
+                        <field name="file_name" invisible="1"/>
+                        <field name="file" filename="file_name"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Upload" type="object" class="btn-primary" name="action_upload"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for GRN Details -->
+    <record id="action_grn_details" model="ir.actions.act_window">
+        <field name="name">GRN Details Import</field>
+        <field name="res_model">grn.details</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item for GRN Details -->
+    <menuitem id="menu_grn_details"
+              name="GRN Details Import"
+              parent="stock.menu_warehouse_report"
+              action="action_grn_details"
+              sequence="190"/>
+</odoo>
