@@ -10,6 +10,12 @@ class ResPartner(models.Model):
                                  help="Check this box if this contact is a customer. It can be selected in sales orders.")
     is_supplier = fields.Boolean(string='Is Vendor?', tracking=True,
                                  help="Check this box if this contact is a vendor. It can be selected in purchase orders.")
+    is_expense = fields.Boolean(string='Is Expense?', tracking=True,
+                                 help="Check this box if this contact is a Expense.")
+    is_salary = fields.Boolean(string='Is Salary?', tracking=True,
+                                 help="Check this box if this contact is a Salary.")
+    is_advanced = fields.Boolean(string='Is Advanced?', tracking=True,
+                                 help="Check this box if this contact is a Advanced.")
 
 
 class MoveLine(models.Model):
