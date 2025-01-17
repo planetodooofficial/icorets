@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_partnerledger">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="data_report_margin_top" t-value="12"/>
+                <t t-set="data_report_header_spacing" t-value="9"/>
+                <t t-set="data_report_dpi" t-value="110"/>
+
+                <style>
+                    tr, td, tbody, thead, th, h, strong, span {
+                    font-size: 12px;
+                    }
+                    .table {
+                    width: 97% !important;
+                    margin-left: auto !important;
+                    margin-right: 0 !important;
+                    }
+                    .table td {
+                    padding: 0.3rem;
+                    }
+                </style>
+
+
+                <div class="page">
+                    <style>
+                        tr, td, tbody, thead, th, h, strong, span{
+                        font-size: 12px;
+                        }
+                    </style>
+                    <h5 style="text-align:center;padding:0%;margin:0%">
+                        <b>
+                            <u>Ledger</u>
+                        </b>
+                    </h5>
+                    <br/>
+                    <!--                   <h3 style="text-align:center;padding:0%;margin:0%"> <b><span>______</span></b></h3>-->
+                    <div class="row" style="margin-bottom:8px;">
+                        <div class="col-3">
+                            <t t-if="data['form']['date_from']">
+                                <strong>Date from :</strong>
+                                <span t-esc="data['form']['date_from']"/>
+                            </t>
+                        </div>
+                        <div class="col-3">
+                            <t t-if="data['form']['date_to']">
+                                <strong>Date to :</strong>
+                                <span t-esc="data['form']['date_to']"/>
+                            </t>
+                        </div>
+                        <!--                        <div class="col-3">-->
+                        <!--                            <strong>Target Moves:</strong>-->
+                        <!--                            <p t-if="data['form']['target_move'] == 'all'">All Entries</p>-->
+                        <!--                            <p t-if="data['form']['target_move'] == 'posted'">All Posted Entries</p>-->
+                        <!--                        </div>-->
+                    </div>
+
+<!--                    <strong t-esc="docs"/>-->
+                    <t t-foreach="docs" t-as="o">
+                        <t t-set="is_parent" t-value="o.check_parent()"/>
+                        <t t-if="is_parent == true">
+                            <div class="col-12 text-start" style="margin-top:10px;">
+                                <strong style="font-size:25px;">
+                                    <t t-esc="o.shop_sales_channel_id.name"/>
+                                </strong>
+                                <br/>
+                                <strong style="font-size:20px;padding: 5px 0px 0px 10px">
+                                    <t t-esc="o.name"/>
+                                    <t t-if="o.cust_alias_name">[<t t-esc="o.cust_alias_name"/>]
+                                    </t>
+                                </strong>
+                            </div>
+                        </t>
+                        <t t-if="is_parent == false">
+                            <div class="row" style="margin-bottom:15px;margin-top:-8px">
+
+                                <div class="col-12 text-start">
+                                    <div style="padding-left:31px">
+                                        <t t-if="o.ref">
+                                            <strong t-esc="o.ref"/>
+                                            -
+                                        </t>
+                                        <strong style="font-size:25px;">
+                                            <t t-esc="o.name"/>
+                                            <t t-if="o.cust_alias_name">[<t t-esc="o.cust_alias_name"/>]
+                                            </t>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-if="is_parent == false">
+                            <div class="row" style="margin-bottom:15px;">
+                                <div class="col-4" style="padding-left:31px">
+                                    <t>
+                                        <strong>Contact Phone :</strong>
+                                        <span t-esc="o.phone"/>
+                                    </t>
+                                </div>
+                                <div class="col-4">
+                                    <t>
+                                        <strong>Contact Email :</strong>
+                                        <span t-esc="o.email"/>
+                                    </t>
+                                </div>
+                                <div class="col-4">
+                                    <t>
+                                        <strong>Sales Person :</strong>
+                                        <span t-esc="o.user_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+
+                        <t t-if="is_parent == false">
+                            <div style="padding-left:25x;">
+                                <!--                                <table class="table" width="80%; margin-left: auto; margin-right: 0;">-->
+                                <table class="table table-sm"
+                                       style="margin-left: auto; margin-right: 0; padding-left: 25px;">
+                                    <thead>
+                                        <!--                                <tr style="border:0px;">-->
+
+                                        <!--                                    <td class="text-start" style="padding-bottom:15px;border:0px;">-->
+
+
+                                        <!--                                    </td>-->
+                                        <!--                                    <td colspan="5" class="text-start" style="background-color: rgba(0, 0, 0, 0.0) !important;padding-bottom:15px;border:0px;">-->
+
+                                        <!--                                    </td>-->
+                                        <!--                                </tr>-->
+
+                                        <tr>
+                                            <b>
+                                                <th>Date</th>
+                                            </b>
+                                            <!--                                <th>JRNL</th>-->
+                                            <!--                                <th>Account</th>-->
+                                            <b>
+                                                <th>Payment Terms</th>
+                                            </b>
+                                            <b>
+                                                <th>Ref</th>
+                                            </b>
+                                            <b>
+                                                <th class="text-end">Debit</th>
+                                            </b>
+                                            <b>
+                                                <th class="text-end">Credit</th>
+                                            </b>
+                                            <b>
+                                                <th class="text-end">Balance</th>
+                                            </b>
+                                            <b>
+                                                <th t-if="data['form']['amount_currency']">Currency</th>
+                                            </b>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="lines(data, o)" t-as="line">
+                                            <td width="10%">
+                                                <span t-esc="line['date']"/>
+                                                <!--                                         width="10%"-->
+                                            </td>
+                                            <td width="10%">
+                                                <t t-if="line['payment_term']">
+                                                    <span t-esc="line['payment_term']"/>
+                                                </t>
+                                            </td>
+                                            <!--                                            <td width="10%" style="text-align:center">-->
+                                            <!--                                        <span t-esc="line['bdl_number']"/>-->
+                                            <!--                                            </td>-->
+                                            <!--                                    <td width="10%">-->
+                                            <!--                                        <span t-esc="line['a_code']"/>-->
+                                            <!--                                    </td>-->
+                                            <td width="50%">
+                                                <span t-esc="line['displayed_name']"/>
+                                                <t t-if="line['include_narration']">
+                                                    - [ User -<span t-esc="line['narration']"/>]
+                                                </t>
+                                                <!--                                         width="30%"-->
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-if="line.get('debit')">
+                                                    <span t-esc="line['debit']"
+                                                          t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    <!--                                        width="10%"-->
+                                                </t>
+                                            </td>
+                                            <td class="text-end">
+                                                <t t-if="line.get('credit')">
+                                                    <span t-esc="line['credit']"
+                                                          t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                    <!--                                         width="10%"-->
+                                                </t>
+                                            </td>
+                                            <td class="text-end">
+                                                <span t-esc="line['progress']"
+                                                      t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                                <!--                                        width="10%"-->
+                                            </td>
+                                            <td class="text-end" t-if="data['form']['amount_currency']">
+                                                <!--                                         width="10%"-->
+                                                <t t-if="line['currency_id']">
+                                                    <span t-esc="line['amount_currency']"
+                                                          t-options="{'widget': 'monetary', 'display_currency': line['currency_id']}"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" style="text-align:left">
+                                                <strong>Total :</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong t-esc="sum_partner(data, o, 'debit')"
+                                                        t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong t-esc="sum_partner(data, o, 'credit')"
+                                                        t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong t-esc="sum_partner(data, o, 'debit - credit')"
+                                                        t-options="{'widget': 'monetary', 'display_currency': res_company.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                        <br/>
+                        <br/>
+                    </t>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>
