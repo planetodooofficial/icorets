@@ -10,6 +10,9 @@
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <filter string="Customer" name="is_customer" domain="[('partner_id.is_customer', '=', True)]"/>
                     <filter string="Vendor" name="is_supplier" domain="[('partner_id.is_supplier', '=', True)]"/>
+                    <filter string="Expense" name="is_expense" domain="[('partner_id.is_expense', '=', True)]"/>
+                    <filter string="Salary" name="is_salary" domain="[('partner_id.is_salary', '=', True)]"/>
+                    <filter string="Advanced" name="is_advanced" domain="[('partner_id.is_advanced', '=', True)]"/>
                 </xpath>
             </field>
         </record>

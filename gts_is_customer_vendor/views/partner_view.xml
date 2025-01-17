@@ -10,6 +10,9 @@
                 <field name="vat" position="after">
                     <field name="is_customer"/>
                     <field name="is_supplier"/>
+                    <field name="is_expense"/>
+                    <field name="is_salary"/>
+                    <field name="is_advanced"/>
                 </field>
             </field>
         </record>
@@ -24,6 +27,9 @@
                             domain="['|',('customer_rank','>', 0),('is_customer','=',True)]"/>
                     <filter string="Vendors" name="supplier"
                             domain="['|',('supplier_rank','>', 0),('is_supplier','=',True)]"/>
+                    <filter string="Expense" name="expense" domain="[('is_expense','=',True)]"/>
+                    <filter string="Salary" name="salary" domain="[('is_salary','=',True)]"/>
+                    <filter string="Advanced" name="advanced" domain="[('is_advanced','=',True)]"/>
                     <separator/>
                 </xpath>
             </field>
