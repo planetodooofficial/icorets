@@ -67,7 +67,7 @@ class ShopInstance(models.Model):
             if fetch_orders.status_code != 200:
                 self.generate_exception_log(message=fetch_orders.json(), start_date=start_date,
                                             end_date=fields.Datetime.now(), count=1, state='exception')
-                orders_list = fetch_orders.json() 
+                orders_list = fetch_orders.json()
                 if orders_list.get("errors", []):
                     raise UserError(_(fetch_orders.json().get("errors", [])[0]["message"]))
             elif fetch_orders.status_code == 200:
@@ -381,7 +381,8 @@ class ShopInstance(models.Model):
 
     def create_sales(self):
         # Get all orders that are in draft state
-        orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')], limit=100, order='displayOrderDateTime desc')
+        orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')], limit=100,
+                                                       order='displayOrderDateTime desc')
         count = 0
         sale_orders = list()
         stock_location = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
@@ -393,12 +394,14 @@ class ShopInstance(models.Model):
                 # Create sale order
                 # partners = self.create_partner(order)
                 partner_id = self.create_partner(order)
+                print("===partner", partner_id)
+                if partner_id.phone == 'null':
+                    partner_id.phone = '9999999999'
+
                 # billing_id = self.env['res.partner'].search(
                 #     [('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
                 # shipping_id = self.env['res.partner'].search(
                 #     [('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
-                if partner_id.phone == 'null':
-                    partner_id.phone = '9999999999'
                 vals_list = {
                     'partner_id': partner_id.id,
                     'order_line': self.create_order_lines(order),
@@ -416,14 +419,13 @@ class ShopInstance(models.Model):
                     'client_order_ref': order.displayOrderCode,
                 }
                 logger.info(vals_list)
-                if partner_id:
-                    sale_order = self.env['sale.order'].create(vals_list)
-                    # Update order state to "done"
-                    sale_order.set_order_line()
-                    order.order_state = 'done'
-                    order.name = sale_order.id
-                    sale_orders.append(sale_order)
-                    count += 1
+                sale_order = self.env['sale.order'].create(vals_list)
+                # Update order state to "done"
+                sale_order.set_order_line()
+                order.order_state = 'done'
+                order.name = sale_order.id
+                sale_orders.append(sale_order)
+                count += 1
             if orders:
                 self.sale_order_confirm_batch(sale_orders, "unicommerce", orders[0].code)
                 # payments = [self.create_payments_entries(order, order.sales_channel_id) for order in sale_orders if
@@ -478,11 +480,14 @@ class ShopInstance(models.Model):
     #         return payments
 
     def sale_order_confirm_batch(self, sale_orders, record_type, dump_sequence):
+        print("----sale_order_confirm_batch")
         order_dates = {}
         shipment_dates = {}
         invoice_dates = {}
 
         for sale_order in sale_orders:
+            # if sale_order.partner_id.phone == 'null':
+            #     sale_order.partner_id.phone = '9999999999'
             if sale_order.sales_channel_id:
                 sale_order.action_confirm()
                 if record_type == "unicommerce":
@@ -497,6 +502,8 @@ class ShopInstance(models.Model):
 
         # Batch process deliveries
         for sale_order in sale_orders:
+            if not sale_order.partner_id.phone:
+                sale_order.partner_id.phone = '999999999'
             if sale_order.state == "sale" and not sale_order.sales_channel_id.is_no_invoice:
                 search_delivery = self.env["stock.picking"].search([('origin', '=', sale_order.name)])
                 search_delivery.write({'dump_sequence': dump_sequence})
@@ -515,9 +522,10 @@ class ShopInstance(models.Model):
 
         # Batch process invoices
         for sale_order in sale_orders:
+            # if sale_order.partner_id.phone == 'null':
+            #     sale_order.partner_id.write({'phone': '9999999999'})
             if sale_order.sales_channel_id and not sale_order.sales_channel_id.is_no_invoice:
                 invoice_vals = sale_order._prepare_invoice()
-
                 lst = [(0, 0, so_order_line._prepare_invoice_line()) for so_order_line in sale_order.order_line]
                 invoice_vals['invoice_line_ids'] = lst
                 result = self.env['account.move'].create(invoice_vals)
@@ -546,6 +554,10 @@ class ShopInstance(models.Model):
         state_id = self.get_state_id(partner_data.get('billing_state'))
         sales_channel_id = partner_data.get('sales_channel_id')
         if sales_channel_id:
+            sales_channel_name = sales_channel_id[1]
+        else:
+            sales_channel_name = ''
+        if sales_channel_id:
             sales_channel_id = sales_channel_id[0]
         partner_id = partner_obj.search([('shop_sales_channel_id', '=', sales_channel_id), ('state_id', '=', state_id)],
                                         limit=1)
@@ -559,6 +571,7 @@ class ShopInstance(models.Model):
                 country_id = self.get_country_id(partner_data.get('shipping_country'))
                 partner_id = search_export_partner.child_ids.filtered(
                     lambda r: r.state_id == state_id and r.country_id == country_id)
+                print("---partner_id: ", partner_id)
                 if not partner_id:
                     partner_id = partner_obj.create({
                         'name': partner_data.get('shipping_state'),
@@ -566,25 +579,40 @@ class ShopInstance(models.Model):
                         'country_id': country_id,
                         'parent_id': search_export_partner.id,
                     })
+                print("---partner_id: ", partner_id)
                 return partner_id
 
         # Determine if the partner is a business based on GSTIN
         is_business = bool(partner_data.get('customerGSTIN'))
-        
         # search for the partner in case the is_business is true
         if is_business:
             partner = partner_obj.search([('vat', '=', partner_data.get('customerGSTIN'))], limit=1)
             if partner:
+                # , partner.child_ids.filtered(lambda r: r.type == 'delivery'),
+                print("====partner", partner)
                 return partner
-        partner = partner_obj.search([('name', '=', partner_data.get('billing_name')),
+
+        if '*' in partner_data.get('billing_name'):
+            billing_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('shipping_state'))
+        else:
+            billing_partner_name = partner_data.get('billing_name')
+
+        partner = partner_obj.search([('name', '=', billing_partner_name),
                                       ('state_id.code', '=', partner_data.get('billing_state')),
                                       ('country_id.code', '=', partner_data.get('billing_country'))], limit=1)
+
+        street = '' if '*' in partner_data.get('billing_addressLine1') else partner_data.get('billing_addressLine1')
+        street2 = '' if '*' in partner_data.get('billing_addressLine2') else partner_data.get('billing_addressLine2')
         # Prepare data for billing partner
         if not partner:
+            print('\nbilling_partner_name++++++++++++++++=', billing_partner_name)
             billing_partner_data = {
-                'name': partner_data.get('billing_name'),
-                'street': partner_data.get('billing_addressLine1'),
-                'street2': partner_data.get('billing_addressLine2'),
+                # 'name': partner_data.get('billing_name'),
+                'name': billing_partner_name,
+                # 'street': partner_data.get('billing_addressLine1'),
+                'street': street,
+                # 'street2': partner_data.get('billing_addressLine2'),
+                'street2': street2,
                 'city': partner_data.get('billing_city'),
                 'state_id': self.get_state_id(partner_data.get('billing_state')),
                 'country_id': self.get_country_id(partner_data.get('billing_country')),
@@ -595,18 +623,29 @@ class ShopInstance(models.Model):
                 'vat': partner_data.get('customerGSTIN') if is_business else False,
                 'l10n_in_gst_treatment': 'regular' if is_business else False,
             }
-        
+
             # Create billing partner
             billing_partner = partner_obj.create(billing_partner_data)
-        
-            # Prepare data for shipping partner
             if partner_data.get('shipping_name') != partner_data.get('billing_name'):
+                if '*' in partner_data.get('shipping_name'):
+                    shipping_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('shipping_state'))
+                else:
+                    shipping_partner_name = partner_data.get('shipping_name')
+                street = '' if '*' in partner_data.get('shipping_addressLine1') else partner_data.get(
+                    'shipping_addressLine1')
+                street2 = '' if '*' in partner_data.get('shipping_addressLine2') else partner_data.get(
+                    'shipping_addressLine2')
+                # Prepare data for shipping partner
                 shipping_partner_data = {
-                    'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
-                    'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
-                    'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
+                    # 'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
+                    'name': shipping_partner_name,
+                    # 'street': partner_data.get('shipping_addressLine1') or partner_data.get('billing_addressLine1'),
+                    'street': street,
+                    # 'street2': partner_data.get('shipping_addressLine2') or partner_data.get('billing_addressLine2'),
+                    'street2': street2,
                     'city': partner_data.get('shipping_city') or partner_data.get('billing_city'),
-                    'state_id': self.get_state_id(partner_data.get('shipping_state') or partner_data.get('billing_state')),
+                    'state_id': self.get_state_id(
+                        partner_data.get('shipping_state') or partner_data.get('billing_state')),
                     'country_id': self.get_country_id(
                         partner_data.get('shipping_country') or partner_data.get('billing_country')),
                     'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
@@ -616,14 +655,16 @@ class ShopInstance(models.Model):
                     'type': 'delivery',
                     'parent_id': billing_partner.id,
                 }
-        
+
                 # Create shipping partner
                 shipping_partner = partner_obj.create(shipping_partner_data)
                 logger.info(f"Created shipping partner: {shipping_partner}")
             # return {'billing_partner':billing_partner, 'shipping_partner': shipping_partner}
             return billing_partner
         else:
+            # partner.child_ids.filtered(lambda r: r.type == 'delivery')
             return partner
+        print("----partner_iddd", partner_id)
         return partner_id
 
     def get_state_id(self, state_name, country_code=None):
