@@ -13,8 +13,10 @@
     'demo': [],
     'data': [
             'security/ir.model.access.csv',
+            'data/partner_ledger.xml',
             'wizard/upload_document_view.xml',
-            'views/account_move_view.xml'
+            'views/account_move_view.xml',
+            'views/account_account_view.xml',
              ],
     'installable': True,
     'images': [],

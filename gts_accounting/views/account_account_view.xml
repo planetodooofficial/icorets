@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="view_account_account" model="ir.ui.view">
+        <field name="name">account.account.pod.button</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//group[1]/group[2]" position="inside">
+                <field name="is_tds"/>
+                <field name="is_vat"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

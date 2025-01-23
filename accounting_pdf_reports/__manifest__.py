@@ -22,6 +22,7 @@
         # 'views/menu.xml',
         # 'views/ledger_menu.xml',
         # 'views/financial_report.xml',
+        'views/res_partner_view.xml',
         'views/settings.xml',
         'wizard/account_report_common_view.xml',
         'wizard/partner_ledger.xml',
