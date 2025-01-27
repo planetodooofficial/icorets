@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_invoice_partner_update_form" model="ir.ui.view">
+        <field name="name">invoice.partner.update.form</field>
+        <field name="model">invoice.partner.update</field>
+        <field name="arch" type="xml">
+            <form string="Update Partner">
+                <sheet>
+                    <group>
+                        <field name="file_name" invisible="1"/>
+                        <field name="file" filename="file_name"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Upload" type="object" class="btn-primary" name="action_upload"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_invoice_partner_update" model="ir.actions.act_window">
+        <field name="name">Invoice Partner Update</field>
+        <field name="res_model">invoice.partner.update</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_invoice_partner_update"
+              name="Invoice Partner Update"
+              parent="account.account_invoicing_menu"
+              action="action_invoice_partner_update"
+              sequence="-1"/>
+</odoo>

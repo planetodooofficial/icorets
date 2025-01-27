@@ -12,7 +12,10 @@
     'category': 'Accounting',
     'demo': [],
     'data': [
+            'security/ir.model.access.csv',
             'views/sale_order_view.xml',
+            # 'views/account_move_view.xml',
+            'wizard/invoice_partner_update_view.xml',
             'report/sale_report_inherit_views.xml',
              ],
     'installable': True,
