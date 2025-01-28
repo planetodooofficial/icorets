@@ -31,11 +31,12 @@ class InvoicePartnerUpdate(models.TransientModel):
             if not partner:
                 partner = self.env['res.partner'].create({'name': row[1]})
             if partner:
-                sql_query = "update account_move set partner_id=%d, partner_shipping_id=%d where id=%d;" % (
-                    partner.id, partner.id, account_move.id)
+                sql_query = "update account_move set partner_id=%d, partner_shipping_id=%d, commercial_partner_id=%d where id=%d;" % (
+                    partner.id, partner.id, partner.id, account_move.id)
                 self._cr.execute(sql_query)
 
                 account_move._compute_invoice_partner_display_info()
+                account_move._inverse_partner_id()
                 # partner onchange in invoice not working due to posted invoices
 
                 sale_order = self.env['sale.order'].search([('invoice_ids', '=', account_move.id)])
