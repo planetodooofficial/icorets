@@ -1,0 +1,29 @@
+<odoo>
+    <data>
+
+        <record id="sale_order_form_invoice_report" model="ir.ui.view">
+            <field name="name">sale.order.form.invoice.report</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//header" position="inside">
+                    <button name="generate_excel" type="object" string="Print Sales (XLSX)"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record model="ir.actions.server" id="action_custom_export_sale_order">
+            <field name="name">Export Sale Order</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="binding_model_id" ref="sale.model_sale_order" />
+            <field name="state">code</field>
+            <field name="code">
+                if records:
+                    action = records.generate_excel()
+            </field>
+        </record>
+
+    </data>
+</odoo>

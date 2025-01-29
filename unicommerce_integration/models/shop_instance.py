@@ -907,7 +907,7 @@ class ShopInstance(models.Model):
             try:
                 inventory_adjustment = []
                 blocked_inventory = []
-                parent_location_id = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
+                parent_location_id = self.env['stock.location'].search([('name', '=', 'DEL')], limit=1)
                 location_id = self.env['stock.location'].search(
                     [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
                 products = self.env['product.product'].search(
@@ -915,15 +915,16 @@ class ShopInstance(models.Model):
 
                 for product in products:
                     product_quant = self.env['stock.quant'].search(
-                        [('location_id', '=', location_id.id), ('product_id', '=', product.id)], limit=1)
+                        [('location_id', '=', location_id.id),
+                         ('product_id', '=', product.id)], limit=1)
                     quantity = product_quant.available_quantity if product_quant and product_quant.available_quantity >= 0 else 0
                     inventory_adjustment.append({
                         "itemSKU": product.default_code,
-                        "quantity": quantity,
+                        "quantity": int(quantity),
                         "shelfCode": "DEFAULT",
                         "inventoryType": "GOOD_INVENTORY",
                         "adjustmentType": "REPLACE",
-                        "facilityCode": "playr"
+                        "facilityCode": "playR_Delhi"
                     })
                 if inventory_adjustment:
                     url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
@@ -936,7 +937,6 @@ class ShopInstance(models.Model):
                         "inventoryAdjustments": inventory_adjustment
                     }
                     response = requests.post(url, headers=headers, data=json.dumps(data))
-
                     if response.status_code == 200:
                         data = response.json()
                         for line in data['inventoryAdjustmentResponses']:
@@ -961,7 +961,7 @@ class ShopInstance(models.Model):
                                         "shelfCode": "DEFAULT",
                                         "inventoryType": "GOOD_INVENTORY",
                                         "adjustmentType": "REPLACE",
-                                        "facilityCode": "playr"
+                                        "facilityCode": "playR_Delhi"
                                     })
                                 instance.generate_exception_log(
                                     message='Inventory Update Failed,For %s Product' %
