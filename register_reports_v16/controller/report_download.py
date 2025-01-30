@@ -97,20 +97,22 @@ class DownloadReport(Controller):
         summary_sheet = DownloadReport.create_summary_sheet(writer)
         # global tot_qty
         # tot_qty = []
+        print("---invoice_data", invoice_data)
 
         def get_detailed_sales_data(invoices, sheet_name):
             data_rows = []
             gst_data = {}
             # tot_qty = []
 
-            for invoice_line in invoices.invoice_line_ids.filtered(lambda line: not line.display_type in ['line_section', 'line_note']):
+            for invoice_line in invoices.invoice_line_ids.filtered(
+                    lambda line: not line.display_type in ['line_section', 'line_note']):
                 taxes = invoice_line.move_id.tax_totals
-                un_tax_amt, total_amt = taxes.get('amount_untaxed'), taxes.get('amount_total')
                 pod_status = ''
                 if invoice_line.move_id.pod_document_id:
                     pod_status = 'POD Received'
                 else:
                     pod_status = 'POD Not Received'
+                un_tax_amt, total_amt = taxes.get('amount_untaxed'), taxes.get('amount_total')
                 data = {'Invoice NO': invoice_line.move_id.name, 'Invoice Date': invoice_line.move_id.date,
                         'Salesperson': invoice_line.move_id.invoice_user_id.name,
                         'Customer': invoice_line.move_id.partner_id.name,
@@ -118,7 +120,7 @@ class DownloadReport(Controller):
                         'State': invoice_line.move_id.partner_id.state_id.name,
                         'Pin': invoice_line.move_id.partner_id.zip,
                         'GST NO': invoice_line.partner_id.vat,
-                        'Analytic':invoice_line.analytic_distribution,
+                        'Analytic': invoice_line.analytic_distribution,
                         'Product': invoice_line.product_id.name,
                         'MRP': invoice_line.product_id.list_price,
                         'Article Code': invoice_line.article_code,
@@ -135,15 +137,20 @@ class DownloadReport(Controller):
                         'SubClass': invoice_line.product_id.categ_id.name,
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity,
-                        'GRN Quantity': ' ',
-                        'Shortage': ' ',
-                        'Transporter': ' ',
-                        'Delivery Status': ' ',
-                        'Delivery Date': ' ',
-                        'PODs Status': pod_status,
-                        'Remark': ' ',
-                        'Unit Price': invoice_line.price_unit,
-                        'PODs Status': pod_status,
+
+                        'Customer Appointment Date': invoice_line.move_id.customer_appointment_date if invoice_line.move_id.customer_appointment_date else None,
+                        'Transporter Name': invoice_line.move_id.transporter_name if invoice_line.move_id.transporter_name else '',
+                        'LR Name': invoice_line.move_id.lr_number if invoice_line.move_id.lr_number else '',
+                        'Customer Delivery Number': invoice_line.move_id.customer_delivery_number if invoice_line.move_id.customer_delivery_number else '',
+
+                        # 'GRN Quantity': ' ',
+                        # 'Shortage': ' ',
+                        # 'Transporter': ' ',
+                        # 'Delivery Status': ' ',
+                        # 'Delivery Date': ' ',
+                        # 'PODs Status': pod_status,
+                        # 'Remark': ' ',
+
                         'Unit Price': invoice_line.price_unit,
                         'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
@@ -172,8 +179,10 @@ class DownloadReport(Controller):
             DownloadReport.dataframe_operations(data_rows, sheet_name, writer)
             return gst_data
 
-        gst_data = get_detailed_sales_data(invoice_data.filtered(lambda x: x.move_type == "out_invoice"), 'Sales Register')
-        gst_data1 = get_detailed_sales_data(invoice_data.filtered(lambda x: x.move_type == "out_refund"), 'Sales Return')
+        gst_data = get_detailed_sales_data(invoice_data.filtered(lambda x: x.move_type == "out_invoice"),
+                                           'Sales Register')
+        gst_data1 = get_detailed_sales_data(invoice_data.filtered(lambda x: x.move_type == "out_refund"),
+                                            'Sales Return')
 
         total_gst_op = sum(gst_data.values())
 
@@ -216,7 +225,7 @@ class DownloadReport(Controller):
         summary_sheet = DownloadReport.create_summary_sheet(writer)
 
         def get_sales_data(invoices, sheet_name):
-            gst_data ={}
+            gst_data = {}
             data_rows = list()
             for invoice in invoices:
                 # taxes = json.loads(invoice.tax_totals_json)
@@ -294,11 +303,11 @@ class DownloadReport(Controller):
     @http.route(['/download/reports'], type='http')
     def portal_my_quotes(self, *args, **kwargs):
         report_for, start_date, end_date, company_id, move_type, journal_id = request.params.get('report_for'), \
-                                                                  request.params.get('start_date'), \
-                                                                  request.params.get('end_date'),\
-                                                                  request.params.get('company_id'),\
-                                                                  request.params.get('move_type'),\
-                                                                  request.params.get('journal_id')
+            request.params.get('start_date'), \
+            request.params.get('end_date'), \
+            request.params.get('company_id'), \
+            request.params.get('move_type'), \
+            request.params.get('journal_id')
         domain = [('state', '=', 'posted'), ('date', '>=', start_date),
                   ('date', '<=', end_date), ('company_id', '=', int(company_id))]
         if move_type == "sales":
@@ -323,7 +332,8 @@ class DownloadReport(Controller):
         def get_detail_bills_data(invoices, sheet_name):
             data_rows = list()
             gst_data = {}
-            for invoice_line in invoices.invoice_line_ids.filtered(lambda line: not line.display_type in ['line_section', 'line_note']):
+            for invoice_line in invoices.invoice_line_ids.filtered(
+                    lambda line: not line.display_type in ['line_section', 'line_note']):
                 taxes = invoice_line.move_id.tax_totals
                 # added by vatsal
                 amt_tax = 0.0
@@ -336,7 +346,8 @@ class DownloadReport(Controller):
                             if d['tax_group_name'] not in ["TDS", "TCS"]:
                                 amt_tax += d['tax_group_amount']
                 # custom code ends
-                un_tax_amt, total_amt, final_total, tax_tot = taxes.get('amount_untaxed'), taxes.get('amount_total'), taxes.get('amount_untaxed') + amt_tax, amt_tax
+                un_tax_amt, total_amt, final_total, tax_tot = taxes.get('amount_untaxed'), taxes.get(
+                    'amount_total'), taxes.get('amount_untaxed') + amt_tax, amt_tax
 
                 data = {'Bill NO': invoice_line.move_id.name, "Bill Reference": invoice_line.move_id.ref,
                         'Accounting Date': invoice_line.move_id.date, "Bill Date": invoice_line.move_id.invoice_date,
@@ -373,7 +384,7 @@ class DownloadReport(Controller):
                     analytic_account = request.env['account.analytic.account'].sudo().search(
                         [('id', '=', (list(invoice_line.analytic_distribution))[0])])
                     data['Analytic'] = analytic_account.name
-                        # 'Bill Tax Amount': invoice_line.move_id.amount_tax, 'Bill Total Amt': total_amt}
+                    # 'Bill Tax Amount': invoice_line.move_id.amount_tax, 'Bill Total Amt': total_amt}
                 data.update({f"Total {tax.get('tax_group_name')}": tax.get('tax_group_amount')
                              for tax in taxes.get('groups_by_subtotal', {}).get('Untaxed Amount', {})})
                 data.update(DownloadReport.compute_taxes(invoice_line))
@@ -395,8 +406,10 @@ class DownloadReport(Controller):
             DownloadReport.dataframe_operations(data_rows, sheet_name, writer)
             return gst_data
 
-        gst_data = get_detail_bills_data(invoice_data.filtered(lambda x: x.move_type == 'in_invoice'), 'Purchase Register')
-        gst_data1 = get_detail_bills_data(invoice_data.filtered(lambda x: x.move_type == 'in_refund'), 'Purchase Return')
+        gst_data = get_detail_bills_data(invoice_data.filtered(lambda x: x.move_type == 'in_invoice'),
+                                         'Purchase Register')
+        gst_data1 = get_detail_bills_data(invoice_data.filtered(lambda x: x.move_type == 'in_refund'),
+                                          'Purchase Return')
 
         total_gst_op = sum(gst_data.values())
         workbook = writer.book
@@ -453,11 +466,12 @@ class DownloadReport(Controller):
                 for pair in pairs:
                     for d in pair:
                         if "tax_group_name" in d:
-                            if d['tax_group_name'] not in ["TDS","TCS"]:
+                            if d['tax_group_name'] not in ["TDS", "TCS"]:
                                 amt_tax += d['tax_group_amount']
 
                 # custom code ends
-                un_tax_amt, total_amt, final_total,tax_tot = taxes.get('amount_untaxed'), taxes.get('amount_total'), taxes.get('amount_untaxed') + amt_tax, amt_tax
+                un_tax_amt, total_amt, final_total, tax_tot = taxes.get('amount_untaxed'), taxes.get(
+                    'amount_total'), taxes.get('amount_untaxed') + amt_tax, amt_tax
                 data = {'Bill NO': invoice.name, "Bill Reference": invoice.ref,
                         'Accounting Date': invoice.date, 'Bill Date': invoice.invoice_date,
                         'Purchase Representative': invoice.invoice_user_id.name,
@@ -480,7 +494,8 @@ class DownloadReport(Controller):
                         data[account_name] += line.debit + line.credit
 
                     if line.analytic_distribution:
-                        analytic_account = request.env['account.analytic.account'].sudo().search([('id','=',(list(line.analytic_distribution))[0])])
+                        analytic_account = request.env['account.analytic.account'].sudo().search(
+                            [('id', '=', (list(line.analytic_distribution))[0])])
                         data['Analytic'] = analytic_account.name
                 data_rows.append(data)
             DownloadReport.dataframe_operations(data_rows, sheet_name, writer)

@@ -149,7 +149,6 @@
 
 <!--    Purchase Register-->
 
-
     <record id="action_detail_purchase_register" model="ir.actions.act_window">
         <field name="name">Detailed Purchase Register</field>
         <field name="res_model">partner.ledger</field>

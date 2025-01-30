@@ -2,6 +2,7 @@ from csv import DictReader
 from odoo import models, fields, api, _
 from io import BytesIO
 import base64
+from datetime import datetime, date
 import pandas as pd
 
 
@@ -45,6 +46,22 @@ class GrnDetails(models.TransientModel):
                 if row[0] == 'Invoice NO':
                     continue
                 product = self._get_product_by_name(row[14])
+
+                if isinstance(row[27], datetime):
+                    delivery_date = row[27]
+                    delivery_date = delivery_date.date()
+                elif isinstance(row[27], date):
+                    delivery_date = row[27]
+                else:
+                    delivery_date = None
+
+                if row[28] == 'POD Not Received':
+                    pod_status = 'pending'
+                elif row[28] == 'POD Received':
+                    pod_status = 'completed'
+                else:
+                    pod_status = ''
+
                 vals = {
                     'invoice_no': row[0],
                     'invoice_date': row[1] if str(row[1]) != 'nan' else None,
@@ -74,7 +91,8 @@ class GrnDetails(models.TransientModel):
                     'transporter': row[25],
                     'delivery_status': row[26],
                     # 'delivery_date': row[27],
-                    'pod_status': '',  # Fetch Selection value
+                    'delivery_date': delivery_date,
+                    'pod_status': pod_status,
                     'remark': row[29],
                     'unit_price': row[30],
                     'discount': float(row[31]),

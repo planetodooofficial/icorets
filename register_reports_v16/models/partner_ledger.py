@@ -56,6 +56,7 @@ class PartnerLedger(models.TransientModel):
         else:
             move_type = self._context.get('move_type')
             url = self.get_base_url() + f'/download/reports?report_for={self.type}&start_date={self.start_date}&end_date={self.end_date}&company_id={self.env.company.id}&move_type={move_type}&journal_id={self.journal_id.ids or False}'
+            print("---url----", url)
             return {'type': 'ir.actions.act_url', 'url': url}
 
 
