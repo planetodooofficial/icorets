@@ -113,7 +113,9 @@ class DownloadReport(Controller):
                 else:
                     pod_status = 'POD Not Received'
                 un_tax_amt, total_amt = taxes.get('amount_untaxed'), taxes.get('amount_total')
-                data = {'Invoice NO': invoice_line.move_id.name, 'Invoice Date': invoice_line.move_id.date,
+                data = {'Invoice NO': invoice_line.move_id.name,
+                        'Payment Ref': invoice_line.move_id.payment_reference if invoice_line.move_id.payment_reference else '',
+                        'Invoice Date': invoice_line.move_id.date,
                         'Salesperson': invoice_line.move_id.invoice_user_id.name,
                         'Customer': invoice_line.move_id.partner_id.name,
                         'City': invoice_line.move_id.partner_id.city,
