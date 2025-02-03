@@ -97,8 +97,6 @@ class DownloadReport(Controller):
         summary_sheet = DownloadReport.create_summary_sheet(writer)
         # global tot_qty
         # tot_qty = []
-        print("---invoice_data", invoice_data)
-
         def get_detailed_sales_data(invoices, sheet_name):
             data_rows = []
             gst_data = {}
