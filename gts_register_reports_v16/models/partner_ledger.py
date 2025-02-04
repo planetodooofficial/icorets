@@ -49,10 +49,10 @@ class PartnerLedger(models.TransientModel):
     def print_report(self):
         if self.type == 'partner_ledger':
             data = {'partner_id': self.partner_id.id, 'start_date': self.start_date, 'end_date': self.end_date}
-            return self.env.ref('register_reports_v16.action_report_partner_ledger_pdf').report_action(self, data)
+            return self.env.ref('gts_register_reports_v16.action_report_partner_ledger_pdf').report_action(self, data)
         elif self.type == 'ledger_confirm':
             data = {'partner_id': self.partner_id.id, 'start_date': self.start_date, 'end_date': self.end_date}
-            return self.env.ref('register_reports_v16.action_ledger_confirm_report_pdf').report_action(self, data)
+            return self.env.ref('gts_register_reports_v16.action_ledger_confirm_report_pdf').report_action(self, data)
         else:
             move_type = self._context.get('move_type')
             url = self.get_base_url() + f'/download/reports?report_for={self.type}&start_date={self.start_date}&end_date={self.end_date}&company_id={self.env.company.id}&move_type={move_type}&journal_id={self.journal_id.ids or False}'
@@ -61,7 +61,7 @@ class PartnerLedger(models.TransientModel):
 
 
 class CustomReport(models.AbstractModel):
-    _name = "report.register_reports_v16.po_report_pdf"
+    _name = "report.gts_register_reports_v16.po_report_pdf"
 
     def _get_report_values(self, docids, data=None):
         cr = self._cr
@@ -98,7 +98,7 @@ class CustomReport(models.AbstractModel):
 
 
 class ConfirmLedger(models.AbstractModel):
-    _name = "report.register_reports_v16.report_ledger_confirm"
+    _name = "report.gts_register_reports_v16.report_ledger_confirm"
 
     def payment_data(self, data):
         # Domains for filtering according to fields in form view

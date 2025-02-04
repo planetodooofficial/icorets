@@ -2,7 +2,7 @@ from odoo import api, models, fields, _
 
 
 class StockRegisterReport(models.AbstractModel):
-    _name = "report.register_reports_v16.stock_register_excel"
+    _name = "report.gts_register_reports_v16.stock_register_excel"
     _inherit = "report.report_xlsx.abstract"
 
     def generate_xlsx_report(self, workbook, data, report):
