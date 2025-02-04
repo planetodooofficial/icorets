@@ -15,7 +15,7 @@ class StockRegisterPoReport(models.TransientModel):
 
 
     def action_stock_register_excel_report(self):
-        return self.env.ref('gts_register_reports_v16.stock_register_po_report_action_excel').report_action(self)
+        return self.env.ref('register_reports_v16.stock_register_po_report_action_excel').report_action(self)
 
     # def action_location_wise_excel_report(self):
-    #     return self.env.ref('gts_register_reports_v16.stock_location_wise_report_action_excel').report_action(self)
+    #     return self.env.ref('register_reports_v16.stock_location_wise_report_action_excel').report_action(self)

@@ -26,7 +26,7 @@
     'images': ['static/description/logo'],
     'qweb': [],
     'assets': { 'web.assets_backend': [
-            'gts_register_reports_v16/static/src/css/style.css',]
+            'register_reports_v16/static/src/css/style.css',]
 
     },
     'license': 'AGPL-3',
