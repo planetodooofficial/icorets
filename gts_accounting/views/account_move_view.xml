@@ -9,6 +9,22 @@
                 <button name="%(gts_accounting.action_upload_document_menu)d" string="POD Upload" class="oe_highlight"
                         type="action" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
             </button>
+
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="po_expiry_date"/>
+                <field name="old_po"/>
+            </xpath>
+
+            <xpath expr="//field[@name='to_check']" position="after">
+                <field name="reason"/>
+                <field name="remarks"/>
+                <field name="asn_no"/>
+                <field name="vin_po_no"/>
+                <field name="vin_asn_no"/>
+                <field name="shortage"/>
+                <field name="appointment"/>
+            </xpath>
+
             <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='partner_bank_id']"
                    position="after">
                 <field name="pod_document_name" invisible="1"/>
@@ -17,12 +33,28 @@
                 <field name="transporter_name"/>
                 <field name="lr_number"/>
                 <field name="customer_delivery_number"/>
+
+                <field name="quick_commerce"/>
+                <field name="eta"/>
+                <field name="timing"/>
+                <field name="cn_number"/>
+                <field name="dn_number"/>
+
             </xpath>
-            <xpath expr="//group[@id='header_right_group']/div[2]/field[@name='invoice_payment_term_id']" position="attributes">
+            <xpath expr="//group[@id='header_right_group']/div[2]/field[@name='invoice_payment_term_id']"
+                   position="attributes">
                 <attribute name="attrs">{'required': [('state', '=', 'draft')]}</attribute>
             </xpath>
-            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='invoice_user_id']" position="attributes">
-                <attribute name="attrs">{'required': [('state', '=', 'draft'), ('move_type', 'in', ('out_invoice', 'out_refund'))]}</attribute>
+            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='invoice_user_id']"
+                   position="attributes">
+                <attribute name="attrs">{'required': [('state', '=', 'draft'), ('move_type', 'in', ('out_invoice',
+                    'out_refund'))]}
+                </attribute>
+            </xpath>
+            <xpath expr="//form//group[1]/group[2]" position="inside">
+                <field name="credit_invoice_ids" widget="many2many_tags"
+                       attrs="{'invisible': [('move_type', '!=', 'out_refund')]}"
+                       domain="[('move_type', '=', 'out_invoice'),('partner_id', '=', partner_id)]"/>
             </xpath>
         </field>
     </record>

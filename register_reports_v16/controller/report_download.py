@@ -97,7 +97,10 @@ class DownloadReport(Controller):
         summary_sheet = DownloadReport.create_summary_sheet(writer)
         # global tot_qty
         # tot_qty = []
+        print("---invoice_data", invoice_data)
+
         def get_detailed_sales_data(invoices, sheet_name):
+
             data_rows = []
             gst_data = {}
             # tot_qty = []
@@ -111,8 +114,13 @@ class DownloadReport(Controller):
                 else:
                     pod_status = 'POD Not Received'
                 un_tax_amt, total_amt = taxes.get('amount_untaxed'), taxes.get('amount_total')
+                sale_line = invoice_line.sale_line_ids[0] if invoice_line.sale_line_ids else False
+                if sale_line:
+                    stock_move = request.env['stock.move'].search([('sale_line_id', '=', sale_line.id)])
+                    stock_move = stock_move[0] if stock_move else False
+                else:
+                    stock_move = False
                 data = {'Invoice NO': invoice_line.move_id.name,
-                        'Payment Ref': invoice_line.move_id.payment_reference if invoice_line.move_id.payment_reference else '',
                         'Invoice Date': invoice_line.move_id.date,
                         'Salesperson': invoice_line.move_id.invoice_user_id.name,
                         'Customer': invoice_line.move_id.partner_id.name,
@@ -137,26 +145,46 @@ class DownloadReport(Controller):
                         'SubClass': invoice_line.product_id.categ_id.name,
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity,
-
-                        'Customer Appointment Date': invoice_line.move_id.customer_appointment_date if invoice_line.move_id.customer_appointment_date else None,
-                        'Transporter Name': invoice_line.move_id.transporter_name if invoice_line.move_id.transporter_name else '',
-                        'LR Name': invoice_line.move_id.lr_number if invoice_line.move_id.lr_number else '',
-                        'Customer Delivery Number': invoice_line.move_id.customer_delivery_number if invoice_line.move_id.customer_delivery_number else '',
-
-                        # 'GRN Quantity': ' ',
-                        # 'Shortage': ' ',
-                        # 'Transporter': ' ',
-                        # 'Delivery Status': ' ',
-                        # 'Delivery Date': ' ',
-                        # 'PODs Status': pod_status,
-                        # 'Remark': ' ',
+                        'GRN Qty': invoice_line.quantity or ' ',
+                        'Shortage': invoice_line.move_id.shortage or ' ',
+                        'Transporter': invoice_line.move_id.transporter_name or ' ',
+                        'Delivery Status': stock_move.state if stock_move else ' ',
+                        'Delivery Date': stock_move.picking_id.date_done if stock_move and stock_move.picking_id.date_done else ' ',
+                        'POD Status': pod_status or ' ',
+                        'Remarks': invoice_line.move_id.remarks or ' ',
 
                         'Unit Price': invoice_line.price_unit,
-                        'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
+                        'Discount': invoice_line.discount,
+                        'Price Subtotal': invoice_line.price_subtotal,
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
                         'Bill Net Amt': invoice_line.price_unit * invoice_line.quantity,
-                        'Price Total': invoice_line.price_total, 'Invoice Untaxed Amt': un_tax_amt,
-                        'Invoice Tax Amount': invoice_line.tax_amount_line, 'Invoice Total Amt': total_amt}
+                        'Price Total': invoice_line.price_total,
+                        'Invoice Untaxed Amt': un_tax_amt,
+                        'Invoice Tax Amount': invoice_line.tax_amount_line,
+                        'Invoice Total Amt': total_amt,
+                        'Payment Ref': invoice_line.move_id.payment_reference if invoice_line.move_id.payment_reference else ' ',
+
+                        'Customer Appointment Date': invoice_line.move_id.customer_appointment_date or False,
+                        'Transporter Name': invoice_line.move_id.transporter_name or ' ',
+                        'LR Name': invoice_line.move_id.lr_number or '',
+                        'Customer Delivery Number': invoice_line.move_id.customer_delivery_number or '',
+
+                        'Quick Commerce': invoice_line.move_id.quick_commerce or ' ',
+                        'No of Box': invoice_line.move_id.no_of_cartons or ' ',
+                        'Ship From': invoice_line.company_id.name or ' ',
+                        'Ship To': invoice_line.move_id.partner_shipping_id.name or ' ',
+                        'PO Expiry Date': invoice_line.move_id.po_expiry_date or False,
+                        'ETA': invoice_line.move_id.eta or ' ',
+                        'Timing': invoice_line.move_id.timing or ' ',
+                        'Appointment ID': invoice_line.move_id.appointment or ' ',
+                        'CN': invoice_line.move_id.cn_number or ' ',
+                        'DN': invoice_line.move_id.dn_number or ' ',
+                        'Old Po': invoice_line.move_id.old_po or ' ',
+                        'Reason': invoice_line.move_id.reason or ' ',
+                        'ASN No': invoice_line.move_id.asn_no or ' ',
+                        'VIN PO No': invoice_line.move_id.vin_po_no or ' ',
+                        'VIN ASN No': invoice_line.move_id.vin_asn_no or ' ',
+                        }
                 data.update({f"Total {tax.get('tax_group_name')}": tax.get('tax_group_amount')
                              for tax in taxes.get('groups_by_subtotal', {}).get('Untaxed Amount', {})})
                 data.update(DownloadReport.compute_taxes(invoice_line))
