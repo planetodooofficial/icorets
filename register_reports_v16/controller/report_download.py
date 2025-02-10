@@ -145,7 +145,7 @@ class DownloadReport(Controller):
                         'SubClass': invoice_line.product_id.categ_id.name,
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity,
-                        'GRN Qty': invoice_line.quantity or ' ',
+                        'GRN Qty': ' ',
                         'Shortage': invoice_line.move_id.shortage or ' ',
                         'Transporter': invoice_line.move_id.transporter_name or ' ',
                         'Delivery Status': stock_move.state if stock_move else ' ',
@@ -165,7 +165,7 @@ class DownloadReport(Controller):
                         'Payment Ref': invoice_line.move_id.payment_reference if invoice_line.move_id.payment_reference else ' ',
 
                         'Customer Appointment Date': invoice_line.move_id.customer_appointment_date or False,
-                        'Transporter Name': invoice_line.move_id.transporter_name or ' ',
+                        # 'Transporter Name': invoice_line.move_id.transporter_name or ' ',
                         'LR Name': invoice_line.move_id.lr_number or '',
                         'Customer Delivery Number': invoice_line.move_id.customer_delivery_number or '',
 

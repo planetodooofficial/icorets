@@ -41,16 +41,21 @@
                 <field name="dn_number"/>
 
             </xpath>
-            <xpath expr="//group[@id='header_right_group']/div[2]/field[@name='invoice_payment_term_id']"
-                   position="attributes">
-                <attribute name="attrs">{'required': [('state', '=', 'draft')]}</attribute>
+            <!--            <xpath expr="//group[@id='header_right_group']/div[2]/field[@name='invoice_payment_term_id']"-->
+            <!--                   position="attributes">-->
+            <!--                <attribute name="attrs">{'required': [('state', '=', 'draft')]}</attribute>-->
+            <!--            </xpath>-->
+            <!--            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='invoice_user_id']"-->
+            <!--                   position="attributes">-->
+            <!--                <attribute name="attrs">{'required': [('state', '=', 'draft'), ('move_type', 'in', ('out_invoice',-->
+            <!--                    'out_refund'))]}-->
+            <!--                </attribute>-->
+            <!--            </xpath>-->
+
+            <xpath expr="//div[@name='journal_div']/field[@name='journal_id']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '=', 'posted')]}</attribute>
             </xpath>
-            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='invoice_user_id']"
-                   position="attributes">
-                <attribute name="attrs">{'required': [('state', '=', 'draft'), ('move_type', 'in', ('out_invoice',
-                    'out_refund'))]}
-                </attribute>
-            </xpath>
+
             <xpath expr="//form//group[1]/group[2]" position="inside">
                 <field name="credit_invoice_ids" widget="many2many_tags"
                        attrs="{'invisible': [('move_type', '!=', 'out_refund')]}"
