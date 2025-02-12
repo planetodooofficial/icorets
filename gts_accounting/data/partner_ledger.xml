@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+<!--    partner_ledgeropen-->
     <record id="account_reports.partner_ledger_report" model="account.report">
         <field name="name">Partner Ledger</field>
         <field name="filter_show_draft" eval="True"/>
