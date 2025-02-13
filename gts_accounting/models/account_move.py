@@ -12,6 +12,21 @@ class AccountMove(models.Model):
     lr_number = fields.Char(string="LR Number")
     customer_delivery_number = fields.Char(string="Customer Delivery Number")
 
+    quick_commerce = fields.Char(string="Quick Commerce")
+    po_expiry_date = fields.Date(string="PO Expiry Date")
+    eta = fields.Char(string="ETA")
+    timing = fields.Char(string="Timing")
+    appointment = fields.Char(string="Appointment")
+    cn_number = fields.Char(string="CN Number")
+    dn_number = fields.Char(string="DN Number")
+    old_po = fields.Char(string="Old Po")
+    reason = fields.Char(string="Reason")
+    remarks = fields.Char(string="Remarks")
+    asn_no = fields.Char(string="ASN No")
+    vin_po_no = fields.Char(string="VIN Po No")
+    vin_asn_no = fields.Char(string="VIN ASN No")
+    shortage = fields.Char(string="Shortage")
+
     credit_invoice_ids = fields.Many2many('account.move', 'credit_invoices_rel', 'credit_id', 'invoice_id',
                                           string='Select Invoice')
 
@@ -62,9 +77,13 @@ class AccountMove(models.Model):
                 if line.display_type == 'product' and line.credit == 0 and line.debit == 0:
                     line.unlink()
 
-            for invoice in self.credit_invoice_ids:
-                invoice.update({
-                    'reversal_move_id': [(4, self.id)]
-                })
+            # if self.env.context.get('no_check') is None:
+            #     for invoice in self.credit_invoice_ids:
+            #         invoice.with_context({'no_check': True}).write({
+            #             'reversal_move_id': [(4, self.id)]
+            #             # 'reversed_entry_id': self.id
+            #         })
+                    # sql_query = "update account_move set reversed_entry_id=%d where id=%d" % (self.id, invoice.id)
+                    # self._cr.execute(sql_query)
 
         return res
