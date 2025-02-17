@@ -77,9 +77,4 @@ class AccountMove(models.Model):
                 if line.display_type == 'product' and line.credit == 0 and line.debit == 0:
                     line.unlink()
 
-            for invoice in self.credit_invoice_ids:
-                invoice.update({
-                    'reversal_move_id': [(4, self.id)]
-                })
-
         return res

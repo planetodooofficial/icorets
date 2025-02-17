@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="sale_channel_report_wizard" model="ir.ui.view">
+        <field name="name">sale.channel.report.wizard</field>
+        <field name="model">sale.channel.report</field>
+        <field name="arch" type="xml">
+            <form string="Sale Channel Report">
+                <group>
+                    <field name="from_date"/>
+                    <field name="to_date"/>
+                    <field name="channel_id" widget="many2many_tags" options="{'no_create': True, 'no_open': True}"/>
+                </group>
+                <footer>
+                    <button name="btn_generate_xlsx_report" string="Generate XLSX Report" type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="sale_channel_report_action" model="ir.actions.act_window">
+        <field name="name">Sale Channel Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.channel.report</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -592,10 +592,12 @@ class ShopInstance(models.Model):
                 print("====partner", partner)
                 return partner
 
-        if '*' in partner_data.get('billing_name'):
-            billing_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('shipping_state'))
-        else:
-            billing_partner_name = partner_data.get('billing_name')
+        # if '*' in partner_data.get('billing_name'):
+        #     billing_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('billing_state'))
+        # else:
+        #     billing_partner_name = partner_data.get('billing_name')
+
+        billing_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('billing_state'))
 
         partner = partner_obj.search([('name', '=', billing_partner_name),
                                       ('state_id.code', '=', partner_data.get('billing_state')),
@@ -617,7 +619,7 @@ class ShopInstance(models.Model):
                 'state_id': self.get_state_id(partner_data.get('billing_state')),
                 'country_id': self.get_country_id(partner_data.get('billing_country')),
                 'zip': partner_data.get('billing_pincode'),
-                'phone': partner_data.get('billing_phone'),
+                'phone': '' if '*' in partner_data.get('billing_phone') else partner_data.get('billing_phone'),
                 'email': partner_data.get('billing_email'),
                 'is_company': is_business,
                 'vat': partner_data.get('customerGSTIN') if is_business else False,
@@ -627,14 +629,19 @@ class ShopInstance(models.Model):
             # Create billing partner
             billing_partner = partner_obj.create(billing_partner_data)
             if partner_data.get('shipping_name') != partner_data.get('billing_name'):
-                if '*' in partner_data.get('shipping_name'):
-                    shipping_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('shipping_state'))
-                else:
-                    shipping_partner_name = partner_data.get('shipping_name')
+                # if '*' in partner_data.get('shipping_name'):
+                #     shipping_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('shipping_state'))
+                # else:
+                #     shipping_partner_name = partner_data.get('shipping_name')
+
+                shipping_partner_name = str(sales_channel_name) + ' - B2C - ' + (partner_data.get('shipping_state'))
+
                 street = '' if '*' in partner_data.get('shipping_addressLine1') else partner_data.get(
                     'shipping_addressLine1')
                 street2 = '' if '*' in partner_data.get('shipping_addressLine2') else partner_data.get(
                     'shipping_addressLine2')
+                phone = '' if '*' in partner_data.get('shipping_phone') else partner_data.get(
+                    'shipping_phone') or partner_data.get('billing_phone')
                 # Prepare data for shipping partner
                 shipping_partner_data = {
                     # 'name': partner_data.get('shipping_name') or partner_data.get('billing_name'),
@@ -649,7 +656,8 @@ class ShopInstance(models.Model):
                     'country_id': self.get_country_id(
                         partner_data.get('shipping_country') or partner_data.get('billing_country')),
                     'zip': partner_data.get('shipping_pincode') or partner_data.get('billing_pincode'),
-                    'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
+                    # 'phone': partner_data.get('shipping_phone') or partner_data.get('billing_phone'),
+                    'phone': phone,
                     'email': partner_data.get('shipping_email') or partner_data.get('billing_email'),
                     'is_company': is_business,
                     'type': 'delivery',
