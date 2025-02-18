@@ -16,7 +16,6 @@ from odoo.addons.iap import jsonrpc
 import html2text
 from odoo.tools.safe_eval import safe_eval
 
-
 from odoo.exceptions import ValidationError
 from odoo.tools import json, float_round, get_lang, DEFAULT_SERVER_DATETIME_FORMAT
 
@@ -25,11 +24,8 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 
 
-
 class ProductVariantInherit(models.Model):
     _inherit = "product.product"
-
-
 
     variants_ean_code = fields.Char('EAN Code', tracking=True)
     default_code = fields.Char('Internal Reference', index=True, tracking=True)
@@ -54,26 +50,26 @@ class ProductVariantInherit(models.Model):
     zepto = fields.Char('Zepto')
     swiggy = fields.Char('Swiggy')
     bigbasket = fields.Char('Bigbasket')
-    product_net_weight = fields.Char(related='product_tmpl_id.product_net_weight', string='Product Net Weight (gms)')
-    product_dimension1 = fields.Char(related='product_tmpl_id.product_dimension1', string='Product Dimension (cm)')
-    product_dimension2 = fields.Char(related='product_tmpl_id.product_dimension2', string='Product Dimension (cm)')
-    product_dimension3 = fields.Char(related='product_tmpl_id.product_dimension3', string='Product Dimension (cm)')
-    package_dimension1 = fields.Char(related='product_tmpl_id.package_dimension1', string='Package Dimension (cm)')
-    package_dimension2 = fields.Char(related='product_tmpl_id.package_dimension2', string='Package Dimension (cm)')
-    package_dimension3 = fields.Char(related='product_tmpl_id.package_dimension3', string='Package Dimension (cm)')
-    package_weight = fields.Char(related='product_tmpl_id.package_weight', string='Package Weight (gms)')
+    product_net_weight = fields.Char(string='Product Net Weight (gms)11')
+    product_dimension1 = fields.Char(string='Product Dimension (cm)')
+    product_dimension2 = fields.Char(string='Product Dimension (cm)')
+    product_dimension3 = fields.Char(string='Product Dimension (cm)')
+    package_dimension1 = fields.Char(string='Package Dimension (cm)')
+    package_dimension2 = fields.Char(string='Package Dimension (cm)')
+    package_dimension3 = fields.Char(string='Package Dimension (cm)')
+    package_weight = fields.Char(string='Package Weight (gms)')
 
-    market_place_tittle = fields.Char(related='product_tmpl_id.market_place_tittle', string='Marketplace Tittle')
-    bullet_point_1 = fields.Char(related='product_tmpl_id.bullet_point_1', string='Bullet Point 1')
-    bullet_point_2 = fields.Char(related='product_tmpl_id.bullet_point_2', string='Bullet Point 2')
-    bullet_point_3 = fields.Char(related='product_tmpl_id.bullet_point_3', string='Bullet Point 3')
-    bullet_point_4 = fields.Char(related='product_tmpl_id.bullet_point_4', string='Bullet Point 4')
-    bullet_point_5 = fields.Char(related='product_tmpl_id.bullet_point_5', string='Bullet Point 5')
-    description = fields.Char(related='product_tmpl_id.description', string='Description')
+    market_place_tittle = fields.Char(string='Marketplace Tittle')
+    bullet_point_1 = fields.Char(string='Bullet Point 1')
+    bullet_point_2 = fields.Char(string='Bullet Point 2')
+    bullet_point_3 = fields.Char(string='Bullet Point 3')
+    bullet_point_4 = fields.Char(string='Bullet Point 4')
+    bullet_point_5 = fields.Char(string='Bullet Point 5')
+    description = fields.Char(string='Description')
+
     google_drive_link = fields.Char(string='Google Drive Link')
     drop_box_link = fields.Char(string='Drop Box Link')
     country_origin = fields.Char(related='product_tmpl_id.country_origin', string='Country of Origin')
-
 
     # Inherited and removed domain
     product_template_variant_value_ids = fields.Many2many('product.template.attribute.value',
@@ -94,6 +90,26 @@ class ProductVariantInherit(models.Model):
     def sum_cost(self):
         if self.standard_price and self.variant_packaging_cost:
             self.variant_total_cost = self.standard_price + self.variant_packaging_cost
+
+    @api.model
+    def create(self, vals):
+        res = super().create(vals)
+        res.product_net_weight = res.product_tmpl_id.product_net_weight
+        res.product_dimension1 = res.product_tmpl_id.product_dimension1
+        res.product_dimension2 = res.product_tmpl_id.product_dimension2
+        res.product_dimension3 = res.product_tmpl_id.product_dimension3
+        res.package_dimension1 = res.product_tmpl_id.package_dimension1
+        res.package_dimension2 = res.product_tmpl_id.package_dimension2
+        res.package_dimension3 = res.product_tmpl_id.package_dimension3
+        res.package_weight = res.product_tmpl_id.package_weight
+        res.market_place_tittle = res.product_tmpl_id.market_place_tittle
+        res.bullet_point_1 = res.product_tmpl_id.bullet_point_1
+        res.bullet_point_2 = res.product_tmpl_id.bullet_point_2
+        res.bullet_point_3 = res.product_tmpl_id.bullet_point_3
+        res.bullet_point_4 = res.product_tmpl_id.bullet_point_4
+        res.bullet_point_5 = res.product_tmpl_id.bullet_point_5
+        res.description = res.product_tmpl_id.description
+        return res
 
 
 class ProductInherit(models.Model):
@@ -144,8 +160,6 @@ class ProductInherit(models.Model):
     drop_box_link = fields.Char('Drop Box Link')
     country_origin = fields.Char('Country of Origin')
 
-
-
     _sql_constraints = [
         ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
     ]
@@ -168,6 +182,7 @@ class ProductBrand(models.Model):
     _rec_name = 'name'
 
     name = fields.Char('Brand Name')
+
 
 class ReasonReason(models.Model):
     _name = 'reason.reason'
@@ -206,12 +221,12 @@ class AccountMoveInheritClass(models.Model):
     partner_shipping_id_street2 = fields.Char('Del Street2', related='partner_shipping_id.street2')
     partner_shipping_id_city = fields.Char('Del City', related='partner_shipping_id.city')
     partner_shipping_id_state = fields.Many2one('res.country.state', 'Del State',
-                                                    related='partner_shipping_id.state_id')
+                                                related='partner_shipping_id.state_id')
     partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
     partner_shipping_id_country = fields.Many2one('res.country', 'Del Country',
                                                   related='partner_shipping_id.country_id')
 
-    #new selection field of address for credit note
+    # new selection field of address for credit note
     shipping_id_credit = fields.Many2one('res.partner', string='Ship To')
 
     def open_update_partner_wizard(self):
@@ -400,7 +415,7 @@ class SaleOrderInherit(models.Model):
         ondelete='restrict', index=True, check_company=True)  # removed the required=True
     event = fields.Char('Event')
     l10n_in_journal_id = fields.Many2one('account.journal', string="Journal", default=False, required=True, store=True,
-                                         readonly=True,
+                                         readonly=True, copy=True,
                                          states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
     is_fo = fields.Boolean("Is Fo", copy=False, default=False)
     fo_id = fields.Many2one("sale.order", string="FO ID")
@@ -412,16 +427,18 @@ class SaleOrderInherit(models.Model):
     partner_invoice_id_street = fields.Char('Inv Street', related='partner_invoice_id.street')
     partner_invoice_id_street2 = fields.Char('Inv Street2', related='partner_invoice_id.street2')
     partner_invoice_id_city = fields.Char('Inv City', related='partner_invoice_id.city')
-    partner_invoice_id_state = fields.Many2one('res.country.state','Inv State', related='partner_invoice_id.state_id')
+    partner_invoice_id_state = fields.Many2one('res.country.state', 'Inv State', related='partner_invoice_id.state_id')
     partner_invoice_id_zip = fields.Char('Inv Zip', related='partner_invoice_id.zip')
-    partner_invoice_id_country = fields.Many2one('res.country','Inv Country', related='partner_invoice_id.country_id')
+    partner_invoice_id_country = fields.Many2one('res.country', 'Inv Country', related='partner_invoice_id.country_id')
 
     partner_shipping_id_street = fields.Char('Del Street', related='partner_shipping_id.street')
     partner_shipping_id_street2 = fields.Char('Del Street2', related='partner_shipping_id.street2')
     partner_shipping_id_city = fields.Char('Del City', related='partner_shipping_id.city')
-    partner_shipping_id_state = fields.Many2one('res.country.state','Del State', related='partner_shipping_id.state_id')
+    partner_shipping_id_state = fields.Many2one('res.country.state', 'Del State',
+                                                related='partner_shipping_id.state_id')
     partner_shipping_id_zip = fields.Char('Del Zip', related='partner_shipping_id.zip')
-    partner_shipping_id_country = fields.Many2one('res.country','Del Country', related='partner_shipping_id.country_id')
+    partner_shipping_id_country = fields.Many2one('res.country', 'Del Country',
+                                                  related='partner_shipping_id.country_id')
     reason_id = fields.Many2one('reason.reason')
     desc = fields.Char('Description')
     is_short_close = fields.Boolean()
@@ -433,7 +450,6 @@ class SaleOrderInherit(models.Model):
             rec.check_amount_in_words = num2words(str(rec.amount_total), lang='en_IN').replace(',', '').replace('and',
                                                                                                                 '').replace(
                 'point', 'and paise').replace('thous', 'thousand')
-
 
     def action_view_fo_so(self):
         search_so = self.env["sale.order"].search([('fo_id', '=', self.id)])
@@ -456,7 +472,6 @@ class SaleOrderInherit(models.Model):
             'view_id': view.id,
             'target': 'new',
         }
-
 
     @api.model
     def default_get(self, fields):
@@ -548,6 +563,7 @@ class SaleOrderInherit(models.Model):
         }
 
     ''' This Func is used for creating forecasted orders. '''
+
     def fo_action_confirm(self):
         top_priority_stock = {}
         medium_priority_stock = {}
@@ -565,9 +581,13 @@ class SaleOrderInherit(models.Model):
         for so_line in self.order_line:
             if so_line not in stock_requirement:
                 stock_requirement[so_line] = so_line.product_uom_qty
-            search_top_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)], limit=1)
-            search_medium_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)], limit=1)
-            search_low_stock = self.env["stock.quant"].search([('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)], limit=1)
+            search_top_stock = self.env["stock.quant"].search(
+                [('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', top_priority_warehouse.id)], limit=1)
+            search_medium_stock = self.env["stock.quant"].search(
+                [('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', medium_priority_warehouse.id)],
+                limit=1)
+            search_low_stock = self.env["stock.quant"].search(
+                [('product_id', '=', so_line.product_id.id), ('warehouse_id', '=', low_priority_warehouse.id)], limit=1)
 
             if search_top_stock:
                 if search_top_stock.available_quantity > 0:
@@ -609,10 +629,10 @@ class SaleOrderInherit(models.Model):
                         prd_qty = qty
                         top_priority_stock[so_line_obj] -= prd_qty
 
-                    # if so_line_obj in stock_requirement:
-                    #     stock_requirement[so_line_obj] -= prd_qty
-                    #
-                    # if qty < stock_requirement[so_line_obj]:
+                        # if so_line_obj in stock_requirement:
+                        #     stock_requirement[so_line_obj] -= prd_qty
+                        #
+                        # if qty < stock_requirement[so_line_obj]:
                         if so_line_obj not in medium_priority_stock and so_line_obj not in low_priority_stock:
                             remaining_prd_qty = stock_requirement[so_line_obj] - prd_qty
                             if remaining_prd_qty > 0:
@@ -678,10 +698,10 @@ class SaleOrderInherit(models.Model):
                         prd_qty = qty
                         medium_priority_stock[so_line_obj] -= prd_qty
 
-                    # if so_line_obj in stock_requirement:
-                    #     stock_requirement[so_line_obj] -= prd_qty
-                    #
-                    # if qty < stock_requirement[so_line_obj]:
+                        # if so_line_obj in stock_requirement:
+                        #     stock_requirement[so_line_obj] -= prd_qty
+                        #
+                        # if qty < stock_requirement[so_line_obj]:
                         if so_line_obj not in low_priority_stock:
                             remaining_prd_qty = stock_requirement[so_line_obj] - prd_qty
                             if remaining_prd_qty > 0:
@@ -747,10 +767,10 @@ class SaleOrderInherit(models.Model):
                         prd_qty = qty
                         low_priority_stock[so_line_obj] -= prd_qty
 
-                    # if so_line_obj in stock_requirement:
-                    #     stock_requirement[so_line_obj] -= prd_qty
-                    #
-                    # if qty < stock_requirement[so_line_obj]:
+                        # if so_line_obj in stock_requirement:
+                        #     stock_requirement[so_line_obj] -= prd_qty
+                        #
+                        # if qty < stock_requirement[so_line_obj]:
                         remaining_prd_qty = stock_requirement[so_line_obj] - prd_qty
                         if remaining_prd_qty > 0:
                             if so_line_obj not in backorder_of_fo_lines:
@@ -939,7 +959,6 @@ class SaleOrderLineInherit(models.Model):
                     product_name = f"{line.product_id.name}"
                     line.name = product_name
 
-
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
     def _compute_amount(self):
         """
@@ -975,7 +994,8 @@ class SaleOrderLineInherit(models.Model):
         if self.product_id:
             self.stock_quantity = prd_qty.available_quantity
 
-#CREATED FOR SAPAT REQUIREMENT
+
+# CREATED FOR SAPAT REQUIREMENT
 # class VendorbillWizard(models.TransientModel):
 #     _name = "vendorbill.wizard"
 #     _description = "Vendor Bill Wizard"
@@ -1114,7 +1134,7 @@ class PurchaseOrderInherit(models.Model):
         for rec in self:
             return {'domain': {'warehouse_id': [('id', '=', rec.picking_type_id.warehouse_id.id)]}}
 
-    #CREATED WIZARD FOR SAPAT REQUIREMENT
+    # CREATED WIZARD FOR SAPAT REQUIREMENT
     # def open_vendorbill_wizard(self):
     #     # Call the wizard action to open the wizard
     #     return {
@@ -1125,8 +1145,6 @@ class PurchaseOrderInherit(models.Model):
     #         'view_id': self.env.ref('icorets.view_vendorbill_wizard_form').id,
     #         'target': 'new',
     #     }
-
-
 
     # For getting user which used approve button in purchase order in pdf
     def button_approve(self, force=False):
@@ -1378,9 +1396,10 @@ class InheritResPartner(models.Model):
             args += ['|', '|', ('name', operator, name), ('cust_alias_name', operator, name)]
         return super()._name_search(name, args, operator, limit, name_get_uid)
 
-    @api.depends('cust_alias_name','name')
+    @api.depends('cust_alias_name', 'name')
     def name_get(self):
-        return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (record.id, "%s" % (record.name)) for record in self]
+        return [(record.id, "[%s] %s" % (record.cust_alias_name, record.name)) if record.cust_alias_name else (
+        record.id, "%s" % (record.name)) for record in self]
 
 
 # Created for Packing List
@@ -1479,16 +1498,12 @@ class PackingListManual(models.TransientModel):
                 package_vals = {'name': destination_package_name}
                 package = package_obj.create(package_vals)
 
-
             new_move_line_vals = {
                 'product_id': search_product.id,
                 'qty_done': rows['Packed Qty'],
                 'result_package_id': package.id
             }
             picking_id.update({'move_line_ids_without_package': [(0, 0, new_move_line_vals)]})
-
-
-
 
 
 # Code for creating excel report in csv then updating it on stock.picking itself
@@ -1559,8 +1574,7 @@ class SaleOrderReport(models.AbstractModel):
         row = 1
         col = 0
 
-
-        sale_order= self.env['sale.order'].search([])
+        sale_order = self.env['sale.order'].search([])
 
         for record in sale_order:
             if record.name == lines.origin:
@@ -1578,6 +1592,7 @@ class SaleOrderReport(models.AbstractModel):
                     sheet.write(row, col + 10, rec.product_uom_qty)
                     sheet.write(row, col + 11, rec.qty_invoiced)
                     row += 1
+
 
 class InheritProductAttribute(models.Model):
     _inherit = 'product.attribute'
