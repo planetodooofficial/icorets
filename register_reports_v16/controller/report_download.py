@@ -167,6 +167,7 @@ class DownloadReport(Controller):
                         'Customer Appointment Date': invoice_line.move_id.customer_appointment_date or False,
                         # 'Transporter Name': invoice_line.move_id.transporter_name or ' ',
                         'LR Name': invoice_line.move_id.lr_number or '',
+                        'Logistic Charge': invoice_line.move_id.logistic_number or '',
                         'Customer Delivery Number': invoice_line.move_id.customer_delivery_number or '',
 
                         'Quick Commerce': invoice_line.move_id.quick_commerce or ' ',

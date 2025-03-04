@@ -69,6 +69,7 @@ class GRNDetailsData(models.Model):
     customer_appointment_date = fields.Date(string="Customer Appointment Date")
     transporter_name = fields.Char(string="Transporter Name")
     lr_number = fields.Char(string="LR Number")
+    logistic_number = fields.Char(string="Logistic Charge")
     customer_delivery_number = fields.Char(string="Customer Delivery Number")
 
     quick_commerce = fields.Char(string="Quick Commerce")

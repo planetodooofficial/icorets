@@ -66,6 +66,7 @@
                 <field name="customer_appointment_date" optional="hide"/>
                 <field name="transporter_name" optional="hide"/>
                 <field name="lr_number" optional="hide"/>
+                <field name="logistic_number" optional="hide"/>
                 <field name="customer_delivery_number" optional="hide"/>
 
                 <field name="quick_commerce" optional="hide"/>

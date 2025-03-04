@@ -66,13 +66,10 @@ class GrnDetails(models.TransientModel):
                     row_40 = row[40]
                 else:
                     row_40 = None
-                if isinstance(row[47], date):
-                    row_47 = row[47]
+                if isinstance(row[48], date):
+                    row_48 = row[48]
                 else:
-                    row_47 = None
-
-                # print('row[40]+++++++++++++++++++', row[40], type(row[40]))
-                # print('row[48]+++++++++++++++++++', row[48], type(row[48]))
+                    row_48 = None
 
                 vals = {
                     'invoice_no': row[0],
@@ -123,53 +120,54 @@ class GrnDetails(models.TransientModel):
                     'customer_appointment_date': row_40,
                     # 'transporter_name': row[41] if str(row[41]) != 'nan' else False,
                     'lr_number': row[41] if str(row[41]) != 'nan' else False,
-                    'customer_delivery_number': row[42] if str(row[42]) != 'nan' else False,
+                    'logistic_number': row[42] if str(row[42]) != 'nan' else False,
+                    'customer_delivery_number': row[43] if str(row[43]) != 'nan' else False,
 
-                    'quick_commerce': row[43] if str(row[43]) != 'nan' else False,
-                    'no_of_box': row[44] if str(row[44]) != 'nan' else False,
-                    'ship_from': row[45] if str(row[45]) != 'nan' else False,
-                    'ship_to': row[46] if str(row[46]) != 'nan' else False,
-                    'po_expiry_date': row_47,
-                    'eta': row[48] if str(row[48]) != 'nan' else False,
-                    'timing': row[49] if str(row[49]) != 'nan' else False,
-                    'appointment': row[50] if str(row[50]) != 'nan' else False,
-                    'cn_number': row[51] if str(row[51]) != 'nan' else False,
-                    'dn_number': row[52] if str(row[52]) != 'nan' else False,
-                    'old_po': row[53] if str(row[53]) != 'nan' else False,
-                    'reason': row[54] if str(row[54]) != 'nan' else False,
-                    'asn_no': row[55] if str(row[55]) != 'nan' else False,
-                    'vin_po_no': row[56] if str(row[56]) != 'nan' else False,
-                    'vin_asn_no': row[57] if str(row[57]) != 'nan' else False,
+                    'quick_commerce': row[44] if str(row[44]) != 'nan' else False,
+                    'no_of_box': row[45] if str(row[45]) != 'nan' else False,
+                    'ship_from': row[46] if str(row[46]) != 'nan' else False,
+                    'ship_to': row[47] if str(row[47]) != 'nan' else False,
+                    'po_expiry_date': row_48,
+                    'eta': row[49] if str(row[49]) != 'nan' else False,
+                    'timing': row[50] if str(row[50]) != 'nan' else False,
+                    'appointment': row[51] if str(row[51]) != 'nan' else False,
+                    'cn_number': row[52] if str(row[52]) != 'nan' else False,
+                    'dn_number': row[53] if str(row[53]) != 'nan' else False,
+                    'old_po': row[54] if str(row[54]) != 'nan' else False,
+                    'reason': row[55] if str(row[55]) != 'nan' else False,
+                    'asn_no': row[56] if str(row[56]) != 'nan' else False,
+                    'vin_po_no': row[57] if str(row[57]) != 'nan' else False,
+                    'vin_asn_no': row[58] if str(row[58]) != 'nan' else False,
 
-                    'total_sgst': row[58] if str(row[58]) != 'nan' else 0,
-                    'total_cgst': row[59] if str(row[59]) != 'nan' else 0,
-                    'sgst_sale_2_5_mh': row[60] if str(row[60]) != 'nan' else 0,
-                    'cgst_sale_2_5_mh': row[61] if str(row[61]) != 'nan' else 0,
-                    'total_igst': row[62] if str(row[62]) != 'nan' else 0,
-                    'igst_12_output_mh': row[63] if str(row[63]) != 'nan' else 0,
-                    'igst_5_output_mh': row[64] if str(row[64]) != 'nan' else 0,
-                    'sgst_sale_6_mh': row[65] if str(row[65]) != 'nan' else 0,
-                    'cgst_sale_6_mh': row[66] if str(row[66]) != 'nan' else 0,
-                    'sgst_sale_9_mh': row[67] if str(row[67]) != 'nan' else 0,
-                    'cgst_sale_9_mh': row[68] if str(row[68]) != 'nan' else 0,
-                    'igst_18_output_mh': row[69] if str(row[69]) != 'nan' else 0,
-                    'igst_5_output_dl': row[70] if str(row[70]) != 'nan' else 0,
-                    'sgst_sale_9': row[71] if str(row[71]) != 'nan' else 0,
+                    'total_sgst': row[59] if str(row[59]) != 'nan' else 0,
+                    'total_cgst': row[60] if str(row[60]) != 'nan' else 0,
+                    'sgst_sale_2_5_mh': row[61] if str(row[61]) != 'nan' else 0,
+                    'cgst_sale_2_5_mh': row[62] if str(row[62]) != 'nan' else 0,
+                    'total_igst': row[63] if str(row[63]) != 'nan' else 0,
+                    'igst_12_output_mh': row[64] if str(row[64]) != 'nan' else 0,
+                    'igst_5_output_mh': row[65] if str(row[65]) != 'nan' else 0,
+                    'sgst_sale_6_mh': row[66] if str(row[66]) != 'nan' else 0,
+                    'cgst_sale_6_mh': row[67] if str(row[67]) != 'nan' else 0,
+                    'sgst_sale_9_mh': row[68] if str(row[68]) != 'nan' else 0,
+                    'cgst_sale_9_mh': row[69] if str(row[69]) != 'nan' else 0,
+                    'igst_18_output_mh': row[70] if str(row[70]) != 'nan' else 0,
+                    'igst_5_output_dl': row[71] if str(row[71]) != 'nan' else 0,
+                    'sgst_sale_9': row[72] if str(row[72]) != 'nan' else 0,
 
                 }
 
-                if len(row) > 73 and row[73] and str(row[73]) != 'nan':
-                    vals.update({'cgst_sale_9': (row[73]) if row[73] and str(row[73]) != 'nan' else 0, })
+                if len(row) > 74 and row[74] and str(row[74]) != 'nan':
+                    vals.update({'cgst_sale_9': (row[74]) if row[74] and str(row[74]) != 'nan' else 0, })
                 else:
                     vals.update({'cgst_sale_9': 0})
 
-                if len(row) > 74 and row[74] and str(row[74]) != 'nan':
-                    vals.update({'igst_18': (row[74]) if str(row[74]) != 'nan' else 0, })
+                if len(row) > 75 and row[75] and str(row[75]) != 'nan':
+                    vals.update({'igst_18': (row[75]) if str(row[75]) != 'nan' else 0, })
                 else:
                     vals.update({'igst_18': 0})
 
-                if len(row) > 75 and row[75] and str(row[75]) != 'nan':
-                    vals.update({'igst_0_output_mh': (row[75]) if str(row[75]) != 'nan' else 0, })
+                if len(row) > 76 and row[76] and str(row[76]) != 'nan':
+                    vals.update({'igst_0_output_mh': (row[76]) if str(row[76]) != 'nan' else 0, })
                 else:
                     vals.update({'igst_0_output_mh': 0})
 

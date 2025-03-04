@@ -32,6 +32,7 @@
                 <field name="customer_appointment_date"/>
                 <field name="transporter_name"/>
                 <field name="lr_number"/>
+                <field name="logistic_number"/>
                 <field name="customer_delivery_number"/>
 
                 <field name="quick_commerce"/>
