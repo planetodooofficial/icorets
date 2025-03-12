@@ -27,6 +27,7 @@ class AccountMove(models.Model):
     vin_po_no = fields.Char(string="VIN Po No")
     vin_asn_no = fields.Char(string="VIN ASN No")
     shortage = fields.Char(string="Shortage")
+    logistic_charge = fields.Float(string="Logistic Charge")
 
     credit_invoice_ids = fields.Many2many('account.move', 'credit_invoices_rel', 'credit_id', 'invoice_id',
                                           string='Select Invoice')
