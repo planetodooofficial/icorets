@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <button name="button_cancel" position="before">
                 <button name="%(gts_accounting.action_upload_document_menu)d" string="POD Upload" class="oe_highlight"
-                        type="action" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund'])]}"/>
+                        type="action" attrs="{'invisible': [('move_type', 'not in', ['out_invoice', 'out_refund', 'in_refund'])]}"/>
             </button>
 
             <xpath expr="//field[@name='ref']" position="after">
@@ -25,7 +25,24 @@
                 <field name="appointment"/>
             </xpath>
 
-            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='partner_bank_id']"
+<!--            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='partner_bank_id']"-->
+<!--                   position="after">-->
+<!--                <field name="pod_document_name" invisible="1"/>-->
+<!--                <field name="pod_document_id" filename="pod_document_name" readonly="1"/>-->
+<!--                <field name="customer_appointment_date"/>-->
+<!--                <field name="transporter_name"/>-->
+<!--                <field name="lr_number"/>-->
+<!--                <field name="logistic_number"/>-->
+<!--                <field name="customer_delivery_number"/>-->
+
+<!--                <field name="quick_commerce"/>-->
+<!--                <field name="eta"/>-->
+<!--                <field name="timing"/>-->
+<!--                <field name="cn_number"/>-->
+<!--                <field name="dn_number"/>-->
+
+<!--            </xpath>-->
+            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='accounting_info_group']/field[@name='to_check']"
                    position="after">
                 <field name="pod_document_name" invisible="1"/>
                 <field name="pod_document_id" filename="pod_document_name" readonly="1"/>
@@ -33,8 +50,8 @@
                 <field name="transporter_name"/>
                 <field name="lr_number"/>
                 <field name="logistic_number"/>
+                <field name="logistic_charge"/>
                 <field name="customer_delivery_number"/>
-
                 <field name="quick_commerce"/>
                 <field name="eta"/>
                 <field name="timing"/>
