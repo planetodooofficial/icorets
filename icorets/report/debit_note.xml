@@ -396,17 +396,17 @@
                                 <t t-esc="o.name"/>
                             </td>
                             <td style="border:1px solid black;width: 30%" rowspan="4">
-                                     <t t-esc="o.company_id.name"/><br/>
-                                    <t t-esc="o.company_id.street"/>
+                                     <t t-esc="o.gstin_id.name"/><br/>
+                                    <t t-esc="o.gstin_id.street"/>
                                     <br/>
-                                    <t t-esc="o.company_id.street2"/>
+                                    <t t-esc="o.gstin_id.street2"/>
                                     <br/>
-                                    <t t-esc="o.company_id.city"/>,<t t-esc="o.company_id.zip"/>
-                                    <t t-esc="o.company_id.state_id.name"/>,
-                                    <t t-esc="o.company_id.country_id.name"/>
+                                    <t t-esc="o.gstin_id.city"/>,<t t-esc="o.gstin_id.zip"/>
+                                    <t t-esc="o.gstin_id.state_id.name"/>,
+                                    <t t-esc="o.gstin_id.country_id.name"/>
                                     <br/>
-                                    <strong>GST Number</strong> <t t-esc="o.company_id.vat"/><br/>
-                                    <strong>PAN Number</strong> <t t-esc="o.company_id.x_studio_pan"/>
+                                    <strong>GST Number</strong> <t t-esc="o.gstin_id.vat"/><br/>
+                                    <strong>PAN Number</strong> <t t-esc="o.gstin_id.x_studio_pan"/>
                             </td>
                                <td style="border:1px solid black;" rowspan="4">
                                     <t t-esc="o.partner_shipping_id.name"/><br/>
