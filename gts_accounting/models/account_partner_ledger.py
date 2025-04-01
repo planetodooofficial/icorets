@@ -155,9 +155,10 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 partner_values[column_group_key]['balance'] = partner_sum.get('balance', 0.0)
                 partner_values[column_group_key]['vat'] = partner_sum.get('vat', 0.0)
                 partner_values[column_group_key]['tds'] = partner_sum.get('tds', 0.0)
-                partner_values[column_group_key]['is_customer'] = True if partner.is_customer else False
-                partner_values[column_group_key]['is_vendor'] = True if partner.is_supplier else False
-                partner_values[column_group_key]['salesperson'] = partner.user_id.name if partner.user_id else False
+                partner_values[column_group_key]['is_customer'] = True if partner and partner.is_customer else False
+                partner_values[column_group_key]['is_vendor'] = True if partner and partner.is_supplier else False
+                partner_values[column_group_key][
+                    'salesperson'] = partner.user_id.name if partner and partner.user_id else False
 
                 totals_by_column_group[column_group_key]['debit'] += partner_values[column_group_key]['debit']
                 totals_by_column_group[column_group_key]['credit'] += partner_values[column_group_key]['credit']
