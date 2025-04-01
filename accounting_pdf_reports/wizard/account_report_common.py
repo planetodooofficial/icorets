@@ -55,3 +55,22 @@ class AccountCommonReport(models.TransientModel):
         data['from_date'] = self.date_from
         data['date_to'] = self.date_to
         return self.with_context(discard_logo_check=True)._print_report(data)
+
+    def check_report_xlsx(self):
+        self.ensure_one()
+        data = {}
+        data['ids'] = self.env.context.get('active_ids', [])
+        data['model'] = self.env.context.get('active_model', 'ir.ui.menu')
+        data['form'] = self.read(['date_from', 'date_to', 'journal_ids', 'target_move', 'company_id'])[0]
+        used_context = self._build_contexts(data)
+        data['form']['used_context'] = dict(used_context, lang=self.env.lang)
+        data['from_date'] = self.date_from
+        data['date_to'] = self.date_to
+
+        return_data = self.with_context(discard_logo_check=True)._print_report_xslx(data)
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%s?download=true' % return_data.id,
+            'target': 'self',
+        }

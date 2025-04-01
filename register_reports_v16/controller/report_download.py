@@ -261,10 +261,17 @@ class DownloadReport(Controller):
                 taxes = invoice.tax_totals
                 un_tax_amt, total_amt = taxes.get('amount_untaxed', ""), taxes.get('amount_total', "")
                 irn = invoice.l10n_in_transaction_id.irn if hasattr(invoice, 'l10n_in_transaction_id') else ""
-                data = {'Invoice NO': invoice.name, 'Invoice Date': invoice.date, 'IRN': irn,
+                data = {'Invoice NO': invoice.name,
+                        'Invoice Date': invoice.date,
+                        'LR Name': invoice.lr_number if invoice.lr_number else ' ',
+                        'IRN': irn,
                         'Salesperson': invoice.invoice_user_id.name,
-                        'Customer': invoice.partner_id.name, 'GST NO': invoice.partner_id.vat,
-                        'Untaxed Amt': un_tax_amt, 'Tax Amount': invoice.amount_tax, 'Total Amt': total_amt}
+                        'Customer': invoice.partner_id.name,
+                        'GST NO': invoice.partner_id.vat,
+                        'Untaxed Amt': un_tax_amt,
+                        'Tax Amount': invoice.amount_tax,
+                        'Total Amt': total_amt
+                        }
                 for line in invoice.line_ids:
                     account_name = line.account_id.name
                     if not account_name:

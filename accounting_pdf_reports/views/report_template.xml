@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="custom_search_template_inherit" inherit_id="account_reports.search_template"
+              name="Inherit Search Template to Add Partner Filter">
+        <xpath expr="//div[@class='btn-group dropdown o_account_reports_filter_journals']" position="after">
+            <div class="btn-group dropdown o_account_reports_filter_partners">
+                <t t-call="accounting_pdf_reports.search_template_partners"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="search_template_partners">
+        <button type="button" class="o-no-caret btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+            <span class="fa fa-user"/>
+            Partner Type:
+        </button>
+        <div class="dropdown-menu o_filter_menu" role="menu">
+            <a role="menuitem"
+               class="dropdown-item js_account_report_partner_choice_filter"
+               data-filter="partners"
+               data-type="customer">Customer
+            </a>
+            <a role="menuitem"
+               class="dropdown-item js_account_report_partner_choice_filter"
+               data-filter="partners"
+               data-type="vendor">Vendor
+            </a>
+            <a role="menuitem"
+               class="dropdown-item js_account_report_partner_choice_filter"
+               data-filter="partners"
+               data-type="all">All
+            </a>
+        </div>
+    </template>
+
+</odoo>

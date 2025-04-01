@@ -14,9 +14,6 @@ from collections import defaultdict
 class PartnerLedgerCustomHandler(models.AbstractModel):
     _inherit = 'account.partner.ledger.report.handler'
 
-    # _inherit = 'account.report.custom.handler'
-    # _description = 'Partner Ledger Custom Handler'
-
     # partner_ledgeropen
     # inner
     def _get_report_line_move_line(self, options, aml_query_result, partner_line_id, init_bal_by_col_group,
@@ -40,6 +37,15 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                         'column_group_key'] else None
                 elif col_expr_label == 'vat':
                     col_value = 'vat' if column['column_group_key'] == aml_query_result[
+                        'column_group_key'] else None
+                elif col_expr_label == 'is_customer':
+                    col_value = 'is_customer' if column['column_group_key'] == aml_query_result[
+                        'column_group_key'] else None
+                elif col_expr_label == 'is_vendor':
+                    col_value = 'is_vendor' if column['column_group_key'] == aml_query_result[
+                        'column_group_key'] else None
+                elif col_expr_label == 'salesperson':
+                    col_value = 'salesperson' if column['column_group_key'] == aml_query_result[
                         'column_group_key'] else None
                 else:
                     col_value = aml_query_result[col_expr_label] if column['column_group_key'] == aml_query_result[
@@ -79,6 +85,18 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                         amount = credit_vat
                     currency = self.env['res.currency'].browse(aml_query_result['currency_id'])
                     formatted_value = report.format_value(amount, currency=currency, figure_type=column['figure_type'])
+                elif col_expr_label == 'is_customer':
+                    move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
+                    partner_is_customer = True if move_line.move_id.partner_id.is_customer else False
+                    formatted_value = report.format_value(partner_is_customer, figure_type=column['figure_type'])
+                elif col_expr_label == 'is_vendor':
+                    move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
+                    partner_is_vendor = True if move_line.move_id.partner_id.is_supplier else False
+                    formatted_value = report.format_value(partner_is_vendor, figure_type=column['figure_type'])
+                elif col_expr_label == 'salesperson':
+                    move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
+                    partner_salesperson = move_line.move_id.partner_id.user_id.name if move_line.move_id.partner_id.user_id else False
+                    formatted_value = report.format_value(partner_salesperson, figure_type=column['figure_type'])
                 elif col_expr_label == 'balance':
                     col_value += init_bal_by_col_group[column['column_group_key']]
                     formatted_value = report.format_value(col_value, figure_type=column['figure_type'],
@@ -115,7 +133,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         totals_by_column_group = {
             column_group_key: {
                 total: 0.0
-                for total in ['debit', 'credit', 'balance', 'vat', 'tds']
+                for total in ['debit', 'credit', 'balance', 'vat', 'tds', 'is_customer', 'is_vendor', 'salesperson']
             }
             for column_group_key in options['column_groups']
         }
@@ -123,7 +141,6 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         search_filter = options.get('filter_search_bar') or ''
         accept_unknown_in_filter = search_filter.lower() in self._get_no_partner_line_label().lower()
         for partner, results in self._query_partners(options):
-            print('results++++++++++++++++++++++=', results)
             if self.env.context.get('print_mode') and search_filter and not partner and not accept_unknown_in_filter:
                 # When printing and searching for a specific partner, make it so we only show its lines, not the 'Unknown Partner' one, that would be
                 # shown in case a misc entry with no partner was reconciled with one of the target partner's entries.
@@ -138,6 +155,9 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 partner_values[column_group_key]['balance'] = partner_sum.get('balance', 0.0)
                 partner_values[column_group_key]['vat'] = partner_sum.get('vat', 0.0)
                 partner_values[column_group_key]['tds'] = partner_sum.get('tds', 0.0)
+                partner_values[column_group_key]['is_customer'] = True if partner.is_customer else False
+                partner_values[column_group_key]['is_vendor'] = True if partner.is_supplier else False
+                partner_values[column_group_key]['salesperson'] = partner.user_id.name if partner.user_id else False
 
                 totals_by_column_group[column_group_key]['debit'] += partner_values[column_group_key]['debit']
                 totals_by_column_group[column_group_key]['credit'] += partner_values[column_group_key]['credit']

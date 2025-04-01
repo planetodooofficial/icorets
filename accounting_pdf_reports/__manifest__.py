@@ -43,8 +43,15 @@
         # 'report/report_aged_partner.xml',
         # 'report/report_journal_audit.xml',
         # 'report/report_journal_entries.xml',
-
+        'views/report_template.xml'
     ],
+
+    'assets': {
+        'web.assets_backend': [
+            'accounting_pdf_reports/static/src/js/account_report.js',
+        ],
+    },
+
     'pre_init_hook': '_pre_init_clean_m2m_models',
     'installable': True,
     'application': False,

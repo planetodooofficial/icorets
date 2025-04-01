@@ -10,8 +10,6 @@ class ReportPartnerLedger(models.AbstractModel):
     _description = 'Partner Ledger Report'
 
     def _lines(self, data, partner):
-        print('data+++++++++++++++++', data)
-        print('partner+++++++++++++++++', partner)
         if not partner.custom_child_ids:
             full_account = []
             currency = self.env['res.currency']
@@ -219,9 +217,7 @@ class ReportPartnerLedger(models.AbstractModel):
             partner_ids = [res['partner_id'] for res in
                            self.env.cr.dictfetchall()]
         partner_ids = self.get_partner_parent_child(partner_ids)
-        print('partner_ids++++++++++++', partner_ids)
         partner_ids = self.remove_duplicate(partner_ids)
-        print('partner_ids++++++++++++++', partner_ids)
         partners = obj_partner.browse(partner_ids)
         partners = sorted(partners, key=lambda x: (x.ref or '', x.name or ''))
 
