@@ -134,6 +134,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             column_group_key: {
                 total: 0.0
                 for total in ['debit', 'credit', 'balance', 'vat', 'tds', 'is_customer', 'is_vendor', 'salesperson']
+                # for total in ['debit', 'credit', 'balance', 'vat', 'tds']
             }
             for column_group_key in options['column_groups']
         }
