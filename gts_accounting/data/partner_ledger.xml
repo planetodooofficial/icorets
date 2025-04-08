@@ -104,6 +104,16 @@
                 <field name="expression_label">salesperson</field>
                 <field name="figure_type">none</field>
             </record>
+            <record id="partner_ledger_report_credit_days" model="account.report.column">
+                <field name="name">Credit Days</field>
+                <field name="expression_label">credit_days</field>
+                <field name="figure_type">none</field>
+            </record>
+            <record id="partner_ledger_report_credit_limit" model="account.report.column">
+                <field name="name">Credit Limit</field>
+                <field name="expression_label">credit_limit</field>
+                <field name="figure_type">none</field>
+            </record>
             <record id="partner_ledger_report_vat" model="account.report.column">
                 <field name="name">VAT</field>
                 <field name="expression_label">vat</field>

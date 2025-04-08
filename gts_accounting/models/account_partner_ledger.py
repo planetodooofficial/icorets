@@ -14,8 +14,8 @@ from collections import defaultdict
 class PartnerLedgerCustomHandler(models.AbstractModel):
     _inherit = 'account.partner.ledger.report.handler'
 
-    # partner_ledgeropen
-    # inner
+    # Partner Ledger Customise
+    # inner line
     def _get_report_line_move_line(self, options, aml_query_result, partner_line_id, init_bal_by_col_group,
                                    level_shift=0):
         if aml_query_result['payment_id']:
@@ -46,6 +46,12 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                         'column_group_key'] else None
                 elif col_expr_label == 'salesperson':
                     col_value = 'salesperson' if column['column_group_key'] == aml_query_result[
+                        'column_group_key'] else None
+                elif col_expr_label == 'credit_days':
+                    col_value = 'credit_days' if column['column_group_key'] == aml_query_result[
+                        'column_group_key'] else None
+                elif col_expr_label == 'credit_limit':
+                    col_value = 'credit_limit' if column['column_group_key'] == aml_query_result[
                         'column_group_key'] else None
                 else:
                     col_value = aml_query_result[col_expr_label] if column['column_group_key'] == aml_query_result[
@@ -88,15 +94,30 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 elif col_expr_label == 'is_customer':
                     move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
                     partner_is_customer = True if move_line.move_id.partner_id.is_customer else False
-                    formatted_value = report.format_value(partner_is_customer, figure_type=column['figure_type'])
+                    # formatted_value = report.format_value(partner_is_customer, figure_type=column['figure_type'])
+                    formatted_value = report.format_value('', figure_type=column['figure_type'])
                 elif col_expr_label == 'is_vendor':
                     move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
                     partner_is_vendor = True if move_line.move_id.partner_id.is_supplier else False
-                    formatted_value = report.format_value(partner_is_vendor, figure_type=column['figure_type'])
+                    # formatted_value = report.format_value(partner_is_vendor, figure_type=column['figure_type'])
+                    formatted_value = report.format_value('', figure_type=column['figure_type'])
                 elif col_expr_label == 'salesperson':
                     move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
                     partner_salesperson = move_line.move_id.partner_id.user_id.name if move_line.move_id.partner_id.user_id else False
-                    formatted_value = report.format_value(partner_salesperson, figure_type=column['figure_type'])
+                    # formatted_value = report.format_value(partner_salesperson, figure_type=column['figure_type'])
+                    formatted_value = report.format_value('', figure_type=column['figure_type'])
+                elif col_expr_label == 'credit_days':
+                    move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
+                    payment_term_id = move_line.move_id.partner_id.with_company(
+                        self.env.company).property_payment_term_id
+                    partner_credit_days = payment_term_id.name if payment_term_id else False
+                    # formatted_value = report.format_value(partner_credit_days, figure_type=column['figure_type'])
+                    formatted_value = report.format_value('', figure_type=column['figure_type'])
+                elif col_expr_label == 'credit_limit':
+                    move_line = self.env['account.move.line'].browse(aml_query_result.get('id'))
+                    partner_credit_limit = move_line.move_id.partner_id.credit_limit if move_line.move_id.partner_id else False
+                    # formatted_value = report.format_value(partner_credit_limit, figure_type=column['figure_type'])
+                    formatted_value = report.format_value('', figure_type=column['figure_type'])
                 elif col_expr_label == 'balance':
                     col_value += init_bal_by_col_group[column['column_group_key']]
                     formatted_value = report.format_value(col_value, figure_type=column['figure_type'],
@@ -126,14 +147,16 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             'level': 4 + level_shift,
         }
 
-    # upper
+    # header line
     def _build_partner_lines(self, report, options, level_shift=0):
         lines = []
 
         totals_by_column_group = {
             column_group_key: {
                 total: 0.0
-                for total in ['debit', 'credit', 'balance', 'vat', 'tds', 'is_customer', 'is_vendor', 'salesperson']
+                for total in
+                ['debit', 'credit', 'balance', 'vat', 'tds', 'is_customer', 'is_vendor', 'salesperson', 'credit_days',
+                 'credit_limit']
                 # for total in ['debit', 'credit', 'balance', 'vat', 'tds']
             }
             for column_group_key in options['column_groups']
@@ -160,6 +183,9 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 partner_values[column_group_key]['is_vendor'] = True if partner and partner.is_supplier else False
                 partner_values[column_group_key][
                     'salesperson'] = partner.user_id.name if partner and partner.user_id else False
+                payment_term_id = partner.with_company(self.env.company).property_payment_term_id if partner else False
+                partner_values[column_group_key]['credit_days'] = payment_term_id.name if payment_term_id else False
+                partner_values[column_group_key]['credit_limit'] = partner.credit_limit if partner else False
 
                 totals_by_column_group[column_group_key]['debit'] += partner_values[column_group_key]['debit']
                 totals_by_column_group[column_group_key]['credit'] += partner_values[column_group_key]['credit']
