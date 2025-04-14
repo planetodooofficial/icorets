@@ -475,6 +475,21 @@ class SaleOrderInherit(models.Model):
             'target': 'new',
         }
 
+    def short_close_sale_order(self):
+        print('self++++++++++++++++++++', self)
+        view = self.env.ref('icorets.view_short_close_wizard')
+        return {
+            'name': 'Short Close',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'short.close',
+            'view_id': view.id,
+            'target': 'new',
+            'context': {
+                'sale_order_ids': self.ids
+            }
+        }
+
     @api.model
     def default_get(self, fields):
         res = super(SaleOrderInherit, self).default_get(fields)

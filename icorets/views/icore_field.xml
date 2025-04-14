@@ -546,6 +546,17 @@
         </field>
     </record>
 
+    <record model="ir.actions.server" id="action_short_close_sale_order">
+        <field name="name">Short Close Sale Order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.short_close_sale_order()
+        </field>
+    </record>
+
     <!--    Inheriting account move-->
 
     <record id="inherit_account_move_tree" model="ir.ui.view">
@@ -572,12 +583,12 @@
             <xpath expr="//field[@name='gstin_id']" position="attributes">
                 <attribute name="attrs">{"invisible": [["move_type","=","entry"]]}</attribute>
             </xpath>
-            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='fiscal_position_id']" position="attributes">
-                <attribute name="attrs">{"invisible": [["move_type","=","entry"]]}</attribute>
-            </xpath>
-            <xpath expr="//field[@name='dispatch_partner_id']" position="attributes">
-                <attribute name="attrs">{"invisible": [["move_type","=","entry"]]}</attribute>
-            </xpath>
+<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='fiscal_position_id']" position="attributes">-->
+<!--                <attribute name="attrs">{"invisible": [["move_type","=","entry"]]}</attribute>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//field[@name='dispatch_partner_id']" position="attributes">-->
+<!--                <attribute name="attrs">{"invisible": [["move_type","=","entry"]]}</attribute>-->
+<!--            </xpath>-->
 
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="cust_code"
@@ -625,9 +636,9 @@
                 <attribute name="options">{"no_create":true}</attribute>
             </xpath>
 
-            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='fiscal_position_id']" position="attributes">
-                <attribute name="options">{"no_create":true}</attribute>
-            </xpath>
+<!--            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='fiscal_position_id']" position="attributes">-->
+<!--                <attribute name="options">{"no_create":true}</attribute>-->
+<!--            </xpath>-->
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='invoice_tab']/field[@name='invoice_line_ids']/tree[1]/field[@name='product_id']"
                    position="attributes">
                 <attribute name="options">{"no_create":true}</attribute>
