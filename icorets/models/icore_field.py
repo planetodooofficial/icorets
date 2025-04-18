@@ -370,9 +370,11 @@ class AccountMoveLineInherit(models.Model):
     def check_tax_amount(self):
         for rec in self:
             if rec.tax_ids:
+                tax_amount_line = 0
                 for tax in rec.tax_ids:
-                    rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
-                    rec.tax_amount_line = rec.quantity * rec.tax_amount_line
+                    # rec.tax_amount_line += (rec.price_unit * tax.amount) / 100
+                    tax_amount_line += (rec.price_unit * tax.amount) / 100
+                rec.tax_amount_line = rec.quantity * tax_amount_line
             else:
                 rec.tax_amount_line = 0
 
@@ -471,6 +473,21 @@ class SaleOrderInherit(models.Model):
             'res_model': 'short.close',
             'view_id': view.id,
             'target': 'new',
+        }
+
+    def short_close_sale_order(self):
+        print('self++++++++++++++++++++', self)
+        view = self.env.ref('icorets.view_short_close_wizard')
+        return {
+            'name': 'Short Close',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'short.close',
+            'view_id': view.id,
+            'target': 'new',
+            'context': {
+                'sale_order_ids': self.ids
+            }
         }
 
     @api.model
