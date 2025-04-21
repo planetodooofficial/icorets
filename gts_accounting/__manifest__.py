@@ -8,7 +8,7 @@
     'maintainer': 'Geotechnosoft',
     'company': 'Geotechnosoft',
     'website': 'https://planet-odoo.com/',
-    'depends': ['base', 'account_reports', 'account'],
+    'depends': ['base', 'account_reports', 'account','mail'],
     'category': 'Accounting',
     'demo': [],
     'data': [
