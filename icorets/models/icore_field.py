@@ -476,7 +476,6 @@ class SaleOrderInherit(models.Model):
         }
 
     def short_close_sale_order(self):
-        print('self++++++++++++++++++++', self)
         view = self.env.ref('icorets.view_short_close_wizard')
         return {
             'name': 'Short Close',
