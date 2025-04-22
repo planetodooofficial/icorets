@@ -32,7 +32,7 @@ class MailWizard(models.TransientModel):
 
                 Please find attached the ledger as on date and reconcile the same with a confirmation return email.<br/><br/>
 
-                Regards,<br/>
+                <br/>
                 </p>
             """
 
