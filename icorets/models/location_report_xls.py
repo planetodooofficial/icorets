@@ -190,10 +190,10 @@ class LocationReportWizard(models.TransientModel):
         product_data = {}
 
         products = self.env['product.product'].search([])
-        # products = self.env['product.product'].browse([47629])
+        # products = self.env['product.product'].browse([49391])
 
         for product in products:
-            print('product++++++++++++++++++++++++++', product, product.name)
+            # print('product++++++++++++++++++++++++++', product, product.name)
             product_id = product.id
 
             product_data[product_id] = {
@@ -309,23 +309,39 @@ class LocationReportWizard(models.TransientModel):
 
             # Find quotations related to the product
 
-            quotation_orders = self.env['sale.order'].search(
-                [('order_line.product_id', '=', product_id), ('state', '=', 'draft'), ('state', '!=', 'cancel')])
-            qty_to_deliver_qtn = sum(
-                order_line.product_uom_qty - order_line.qty_delivered for order in quotation_orders for order_line in
-                order.order_line
-                if order_line.product_id.id == product_id)
+            # quotation_orders = self.env['sale.order'].search(
+            #     [('order_line.product_id', '=', product_id), ('state', '=', 'draft'), ('state', '!=', 'cancel')])
+            # qty_to_deliver_qtn = sum(
+            #     order_line.product_uom_qty - order_line.qty_delivered for order in quotation_orders for order_line in
+            #     order.order_line
+            #     if order_line.product_id.id == product_id)
+
+            self.env.cr.execute("""
+                                select sum(product_uom_qty - qty_delivered) 
+                                from sale_order_line
+                                where state = 'draft' and product_id = %s
+                                """, (product_id,))
+            qty_to_deliver_qtn_data = self.env.cr.dictfetchall()
+            qty_to_deliver_qtn = qty_to_deliver_qtn_data[0].get('sum') if qty_to_deliver_qtn_data[0].get('sum') != None else 0
             # Update 'Quotation Qty'
             product_data[product_id]['Quotation Qty'] = qty_to_deliver_qtn
 
             # Find sales orders related to the product
-            sale_orders = self.env['sale.order'].search(
-                [('order_line.product_id', '=', product_id), ('state', 'not in', ['draft', 'cancel', 'sent'])])
-            # Calculate 'Qty to Deliver' based on confirmed sales order quantities
-            qty_to_deliver = sum(
-                order_line.product_uom_qty - order_line.qty_delivered for order in sale_orders for order_line in
-                order.order_line
-                if order_line.product_id.id == product_id)
+            # sale_orders = self.env['sale.order'].search(
+            #     [('order_line.product_id', '=', product_id), ('state', 'not in', ['draft', 'cancel', 'sent'])])
+            # # Calculate 'Qty to Deliver' based on confirmed sales order quantities
+            # qty_to_deliver = sum(
+            #     order_line.product_uom_qty - order_line.qty_delivered for order in sale_orders for order_line in
+            #     order.order_line
+            #     if order_line.product_id.id == product_id)
+
+            self.env.cr.execute("""
+                                   select sum(product_uom_qty - qty_delivered) 
+                                   from sale_order_line
+                                   where state not in ('draft', 'cancel', 'sent') and product_id = %s
+                                   """, (product_id,))
+            qty_to_deliver_data = self.env.cr.dictfetchall()
+            qty_to_deliver = qty_to_deliver_data[0].get('sum') if qty_to_deliver_data[0].get('sum') != None else 0
             # Update 'Reserved Qty'
             product_data[product_id]['Confirmed SO qty'] = qty_to_deliver
 
@@ -339,14 +355,22 @@ class LocationReportWizard(models.TransientModel):
                 free_to_use = product.qty_available - qty_to_deliver
 
             # Fetch purchase orders related to the product
-            purchase_orders = self.env['purchase.order'].search([('order_line.product_id', '=', product_id), (
-                'state', 'not in', ['draft', 'to approve', 'cancel', 'sent'])])
+            # purchase_orders = self.env['purchase.order'].search([('order_line.product_id', '=', product_id), (
+            #     'state', 'not in', ['draft', 'to approve', 'cancel', 'sent'])])
+            #
+            # # Calculate 'Ordered - Received' based on unprocessed purchase order quantities
+            # order_pending_qty = sum(
+            #     order_line.product_qty - order_line.qty_received for order in purchase_orders for order_line in
+            #     order.order_line
+            #     if order_line.product_id.id == product_id)
 
-            # Calculate 'Ordered - Received' based on unprocessed purchase order quantities
-            order_pending_qty = sum(
-                order_line.product_qty - order_line.qty_received for order in purchase_orders for order_line in
-                order.order_line
-                if order_line.product_id.id == product_id)
+            self.env.cr.execute("""
+                                   select sum(product_qty - qty_received) 
+                                   from purchase_order_line
+                                   where state not in ('draft', 'to approve', 'cancel', 'sent') and product_id = %s
+                                   """, (product_id,))
+            order_pending_qty_data = self.env.cr.dictfetchall()
+            order_pending_qty = order_pending_qty_data[0].get('sum') if order_pending_qty_data[0].get('sum') != None else 0
 
             # Update 'Ordered - Received'
             product_data[product_id]['PO Receipt Pending'] = order_pending_qty
@@ -359,13 +383,21 @@ class LocationReportWizard(models.TransientModel):
                 if product_data[product_id]['To Replenish'] < 0:
                     product_data[product_id]['To Replenish'] = 0
 
-            quotation_orders = self.env['sale.order'].search(
-                [('order_line.product_id', '=', product_id), ('state', '=', 'draft'), ('state', '!=', 'cancel')])
+            # quotation_orders = self.env['sale.order'].search(
+            #     [('order_line.product_id', '=', product_id), ('state', '=', 'draft'), ('state', '!=', 'cancel')])
+            #
+            # # Calculate outgoing quantity based on sale orders and quotation orders
+            # quotation_outgoing_qty = sum(
+            #     order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
+            #     if order_line.product_id.id == product_id)
 
-            # Calculate outgoing quantity based on sale orders and quotation orders
-            quotation_outgoing_qty = sum(
-                order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
-                if order_line.product_id.id == product_id)
+            self.env.cr.execute("""
+                                   select sum(product_uom_qty) 
+                                   from sale_order_line
+                                   where state in ('draft') and product_id = %s
+                                   """, (product_id,))
+            quotation_outgoing_qty_data = self.env.cr.dictfetchall()
+            quotation_outgoing_qty = quotation_outgoing_qty_data[0].get('sum') if quotation_outgoing_qty_data[0].get('sum') != None else 0
 
             # Total outgoing quantityy
             outgoing_qty = product.outgoing_qty + quotation_outgoing_qty
@@ -384,15 +416,16 @@ class LocationReportWizard(models.TransientModel):
             opening_stock = product.with_context({'to_date': self.from_date}).qty_available
             # print('opening_stock++++++++++++++++', opening_stock)
             product_data[product_id]['Opening Stock'] = opening_stock
-
+            # print("--------------------start")
             domain = [('product_id', '=', product.id),
-                      ('picking_id.picking_type_code', '=', 'incoming'), ('picking_id.date_done', '>=', self.from_date),
+                      ('location_id.usage', '=', 'supplier'), ('location_dest_id.usage', '=', 'internal'),
+                      ('picking_id.date_done', '>=', self.from_date),
                       ('picking_id.date_done', '<=', self.to_date), ('picking_id.state', '=', 'done'), ]
             purchase_qty = sum(self.env['stock.move'].search(domain).mapped('quantity_done'))
             product_data[product_id]['Purchase'] = purchase_qty
 
-            domain = [('product_id', '=', product.id), ('picking_id.picking_type_id.code', '=', 'outgoing'),
-                      ('picking_id.picking_type_id.return_picking_type_id.code', '=', 'incoming'),
+            domain = [('product_id', '=', product.id), ('location_id.usage', '=', 'internal'),
+                      ('location_dest_id.usage', '=', 'supplier'),
                       ('picking_id.date_done', '>=', self.from_date),
                       ('picking_id.date_done', '<=', self.to_date), ('picking_id.state', '=', 'done'), ]
             purchase_return_qty = sum(self.env['stock.move'].search(domain).mapped('quantity_done'))
@@ -401,16 +434,19 @@ class LocationReportWizard(models.TransientModel):
             product_data[product_id]['Net Purchase'] = purchase_qty - purchase_return_qty
 
             domain = [('product_id', '=', product.id),
-                      ('picking_id.picking_type_code', '=', 'outgoing'), ('picking_id.date_done', '>=', self.from_date),
+                      ('location_id.usage', '=', 'internal'), ('location_dest_id.usage', '=', 'customer'),
+                    ('picking_id.date_done', '>=', self.from_date),
                       ('picking_id.date_done', '<=', self.to_date), ('picking_id.state', '=', 'done'), ]
             sales_qty = sum(self.env['stock.move'].search(domain).mapped('quantity_done'))
             product_data[product_id]['Sales'] = sales_qty
 
-            domain = [('product_id', '=', product.id), ('picking_id.picking_type_id.code', '=', 'incoming'),
-                      ('picking_id.picking_type_id.return_picking_type_id.code', '=', 'outgoing'),
+            domain = [('product_id', '=', product.id), ('location_id.usage', '=', 'customer'),
+                      ('location_dest_id.usage', '=', 'internal'),
                       ('picking_id.date_done', '>=', self.from_date),
                       ('picking_id.date_done', '<=', self.to_date), ('picking_id.state', '=', 'done'), ]
             sales_return_qty = sum(self.env['stock.move'].search(domain).mapped('quantity_done'))
+            # print("-----------end")
+
             product_data[product_id]['Sales Return'] = sales_return_qty
 
             product_data[product_id]['Net Sales'] = sales_qty - sales_return_qty
@@ -421,23 +457,44 @@ class LocationReportWizard(models.TransientModel):
             closing_stock = product.with_context({'to_date': self.to_date}).qty_available
             product_data[product_id]['Closing Stock'] = closing_stock
 
-            domain = [('order_id.state', 'in', ['sale', 'done']), ('product_id', '=', product.id),
-                      ('order_id.date_order', '>=', self.from_date), ('order_id.date_order', '<=', self.to_date), ]
-            order_lines = self.env['sale.order.line'].search(domain)
-            pending_so = sum(line.product_uom_qty - line.qty_delivered for line in order_lines)
+            # domain = [('order_id.state', 'in', ['sale', 'done']), ('product_id', '=', product.id),
+            #           ('order_id.date_order', '>=', self.from_date), ('order_id.date_order', '<=', self.to_date), ]
+            # order_lines = self.env['sale.order.line'].search(domain)
+
+            self.env.cr.execute("""
+                                select sum(line.product_uom_qty - line.qty_delivered) 
+                                from sale_order_line as line
+                                left join sale_order as so on line.order_id = so.id
+                                where so.state not in ('draft', 'cancel', 'sent') and product_id = %s and so.date_order between %s and %s
+                              """, (product_id, self.from_date, self.to_date))
+            pending_so_data = self.env.cr.dictfetchall()
+            pending_so = pending_so_data[0].get('sum') if pending_so_data[0].get('sum') != None else 0
+
+
+            # pending_so = sum(line.product_uom_qty - line.qty_delivered for line in order_lines)
             product_data[product_id]['Pending SOs customers'] = pending_so
 
-            domain = [('order_id.state', 'in', ['purchase', 'done']), ('product_id', '=', product.id),
-                      ('order_id.date_order', '>=', self.from_date), ('order_id.date_order', '<=', self.to_date), ]
-            order_lines = self.env['purchase.order.line'].search(domain)
-            pending_po = sum(line.product_qty - line.qty_received for line in order_lines)
+            # domain = [('order_id.state', 'in', ['purchase', 'done']), ('product_id', '=', product.id),
+            #           ('order_id.date_order', '>=', self.from_date), ('order_id.date_order', '<=', self.to_date), ]
+            # order_lines = self.env['purchase.order.line'].search(domain)
+            # pending_po = sum(line.product_qty - line.qty_received for line in order_lines)
+
+            self.env.cr.execute("""
+                                    select sum(line.product_qty - line.qty_received) 
+                                    from purchase_order_line as line
+                                    left join purchase_order as po on line.order_id = po.id
+                                    where po.state in ('purchase', 'done') and product_id = %s and po.date_order between %s and %s
+                                  """, (product_id, self.from_date, self.to_date))
+            pending_po_data = self.env.cr.dictfetchall()
+            pending_po = pending_po_data[0].get('sum') if pending_po_data[0].get('sum') != None else 0
+
             product_data[product_id]['Pending POs vendors'] = pending_po
 
         # Write data to the sheet
         for product_id, data in sorted(product_data.items(), key=lambda x: (
                 x[1]['Brand'].lower(), x[1]['Category 1'].lower(), x[1]['Category 2'].lower(),
                 x[1]['Category 3'].lower())):
-            print(data, 'dataa')
+            # print(data, 'dataa')
             sheet.write(row, col, data['Brand'])
             sheet.write(row, col + 1, data['Category 1'])
             sheet.write(row, col + 2, data['Category 2'])
@@ -688,7 +745,7 @@ class LocationReport(models.AbstractModel):
         # sheet.write(0, 31, '(Onhand + incoming) - outgoing(With_Qtn)', bold)
         sheet.freeze_panes(1, 0)
 
-        kmkmkmk
+        # kmkmkmk
 
         row = 1
         col = 0
@@ -883,7 +940,7 @@ class LocationReport(models.AbstractModel):
         for product_id, data in sorted(product_data.items(), key=lambda x: (
                 x[1]['Brand'].lower(), x[1]['Category 1'].lower(), x[1]['Category 2'].lower(),
                 x[1]['Category 3'].lower())):
-            print(data, 'dataa')
+            # print(data, 'dataa')
             sheet.write(row, col, data['Brand'])
             sheet.write(row, col + 1, data['Category 1'])
             sheet.write(row, col + 2, data['Category 2'])
