@@ -97,8 +97,6 @@ class DownloadReport(Controller):
         summary_sheet = DownloadReport.create_summary_sheet(writer)
         # global tot_qty
         # tot_qty = []
-        print("---invoice_data", invoice_data)
-
         def get_detailed_sales_data(invoices, sheet_name):
 
             data_rows = []
@@ -148,8 +146,8 @@ class DownloadReport(Controller):
                         'GRN Qty': ' ',
                         'Shortage': invoice_line.move_id.shortage or ' ',
                         'Transporter': invoice_line.move_id.transporter_name or ' ',
-                        'Delivery Status': stock_move.state if stock_move else ' ',
-                        'Delivery Date': stock_move.picking_id.date_done if stock_move and stock_move.picking_id.date_done else ' ',
+                        # 'Delivery Status': stock_move.state if stock_move else ' ',
+                        # 'Delivery Date': stock_move.picking_id.date_done if stock_move and stock_move.picking_id.date_done else ' ',
                         'POD Status': pod_status or ' ',
                         'Remarks': invoice_line.move_id.remarks or ' ',
 
@@ -167,9 +165,8 @@ class DownloadReport(Controller):
                         'Customer Appointment Date': invoice_line.move_id.customer_appointment_date or False,
                         # 'Transporter Name': invoice_line.move_id.transporter_name or ' ',
                         'LR Name': invoice_line.move_id.lr_number or '',
-                        'Logistic Charge': invoice_line.move_id.logistic_number or '',
-                        'Customer Delivery Number': invoice_line.move_id.customer_delivery_number or '',
-
+                        'Logistic Charge': invoice_line.move_id.logistic_charge or '',
+                        'Delivery Status': invoice_line.move_id.customer_delivery_number or '',
                         'Quick Commerce': invoice_line.move_id.quick_commerce or ' ',
                         'No of Box': invoice_line.move_id.no_of_cartons or ' ',
                         'Ship From': invoice_line.company_id.name or ' ',

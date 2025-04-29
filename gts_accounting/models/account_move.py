@@ -10,7 +10,7 @@ class AccountMove(models.Model):
     customer_appointment_date = fields.Date(string="Customer Appointment Date")
     transporter_name = fields.Char(string="Transporter Name")
     lr_number = fields.Char(string="LR Number")
-    logistic_number = fields.Char(string="Logistic Charge")
+    logistic_number = fields.Char(string="L Number....")
     customer_delivery_number = fields.Char(string="Customer Delivery Number")
 
     quick_commerce = fields.Char(string="Quick Commerce")
@@ -27,7 +27,7 @@ class AccountMove(models.Model):
     vin_po_no = fields.Char(string="VIN Po No")
     vin_asn_no = fields.Char(string="VIN ASN No")
     shortage = fields.Char(string="Shortage")
-    logistic_charge = fields.Float(string="Logistic Charge")
+    logistic_charge = fields.Float(string="Logistic Charge", copy=False)
 
     credit_invoice_ids = fields.Many2many('account.move', 'credit_invoices_rel', 'credit_id', 'invoice_id',
                                           string='Select Invoice')
