@@ -164,7 +164,7 @@ class DownloadReport(Controller):
 
                         'Customer Appointment Date': invoice_line.move_id.customer_appointment_date or False,
                         # 'Transporter Name': invoice_line.move_id.transporter_name or ' ',
-                        'LR Name': invoice_line.move_id.lr_number or '',
+                        'LR Number': invoice_line.move_id.lr_number or '',
                         'Logistic Charge': invoice_line.move_id.logistic_charge or '',
                         'Delivery Status': invoice_line.move_id.customer_delivery_number or '',
                         'Quick Commerce': invoice_line.move_id.quick_commerce or ' ',
@@ -260,7 +260,7 @@ class DownloadReport(Controller):
                 irn = invoice.l10n_in_transaction_id.irn if hasattr(invoice, 'l10n_in_transaction_id') else ""
                 data = {'Invoice NO': invoice.name,
                         'Invoice Date': invoice.date,
-                        'LR Name': invoice.lr_number if invoice.lr_number else ' ',
+                        'LR Number': invoice.lr_number if invoice.lr_number else ' ',
                         'IRN': irn,
                         'Salesperson': invoice.invoice_user_id.name,
                         'Customer': invoice.partner_id.name,
