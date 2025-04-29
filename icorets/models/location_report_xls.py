@@ -13,7 +13,7 @@ class LocationReportWizard(models.TransientModel):
     excel_file = fields.Binary('Download report Excel', attachment=True, readonly=True)
     file_name = fields.Char('Excel File', size=64)
 
-    from_date = fields.Date(string='From Date')
+    from_date = fields.Date(string='From Date', default=fields.date.today())
     to_date = fields.Date(string='To Date', default=fields.date.today())
 
     # def location_report_xlsx(self):
