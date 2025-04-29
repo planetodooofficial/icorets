@@ -11,7 +11,7 @@ class AccountMove(models.Model):
     transporter_name = fields.Char(string="Transporter Name")
     lr_number = fields.Char(string="LR Number")
     logistic_number = fields.Char(string="L Number....")
-    customer_delivery_number = fields.Char(string="Customer Delivery Number")
+    customer_delivery_number = fields.Char(string="Delivery Status")
 
     quick_commerce = fields.Char(string="Quick Commerce")
     po_expiry_date = fields.Date(string="PO Expiry Date")
