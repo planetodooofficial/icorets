@@ -25,6 +25,8 @@ class MailWizard(models.TransientModel):
     @api.onchange('to_partner_id')
     def _onchange_to_partner_id(self):
         if self.to_partner_id:
+            self.cc_partner_ids = self.to_partner_id.user_id.partner_id.ids
+            self.subject = f'Partner Ledger Of {self.to_partner_id.name}'
             self.body = f"""
                 <p>Dear,<br/>
                 <strong>{self.to_partner_id.name}</strong><br/>
