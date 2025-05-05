@@ -23,6 +23,7 @@
                 <field name="vin_asn_no"/>
                 <field name="shortage"/>
                 <field name="appointment"/>
+                <field name="invoice_user_id"/>
             </xpath>
 
 <!--            <xpath expr="//page[@id='other_tab']/group[@id='other_tab_group']/group[@name='sale_info_group']/field[@name='partner_bank_id']"-->

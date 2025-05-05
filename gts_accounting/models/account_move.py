@@ -80,3 +80,9 @@ class AccountMove(models.Model):
                     line.unlink()
 
         return res
+
+    @api.onchange("partner_id")
+    def _onchange_salesperson(self):
+        for move in self:
+            move.invoice_user_id = move.partner_id.user_id.id
+
