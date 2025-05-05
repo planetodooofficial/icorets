@@ -385,7 +385,7 @@ class ShopInstance(models.Model):
                                                        order='displayOrderDateTime desc')
         count = 0
         sale_orders = list()
-        stock_location = self.env['stock.location'].search([('name', '=', 'BHW')], limit=1)
+        stock_location = self.env['stock.location'].search([('name', '=', 'DEL')], limit=1)
         location_id = self.env['stock.location'].search(
             [('name', '=', 'Stock'), ('location_id', '=', stock_location.id)], limit=1)
         start_date = fields.Datetime.now()
