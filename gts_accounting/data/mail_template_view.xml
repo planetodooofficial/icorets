@@ -30,8 +30,8 @@
                         <t t-else="">
                             invoice
                         </t>
-                        <t t-if="object.invoice_origin">
-                            (with reference: <t t-out="object.invoice_origin or ''">SUB003</t>)
+                        <t t-if="object.ref">
+                            (with reference: <t t-out="object.ref or ''"></t>)
                         </t>
                         amounting in
                         <span style="font-weight:bold;"
