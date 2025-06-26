@@ -52,6 +52,7 @@
                 <field name="lr_number"/>
                 <field name="logistic_number" invisible="1"/>
                 <field name="logistic_charge"/>
+                <field name="tracking_website" widget="url"/>
                 <field name="customer_delivery_number"/>
                 <field name="quick_commerce"/>
                 <field name="eta"/>

@@ -31,6 +31,7 @@ class AccountMove(models.Model):
 
     credit_invoice_ids = fields.Many2many('account.move', 'credit_invoices_rel', 'credit_id', 'invoice_id',
                                           string='Select Invoice')
+    tracking_website = fields.Char(string="Tracking Website")
 
     @api.onchange('credit_invoice_ids')
     def onchange_credit_invoice_ids(self):

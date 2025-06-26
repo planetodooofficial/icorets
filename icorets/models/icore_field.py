@@ -291,6 +291,52 @@ class AccountMoveInheritClass(models.Model):
                                                                                                                 '').replace(
                 'point', 'and paise').replace('thous', 'thousand')
 
+    def action_invoice_sent(self):
+        # OVERRIDE
+        rslt = super(AccountMoveInheritClass, self).action_invoice_sent()
+        if self.partner_id.user_id:
+            rslt['context']['default_partner_cc_ids'] = self.partner_id.user_id.partner_id.ids
+        return rslt
+
+    def send_daily_tax_invoice_report(self):
+        today = fields.Date.today()
+        # Filter invoices for today
+        # invoices = self.search([
+        #     ('move_type', '=', 'out_invoice'),('state', '=', 'posted'),
+        #     ('create_date', '>=', '2025-04-17'), ('create_date', '<=', '2025-04-17')
+        # ], limit=1)
+        # print("----invoices", invoices)
+        # if not invoices:
+        #     return
+        for invoice in self:
+            # Generate PDF report
+            if invoice.lr_number and invoice.partner_id.email:
+                pdf_content = self.env["ir.actions.report"]._render_qweb_pdf('icorets.taxes_invoice_report', invoice.id)[0]
+                attachment = self.env['ir.attachment'].create({
+                    'name': f'Tax Invoice - {invoice.name}.pdf',
+                    'type': 'binary',
+                    'datas': base64.b64encode(pdf_content),
+                    'res_model': 'account.move',
+                    'res_id': invoice.id,
+                    'mimetype': 'application/pdf'
+                })
+                # Send email
+                mail_values = {
+                    'subject': f'Tax Invoice - {invoice.name}',
+                    'body_html': f'''<p>Dear LOGY XPRESS,
+                                    Here is your invoice <b>{invoice.name}</b> (with reference: <b>{invoice.ref}</b>) amounting in <b>{invoice.amount_total}</b> from {invoice.gstin_id.name}. Please remit the payment as per the payment terms.<br/><br/><br/>
+                                    <b>Transporter details<b/><br/>
+                                    LR No. {invoice.lr_number}<br/>
+                                    Name: {invoice.partner_id.name} <br/>
+                                    Tracking website : {invoice.tracking_website} <br/>
+                                    Do not hesitate to contact us if you have any questions.</p>''',
+                    'email_to': invoice.partner_id.email,
+                    'attachment_ids': [(6, 0, [attachment.id])],
+                }
+                if invoice.partner_id.user_id.partner_id.email:
+                    mail_values['email_cc'] = invoice.partner_id.user_id.partner_id.email
+                self.env['mail.mail'].create(mail_values).send()
+
 
 class AccountMoveLineInherit(models.Model):
     _inherit = 'account.move.line'
