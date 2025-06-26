@@ -12,6 +12,7 @@
     'data': ['security/ir.model.access.csv',
              'views/icore_field.xml',
              'data/forecast_sequence.xml',
+             # 'data/cron.xml',
              'views/inherit_res_partner_view.xml',
              'views/inherit_stock_warehouse_view.xml',
              'views/forecast_order_view.xml',

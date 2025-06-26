@@ -579,6 +579,12 @@
             <!--               <xpath expr="//field[@name='ref']" position="after">-->
             <!--                <field name="shipping_id_credit"  attrs="{'invisible':[('move_type','!=','out_refund')]}"  options="{'no_create': True, 'no_open': True}"/>-->
             <!--            </xpath>-->
+<!--            <xpath expr="//button[@name='action_register_payment']" position="after">-->
+<!--                <button name="send_daily_tax_invoice_report"-->
+<!--                        type="object" class="oe_highlight"-->
+<!--                        attrs="{'invisible': ['|', ('state', '!=', 'posted'), ('move_type', 'not in', ('out_invoice', 'out_refund'))]}"-->
+<!--                        string="Send Mail" />-->
+<!--            </xpath>-->
 
             <xpath expr="//field[@name='gstin_id']" position="attributes">
                 <attribute name="attrs">{"invisible": [["move_type","=","entry"]]}</attribute>
