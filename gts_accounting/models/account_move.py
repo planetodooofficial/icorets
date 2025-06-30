@@ -1,6 +1,8 @@
 from odoo import models, fields, api, _, Command
 from odoo.exceptions import UserError, ValidationError
-
+import base64
+import calendar
+from datetime import date, timedelta, datetime
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -86,4 +88,92 @@ class AccountMove(models.Model):
     def _onchange_salesperson(self):
         for move in self:
             move.invoice_user_id = move.partner_id.user_id.id
+
+
+
+
+    def statement_partner_report(self):
+        subject = "Customer Account Ledger Report"
+
+        today = datetime.today()
+
+        if today.month < 4:
+            # Jan, Feb, Mar → financial year started April 1st last year
+            fy_start_year = today.year - 1
+        else:
+            # Apr to Dec → financial year started April 1st this year
+            fy_start_year = today.year
+
+        date_from = date(fy_start_year, 4, 1).strftime('%Y-%m-%d')
+        date_to = today.strftime('%Y-%m-%d')
+        # date_from = '2025-01-01'
+        # date_to = '2026-12-31'
+        # Get email recipients (you can customize this as needed)
+        recipients = self.env['res.partner'].search([('email', '!=', False), ('id', 'in', [128327])], limit=1)
+        report = self.env['account.report'].sudo().browse(self.env.ref('account_reports.partner_ledger_report').id)
+        for recipient in recipients:
+            move = self.env['account.move'].search([('partner_id', '=', recipient.id), ('move_type', '=', 'out_invoice'),
+                                                    ('invoice_date', '>=', date_from), ('invoice_date', '<=', date_to),
+                                                    ('state', '=', 'posted')])
+
+            due_amount = sum(move.mapped('amount_residual'))
+            body = ("<p>Dear Sir/Mam,</p>\n\n "
+                    f"<p>This is a reminder regarding the outstanding payment Due Amount:<b>{'{:,.2f}'.format(due_amount)}</b></p>"
+                    "<p>As of today, we have not yet received the payment, kindly make the payment.</p>"
+                    "<p>For your reference, please find the attached Invoice copy and Accounts Ledger.</p>"
+                    "<br/><br/><br/>"
+                    "<p>Note:- This is system generated Mail if you are already paid please share the payment details</p>"
+
+                    )
+            options = {
+                'date': {
+                    'date_from': date_from,
+                    'date_to': date_to,
+                    'filter': 'custom',
+                    'mode': 'range', },
+                'hierarchy': False,
+                'unfold_all': True,
+                'unfolded': False,
+                'fiscal_position': 'all',
+                'filter_unfold_all': True,
+                'unposted_in_period': True,
+                'partner_ids': [recipient.id],
+                'selected_partner_ids': [recipient.id],
+                'params': {
+                    'partner_ids': [recipient.id],
+                    'ignore_session': 'both', }
+
+            }
+            if due_amount > 0:
+                # new_options = report._get_options(options)
+                new_options = report.sudo()._get_options(options)
+                print("---new_options", new_options)
+                xlsx_data = report.sudo().export_to_xlsx(new_options, response=None)
+                print("-----xlsx", xlsx_data)
+                attachment = self.env['ir.attachment'].create({
+                    'name': 'partner_ledger.xlsx',
+                    'type': 'binary',
+                    'datas': base64.b64encode(xlsx_data.get('file_content')),
+                    # 'datas': xlsx_data.get('file_content'),
+                    'res_model': 'res.partner',
+                    'res_id': recipient.id,
+                    'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                })
+                mail_values = {
+                    'subject': subject,
+                    'body_html': body,
+                    'email_to': recipient.email,
+                    'attachment_ids': [(6, 0, [attachment.id])],
+                }
+                self.env['mail.mail'].create(mail_values).send()
+
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Email Sent.'),
+                    'message': _('Mail Sent Successfully'),
+                    'sticky': True,
+                }
+            }
 

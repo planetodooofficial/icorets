@@ -30,9 +30,9 @@
                         <t t-else="">
                             invoice
                         </t>
-                        <t t-if="object.ref">
-                            (with reference: <t t-out="object.ref or ''"></t>)
-                        </t>
+<!--                        <t t-if="object.ref">-->
+                            (with reference: <t t-out="object.ref or ''"></t>,<t t-out="object.invoice_origin or ''"></t>)
+<!--                        </t>-->
                         amounting in
                         <span style="font-weight:bold;"
                               t-out="format_amount(object.amount_total, object.currency_id) or ''">$ 143,750.00
