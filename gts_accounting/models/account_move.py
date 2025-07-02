@@ -109,7 +109,7 @@ class AccountMove(models.Model):
         # date_from = '2025-01-01'
         # date_to = '2026-12-31'
         # Get email recipients (you can customize this as needed)
-        recipients = self.env['res.partner'].search([('email', '!=', False), ('id', 'in', [128327])], limit=1)
+        recipients = self.env['res.partner'].search([('email', '!=', False)])
         report = self.env['account.report'].sudo().browse(self.env.ref('account_reports.partner_ledger_report').id)
         for recipient in recipients:
             move = self.env['account.move'].search([('partner_id', '=', recipient.id), ('move_type', '=', 'out_invoice'),
@@ -147,9 +147,7 @@ class AccountMove(models.Model):
             if due_amount > 0:
                 # new_options = report._get_options(options)
                 new_options = report.sudo()._get_options(options)
-                print("---new_options", new_options)
                 xlsx_data = report.sudo().export_to_xlsx(new_options, response=None)
-                print("-----xlsx", xlsx_data)
                 attachment = self.env['ir.attachment'].create({
                     'name': 'partner_ledger.xlsx',
                     'type': 'binary',
