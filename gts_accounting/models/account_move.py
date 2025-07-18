@@ -118,7 +118,6 @@ class AccountMove(models.Model):
                                                     ('state', '=', 'posted')])
 
             due_amount = sum(move.mapped('amount_residual'))
-            print("----due_amount", due_amount)
             body = ("<p>Dear Sir/Mam,</p>\n\n "
                     f"<p>This is a reminder regarding the outstanding payment Due Amount:<b>{'{:,.2f}'.format(due_amount)}</b></p>"
                     "<p>As of today, we have not yet received the payment, kindly make the payment.</p>"
@@ -167,14 +166,14 @@ class AccountMove(models.Model):
                 }
                 mail = self.env['mail.mail'].create(mail_values).send()
                 mail_created.append(mail)
-            if mail_created:
-                return {
-                    'type': 'ir.actions.client',
-                    'tag': 'display_notification',
-                    'params': {
-                        'title': _('Email Sent.'),
-                        'message': _('Mail Sent Successfully'),
-                        'sticky': True,
-                    }
+        if mail_created:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Email Sent.'),
+                    'message': _('Mail Sent Successfully'),
+                    'sticky': True,
                 }
+            }
 
