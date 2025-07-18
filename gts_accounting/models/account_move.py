@@ -111,12 +111,14 @@ class AccountMove(models.Model):
         # Get email recipients (you can customize this as needed)
         recipients = self.env['res.partner'].search([('email', '!=', False)])
         report = self.env['account.report'].sudo().browse(self.env.ref('account_reports.partner_ledger_report').id)
+        mail_created = []
         for recipient in recipients:
             move = self.env['account.move'].search([('partner_id', '=', recipient.id), ('move_type', '=', 'out_invoice'),
                                                     ('invoice_date', '>=', date_from), ('invoice_date', '<=', date_to),
                                                     ('state', '=', 'posted')])
 
             due_amount = sum(move.mapped('amount_residual'))
+            print("----due_amount", due_amount)
             body = ("<p>Dear Sir/Mam,</p>\n\n "
                     f"<p>This is a reminder regarding the outstanding payment Due Amount:<b>{'{:,.2f}'.format(due_amount)}</b></p>"
                     "<p>As of today, we have not yet received the payment, kindly make the payment.</p>"
@@ -163,15 +165,16 @@ class AccountMove(models.Model):
                     'email_to': recipient.email,
                     'attachment_ids': [(6, 0, [attachment.id])],
                 }
-                self.env['mail.mail'].create(mail_values).send()
-
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Email Sent.'),
-                    'message': _('Mail Sent Successfully'),
-                    'sticky': True,
+                mail = self.env['mail.mail'].create(mail_values).send()
+                mail_created.append(mail)
+            if mail_created:
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': _('Email Sent.'),
+                        'message': _('Mail Sent Successfully'),
+                        'sticky': True,
+                    }
                 }
-            }
 
