@@ -89,8 +89,16 @@ class AccountMove(models.Model):
         for move in self:
             move.invoice_user_id = move.partner_id.user_id.id
 
-
-
+    def _cal_customer_due(self, partner_id):
+        query = '''
+            SELECT SUM(aml.debit) - SUM(aml.credit) AS balance
+            FROM account_move_line aml
+            JOIN account_account acc ON aml.account_id = acc.id
+            WHERE aml.partner_id = %s AND acc.account_type = 'receivable'
+        '''
+        self._cr.execute(query, (partner_id,))
+        result = self._cr.fetchone()
+        return result[0] or 0.0
 
     def statement_partner_report(self):
         subject = "Customer Account Ledger Report"
@@ -113,11 +121,16 @@ class AccountMove(models.Model):
         report = self.env['account.report'].sudo().browse(self.env.ref('account_reports.partner_ledger_report').id)
         mail_created = []
         for recipient in recipients:
-            move = self.env['account.move'].search([('partner_id', '=', recipient.id), ('move_type', '=', 'out_invoice'),
-                                                    ('invoice_date', '>=', date_from), ('invoice_date', '<=', date_to),
-                                                    ('state', '=', 'posted')])
 
-            due_amount = sum(move.mapped('amount_residual'))
+            # move = self.env['account.move'].search([('partner_id', '=', recipient.id), ('move_type', '=', 'out_invoice'),
+            #                                         ('invoice_date', '>=', date_from), ('invoice_date', '<=', date_to),
+            #                                         ('state', '=', 'posted')])
+            move = self.env['account.move.line'].sudo().search([('date', '<=', date_to),
+                                                                ('partner_id', '=', recipient.id),
+                                                                ('move_id.state', '=', 'posted'),
+                                                                ('account_id.account_type', '=', 'asset_receivable')],
+                                                               order='date asc')
+            due_amount = sum(move.mapped('balance'))
             body = ("<p>Dear Sir/Mam,</p>\n\n "
                     f"<p>This is a reminder regarding the outstanding payment Due Amount:<b>{'{:,.2f}'.format(due_amount)}</b></p>"
                     "<p>As of today, we have not yet received the payment, kindly make the payment.</p>"
