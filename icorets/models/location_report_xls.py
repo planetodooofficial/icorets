@@ -128,7 +128,8 @@ class LocationReportWizard(models.TransientModel):
         sheet.write(0, 25, 'Zepto', bold)
         sheet.write(0, 26, 'Colour', bold)
         sheet.write(0, 27, 'Size', bold)
-        sheet.write(0, 28, 'MRP', bold)
+        # sheet.write(0, 28, 'MRP', bold)
+        sheet.write(0, 28, 'COST Price', bold)
         sheet.write(0, 29, 'GST', bold)
         sheet.write(0, 30, 'IHO Stock', bold)
         sheet.write(0, 31, 'Bhiwandi Stock', bold)
@@ -523,7 +524,8 @@ class LocationReportWizard(models.TransientModel):
             sheet.write(row, col + 25, data['Zepto'])
             sheet.write(row, col + 26, data['Colour'])
             sheet.write(row, col + 27, data['Size'])
-            sheet.write(row, col + 28, data['MRP'])
+            # sheet.write(row, col + 28, data['MRP'])
+            sheet.write(row, col + 28, data['COST Price'])
             sheet.write(row, col + 29, data['GST'])
             sheet.write(row, col + 30, data['IHO Stock'])
             sheet.write(row, col + 31, data['Bhiwandi Stock'])
@@ -700,7 +702,8 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 25, 'Zepto', bold)
         sheet.write(0, 26, 'Colour', bold)
         sheet.write(0, 27, 'Size', bold)
-        sheet.write(0, 28, 'MRP', bold)
+        # sheet.write(0, 28, 'MRP', bold)
+        sheet.write(0, 28, 'COST Price', bold)
         sheet.write(0, 29, 'GST', bold)
         sheet.write(0, 30, 'IHO Stock', bold)
         sheet.write(0, 31, 'Bhiwandi Stock', bold)
@@ -783,7 +786,8 @@ class LocationReport(models.AbstractModel):
                 'Zepto': product.zepto or '',
                 'Colour': product.color or '',
                 'Size': product.size or '',
-                'MRP': product.lst_price or '',
+                # 'MRP': product.lst_price or '',
+                'COST Price': product.standard_price or '',
                 'GST': ''.join([str(x) for x in product.taxes_id.name]) if product.taxes_id else '',
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
@@ -969,7 +973,8 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 25, data['Zepto'])
             sheet.write(row, col + 26, data['Colour'])
             sheet.write(row, col + 27, data['Size'])
-            sheet.write(row, col + 28, data['MRP'])
+            # sheet.write(row, col + 28, data['MRP'])
+            sheet.write(row, col + 28, data['COST Price'])
             sheet.write(row, col + 29, data['GST'])
             sheet.write(row, col + 30, data['IHO Stock'])
             sheet.write(row, col + 31, data['Bhiwandi Stock'])
