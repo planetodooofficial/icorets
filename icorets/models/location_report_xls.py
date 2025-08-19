@@ -223,7 +223,7 @@ class LocationReportWizard(models.TransientModel):
                 'Zepto': product.zepto or '',
                 'Colour': product.color or '',
                 'Size': product.size or '',
-                'MRP': product.lst_price or '',
+                'Sales Price': product.lst_price or '',
                 'GST': ''.join([str(x) for x in product.taxes_id.name]) if product.taxes_id else '',
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
