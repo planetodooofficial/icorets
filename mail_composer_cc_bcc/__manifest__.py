@@ -14,7 +14,7 @@
     "installable": True,
     "preloadable": True,
     "depends": [
-        "mail",
+        "mail","account"
     ],
     "data": [
         "views/res_company_views.xml",
@@ -22,5 +22,6 @@
         "views/mail_message_views.xml",
         "views/mail_template_views.xml",
         "wizards/mail_compose_message_view.xml",
+        "wizards/account_invoice_send_views.xml",
     ],
 }
