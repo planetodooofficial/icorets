@@ -33,7 +33,8 @@ class zkMachine(models.Model):
         for r in self:
             machine_ip = r.name
             port = r.port
-            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False)
+            # zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False)
+            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=True)
             print("----------zk", zk)
             conn = ''
             try:
@@ -52,7 +53,8 @@ class zkMachine(models.Model):
         for r in self:
             machine_ip = r.name
             port = r.port
-            zk = ZK(machine_ip, port=port, timeout=5, password=0, force_udp=False, ommit_ping=False)
+            # zk = ZK(machine_ip, port=port, timeout=5, password=0, force_udp=False, ommit_ping=False)
+            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=True)
             conn = ''
             try:
                 conn = zk.connect()
@@ -70,7 +72,8 @@ class zkMachine(models.Model):
             employee_list = []
             machine_ip = r.name
             port = r.port
-            zk = ZK(machine_ip, port=port, timeout=5, password=0, force_udp=False, ommit_ping=False)
+            # zk = ZK(machine_ip, port=port, timeout=5, password=0, force_udp=False, ommit_ping=False)
+            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=True)
             conn = ''
             try:
                 conn = zk.connect()
@@ -105,7 +108,8 @@ class zkMachine(models.Model):
         for r in self:
             machine_ip = r.name
             port = r.port
-            zk = ZK(machine_ip, port=port, timeout=5, password=0, force_udp=False, ommit_ping=False)
+            # zk = ZK(machine_ip, port=port, timeout=5, password=0, force_udp=False, ommit_ping=False)
+            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=True)
             conn = ''
             try:
                 conn = zk.connect()
@@ -129,7 +133,8 @@ class zkMachine(models.Model):
         for machine in self:
             machine_ip = machine.name
             port = machine.port
-            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=False)
+            # zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=False)
+            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=True)
             conn = ''
             try:
                 conn = zk.connect()
@@ -155,7 +160,8 @@ class zkMachine(models.Model):
         for machine in self:
             machine_ip = machine.name
             port = machine.port
-            zk = ZK(machine_ip, port=port, timeout=10, password=0, force_udp=False, ommit_ping=False)
+            # zk = ZK(machine_ip, port=port, timeout=10, password=0, force_udp=False, ommit_ping=False)
+            zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=True)
             conn = ''
             try:
                 conn = zk.connect()
@@ -292,7 +298,8 @@ class hrEmployee(models.Model):
         machine_id = self.env['zk.machine'].search([('id','=',int(self.env.context.get('machine_id')))])
         machine_ip = machine_id.name
         port = machine_id.port
-        zk = ZK(machine_ip, port=port, timeout=10, password=0, force_udp=False, ommit_ping=False)
+        # zk = ZK(machine_ip, port=port, timeout=10, password=0, force_udp=False, ommit_ping=False)
+        zk = ZK(machine_ip, port=port, timeout=50, password=0, force_udp=False, ommit_ping=True)
         conn = ''
         try:
             conn = zk.connect()
