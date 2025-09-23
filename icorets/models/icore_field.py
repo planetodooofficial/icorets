@@ -489,7 +489,7 @@ class SaleOrderInherit(models.Model):
                                                   related='partner_shipping_id.country_id')
     reason_id = fields.Many2one('reason.reason')
     desc = fields.Char('Description')
-    is_short_close = fields.Boolean()
+    is_short_close = fields.Boolean(store=True)
     closer_date = fields.Datetime()
 
     @api.depends('amount_total')
@@ -1190,6 +1190,11 @@ class PurchaseOrderInherit(models.Model):
     warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
     is_approve = fields.Boolean('Is Approve')
 
+    reason_id = fields.Many2one('reason.reason')
+    desc = fields.Char('Description')
+    is_short_close = fields.Boolean(store=True)
+    closer_date = fields.Datetime()
+
     # Onchange for selecting warehouse
     @api.onchange('picking_type_id')
     def onchange_delivery_name(self):
@@ -1213,6 +1218,32 @@ class PurchaseOrderInherit(models.Model):
         res = super(PurchaseOrderInherit, self).button_approve()
         self.is_approve = True
         return res
+
+    def short_close(self):
+        view = self.env.ref('icorets.view_short_close_wizard')
+        return {
+            'name': 'Short Close',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'short.close',
+            'view_id': view.id,
+            'target': 'new',
+        }
+
+    def short_close_purchase_order(self):
+        view = self.env.ref('icorets.view_short_close_wizard')
+        return {
+            'name': 'Short Close',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'short.close',
+            'view_id': view.id,
+            'target': 'new',
+            'context': {
+                'purchase_order_ids': self.ids
+            }
+        }
+
 
     def _prepare_invoice(self):
         invoice_vals = super(PurchaseOrderInherit, self)._prepare_invoice()

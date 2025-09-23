@@ -672,6 +672,17 @@
             <xpath expr="//header/button[@name='action_create_invoice']" position="replace">
                 <!--                <button string="Create Bill" type="object" class="oe_highlight" name="open_vendorbill_wizard"/>-->
             </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="short_close" type="object" string="Short Close" class="oe_highlight"
+                        attrs="{'invisible': [('is_short_close', '=', True)]}"/>
+            </xpath>
+
+            <xpath expr="//page[@name='purchase_delivery_invoice']/group/group[@name='other_info']/field[@name='user_id']" position="after">
+                <field name="reason_id"/>
+                <field name="desc"/>
+                <field name="is_short_close" invisible="1"/>
+                <field name="closer_date"/>
+            </xpath>
 
 
             <xpath expr="//div[@name='date_planned_div']" position="after">

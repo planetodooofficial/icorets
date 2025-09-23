@@ -10,6 +10,27 @@ class ShortClose(models.Model):
     desc = fields.Char('Description')
 
     def confirm_short_close(self):
+        print("---context", self.env.context)
+        purchase_model = self.env.context.get('active_model')
+        if purchase_model == 'purchase.order':
+            if self.env.context.get('purchase_order_ids'):
+                to_browse = self.env.context.get('purchase_order_ids')
+            else:
+                to_browse = self.env.context.get("active_ids")
+            search_po = self.env['purchase.order'].browse(to_browse)
+
+            for purchase in search_po:
+                purchase.reason_id = self.reason_id
+                purchase.desc = self.desc
+                purchase.closer_date = fields.Datetime.now()
+                purchase.is_short_close = True
+
+                for rec in purchase.picking_ids:
+                    if rec.state not in ['done', 'cancel']:
+                        rec.action_cancel()
+                for line in purchase.order_line:
+                    line.product_qty = line.qty_received
+            return True
 
         if self.env.context.get('sale_order_ids'):
             to_browse = self.env.context.get('sale_order_ids')

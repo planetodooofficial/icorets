@@ -145,7 +145,7 @@ class LocationReportWizard(models.TransientModel):
         sheet.write(0, 42, 'Customer Location', bold)
         sheet.write(0, 43, 'Vendor Location', bold)
         sheet.write(0, 44, 'Virtual Locations/Inventory adjustment', bold)
-        sheet.write(0, 45, 'Virtual Locations/Scrap', bold)
+        sheet.write(0, 45, 'Damage/Stock', bold)
         sheet.write(0, 46, 'Virtual Locations/Production', bold)
         sheet.write(0, 47, 'Total Qty', bold)
         sheet.write(0, 48, 'Quotation Qty', bold)
@@ -241,7 +241,7 @@ class LocationReportWizard(models.TransientModel):
                 'Customer Location': '',
                 'Vendor Location': '',
                 'Virtual Locations/Inventory adjustment': '',
-                'Virtual Locations/Scrap': '',
+                'Damage/Stock': '',
                 'Virtual Locations/Production': '',
                 'Total': product.qty_available or '',
                 'To Replenish': 0,
@@ -305,7 +305,7 @@ class LocationReportWizard(models.TransientModel):
                 elif quant.location_id.name == 'Inventory adjustment':
                     product_data[product_id]['Virtual Locations/Inventory adjustment'] = quant.quantity
                 elif quant.location_id.name == 'Scrap':
-                    product_data[product_id]['Virtual Locations/Scrap'] = quant.quantity
+                    product_data[product_id]['Damage/Stock'] = quant.quantity
                 elif quant.location_id.name == 'Production':
                     product_data[product_id]['Virtual Locations/Production'] = quant.quantity
 
@@ -319,9 +319,10 @@ class LocationReportWizard(models.TransientModel):
             #     if order_line.product_id.id == product_id)
 
             self.env.cr.execute("""
-                                select sum(product_uom_qty - qty_delivered) 
-                                from sale_order_line
-                                where state = 'draft' and product_id = %s
+                                select sum(line.product_uom_qty - line.qty_delivered) 
+                                from sale_order_line as line
+                                join sale_order so on line.order_id = so.id
+                                where line.state = 'draft' and line.product_id = %s and so.is_short_close != True
                                 """, (product_id,))
             qty_to_deliver_qtn_data = self.env.cr.dictfetchall()
             qty_to_deliver_qtn = qty_to_deliver_qtn_data[0].get('sum') if qty_to_deliver_qtn_data[0].get('sum') != None else 0
@@ -338,9 +339,11 @@ class LocationReportWizard(models.TransientModel):
             #     if order_line.product_id.id == product_id)
 
             self.env.cr.execute("""
-                                   select sum(product_uom_qty - qty_delivered) 
-                                   from sale_order_line
-                                   where state not in ('draft', 'cancel', 'sent') and product_id = %s
+                                   select sum(line.product_uom_qty - line.qty_delivered) 
+                                   from sale_order_line as line
+                                   join sale_order so on line.order_id = so.id
+                                   where line.state not in ('draft', 'cancel', 'sent') and line.product_id = %s and 
+                                   so.is_short_close != True
                                    """, (product_id,))
             qty_to_deliver_data = self.env.cr.dictfetchall()
             qty_to_deliver = qty_to_deliver_data[0].get('sum') if qty_to_deliver_data[0].get('sum') != None else 0
@@ -468,6 +471,7 @@ class LocationReportWizard(models.TransientModel):
                                 from sale_order_line as line
                                 left join sale_order as so on line.order_id = so.id
                                 where so.state not in ('draft', 'cancel', 'sent') and line.product_id = %s and so.date_order <= %s
+                                and so.is_short_close != True
                               """, (product_id, self.to_date))
             pending_so_data = self.env.cr.dictfetchall()
             pending_so = pending_so_data[0].get('sum') if pending_so_data[0].get('sum') != None else 0
@@ -486,6 +490,7 @@ class LocationReportWizard(models.TransientModel):
                                     from purchase_order_line as line
                                     left join purchase_order as po on line.order_id = po.id
                                     where po.state in ('purchase', 'done') and line.product_id = %s and po.date_order <= %s
+                                    and po.is_short_close != True
                                   """, (product_id, self.to_date))
             pending_po_data = self.env.cr.dictfetchall()
             pending_po = pending_po_data[0].get('sum') if pending_po_data[0].get('sum') != None else 0
@@ -542,7 +547,7 @@ class LocationReportWizard(models.TransientModel):
             sheet.write(row, col + 42, data['Customer Location'])
             sheet.write(row, col + 43, data['Vendor Location'])
             sheet.write(row, col + 44, data['Virtual Locations/Inventory adjustment'])
-            sheet.write(row, col + 45, data['Virtual Locations/Scrap'])
+            sheet.write(row, col + 45, data['Damage/Stock'])
             sheet.write(row, col + 46, data['Virtual Locations/Production'])
             sheet.write(row, col + 47, data['Total'])
             sheet.write(row, col + 48, data['Quotation Qty'])
