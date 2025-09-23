@@ -13,5 +13,6 @@
     "currency": "USD",
     'data': [
         'views/sale_order.xml',
+        'views/purchase_order.xml',
     ],
 }
