@@ -373,6 +373,7 @@ class LocationReportWizard(models.TransientModel):
                                    select sum(product_qty - qty_received) 
                                    from purchase_order_line
                                    where state not in ('draft', 'to approve', 'cancel', 'sent') and product_id = %s
+                                   and po.is_short_close != True
                                    """, (product_id,))
             order_pending_qty_data = self.env.cr.dictfetchall()
             order_pending_qty = order_pending_qty_data[0].get('sum') if order_pending_qty_data[0].get('sum') != None else 0
