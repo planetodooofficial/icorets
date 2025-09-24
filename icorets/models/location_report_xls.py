@@ -370,9 +370,10 @@ class LocationReportWizard(models.TransientModel):
             #     if order_line.product_id.id == product_id)
 
             self.env.cr.execute("""
-                                   select sum(product_qty - qty_received) 
-                                   from purchase_order_line
-                                   where state not in ('draft', 'to approve', 'cancel', 'sent') and product_id = %s
+                                   select sum(line.product_qty - line.qty_received) 
+                                   from purchase_order_line as line
+                                   left join purchase_order as po on line.order_id = po.id
+                                   where line.state not in ('draft', 'to approve', 'cancel', 'sent') and line.product_id = %s
                                    and po.is_short_close != True
                                    """, (product_id,))
             order_pending_qty_data = self.env.cr.dictfetchall()
