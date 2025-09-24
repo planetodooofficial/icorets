@@ -372,7 +372,7 @@ class LocationReportWizard(models.TransientModel):
             self.env.cr.execute("""
                                    select sum(line.product_qty - line.qty_received) 
                                    from purchase_order_line as line
-                                   left join purchase_order as po on line.order_id = po.id
+                                   join purchase_order as po on line.order_id = po.id
                                    where line.state not in ('draft', 'to approve', 'cancel', 'sent') and line.product_id = %s
                                    and po.is_short_close != True
                                    """, (product_id,))
@@ -471,7 +471,7 @@ class LocationReportWizard(models.TransientModel):
             self.env.cr.execute("""
                                 select sum(line.product_uom_qty - line.qty_delivered) 
                                 from sale_order_line as line
-                                left join sale_order as so on line.order_id = so.id
+                                join sale_order as so on line.order_id = so.id
                                 where so.state not in ('draft', 'cancel', 'sent') and line.product_id = %s
                                 and so.is_short_close != True
                               """, (product_id,))
@@ -490,7 +490,7 @@ class LocationReportWizard(models.TransientModel):
             self.env.cr.execute("""
                                     select sum(line.product_qty - line.qty_received) 
                                     from purchase_order_line as line
-                                    left join purchase_order as po on line.order_id = po.id
+                                    join purchase_order as po on line.order_id = po.id
                                     where po.state in ('purchase', 'done') and line.product_id = %s
                                     and po.is_short_close != True
                                   """, (product_id,))
