@@ -472,9 +472,9 @@ class LocationReportWizard(models.TransientModel):
                                 select sum(line.product_uom_qty - line.qty_delivered) 
                                 from sale_order_line as line
                                 left join sale_order as so on line.order_id = so.id
-                                where so.state not in ('draft', 'cancel', 'sent') and line.product_id = %s and so.date_order <= %s
+                                where so.state not in ('draft', 'cancel', 'sent') and line.product_id = %s
                                 and so.is_short_close != True
-                              """, (product_id, self.to_date))
+                              """, (product_id,))
             pending_so_data = self.env.cr.dictfetchall()
             pending_so = pending_so_data[0].get('sum') if pending_so_data[0].get('sum') != None else 0
 
@@ -491,9 +491,9 @@ class LocationReportWizard(models.TransientModel):
                                     select sum(line.product_qty - line.qty_received) 
                                     from purchase_order_line as line
                                     left join purchase_order as po on line.order_id = po.id
-                                    where po.state in ('purchase', 'done') and line.product_id = %s and po.date_order <= %s
+                                    where po.state in ('purchase', 'done') and line.product_id = %s
                                     and po.is_short_close != True
-                                  """, (product_id, self.to_date))
+                                  """, (product_id,))
             pending_po_data = self.env.cr.dictfetchall()
             pending_po = pending_po_data[0].get('sum') if pending_po_data[0].get('sum') != None else 0
 
