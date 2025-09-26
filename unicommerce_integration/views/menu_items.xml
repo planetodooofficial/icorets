@@ -36,4 +36,10 @@
               parent="unicommerce_menu"
               action="unicommerce_integration.shop_sales_channel_action"
               sequence="2"/>
+
+    <menuitem id="channel_report_menu"
+              name="Channel Report"
+              parent="unicommerce_menu"
+              action="unicommerce_integration.sale_channel_report_action"
+              sequence="3"/>
 </odoo>

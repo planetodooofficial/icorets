@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_update_product_details_form" model="ir.ui.view">
+        <field name="name">update.product.details.form</field>
+        <field name="model">update.product.details</field>
+        <field name="arch" type="xml">
+            <form string="Update Product Details" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <field name="upload_file" filename="file_name"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_update_products"
+                            type="object"
+                            string="Update Products"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            special="cancel"
+                            class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Action Window -->
+    <record id="action_update_product_details" model="ir.actions.act_window">
+        <field name="name">Update Product Details</field>
+        <field name="res_model">update.product.details</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+    <menuitem id="menu_update_product_details"
+              name="Update Product Cost"
+              parent="stock.menu_warehouse_config"
+              action="action_update_product_details"
+              sequence="10"/>
+
+</odoo>
