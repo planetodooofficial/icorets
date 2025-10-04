@@ -5,6 +5,8 @@ from datetime import datetime
 class StockValuationLayer(models.Model):
     _inherit = 'stock.valuation.layer'
 
+    missing_valuation = fields.Boolean(string="Missing Valuation", default=False)
+
     def update_date(self, date=None):
         """Update valuation layer date and related journal entry date (SQL)"""
         if not date:

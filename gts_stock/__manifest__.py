@@ -11,6 +11,8 @@
     'demo': [],
     'data': [
         'security/ir.model.access.csv',
+        # 'views/stock_picking_view.xml',
+        # 'wizard/select_warehouse_wizard_view.xml',
         'views/stock_valuation_layer_view.xml',
         # 'views/stock_picking_view.xml',
         # 'wizard/select_warehouse_wizard_view.xml',
