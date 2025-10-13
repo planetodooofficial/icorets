@@ -12,7 +12,7 @@ class ProductProduct(models.Model):
             ('location_id.usage', '=', 'supplier'),
 
             ('missing_valuation', '=', False),
-        ])
+        ], limit = 3000)
         # , limit = 3000
         # ('date', '>=', datetime(2023, 1, 1)),
         # ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
@@ -59,7 +59,7 @@ class ProductProduct(models.Model):
             ('location_id.usage', '=', 'inventory'),
             ('location_dest_id.usage', '=', 'inventory'),
             ('missing_valuation', '=', False),
-        ])
+        ], limit = 3000)
         # ('date', '>=', datetime(2023, 1, 1)),
         # ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
         internal_valuation_amount = 0.0
@@ -113,7 +113,7 @@ class ProductProduct(models.Model):
             ('location_dest_id.usage', '=', 'customer'),
 
             ('missing_valuation', '=', False),
-        ])
+        ], limit = 3000)
         # , limit = 3000
         # ('date', '>=', datetime(2023, 1, 1)),
         # ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
