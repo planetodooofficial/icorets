@@ -10,10 +10,12 @@ class ProductProduct(models.Model):
             ('state', '=', 'done'),
             ('product_id.type', '=', 'product'),
             ('location_id.usage', '=', 'supplier'),
-            ('date', '>=', datetime(2023, 1, 1)),
-            ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
+
             ('missing_valuation', '=', False),
-        ], limit=3000)
+        ])
+        # , limit = 3000
+        # ('date', '>=', datetime(2023, 1, 1)),
+        # ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
         # ('missing_valuation', '=', False),
         receipt_valuation_amount = 0.0
         missing_receipt_valuations = []
@@ -31,63 +33,90 @@ class ProductProduct(models.Model):
                     # receipt_valuation_amount += expected_value
                     amount = expected_value - valuation.value
                     receipt_valuation_amount += expected_value - valuation.value
-                    missing_receipt_valuations.append({
-                        'move_id': move.id,
-                        'expected_value': expected_value,
-                        'actual_value': valuation.value
-                    })
-                    valuation = self._create_missing_valuation(products=move.product_id, quantity=quantity_done, new_price=purchase_unit_price, value=amount)
+                    # missing_receipt_valuations.append({
+                    #     'move_id': move.id,
+                    #     'expected_value': expected_value,
+                    #     'actual_value': valuation.value
+                    # })
+                    self._create_missing_valuation(products=move.product_id, quantity=quantity_done, new_price=purchase_unit_price, value=amount)
                     move.missing_valuation = True
             else:
                 # No valuation created
                 receipt_valuation_amount += expected_value
-                missing_receipt_valuations.append({
-                    'move_id': move.id,
-                    'expected_value': expected_value,
-                    'actual_value': 0
-                })
-                valuation = self._create_missing_valuation(products=move.product_id,quantity=quantity_done, new_price=purchase_unit_price,
+                # missing_receipt_valuations.append({
+                #     'move_id': move.id,
+                #     'expected_value': expected_value,
+                #     'actual_value': 0
+                # })
+                self._create_missing_valuation(products=move.product_id,quantity=quantity_done, new_price=purchase_unit_price,
                                                            value=expected_value)
                 move.missing_valuation = True
 
-        # #for adjustment
-        # adjustment_moves = self.env['stock.move'].search([
-        #     ('state', '=', 'done'),
-        #     ('product_id.type', '=', 'product'), '|',
-        #     ('location_id.usage', '=', 'inventory'),
-        #     ('location_dest_id.usage', '=', 'inventory'),
-        #     ('date', '>=', datetime(2023, 1, 1)),
-        #     ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
-        # ])
-        # internal_valuation_amount = 0.0
-        # missing_internal_valuations = []
-        #
-        # for move in adjustment_moves:
-        #     valuation = self.env['stock.valuation.layer'].search([('stock_move_id', '=', move.id)], limit=1)
-        #     product_cost = move.product_id.standard_price or 0.0
-        #     quantity_done = move.quantity_done
-        #     expected_value = product_cost * quantity_done
-        #
-        #     if valuation:
-        #         if valuation.value != expected_value:
-        #             if valuation.value > 0:
-        #                 internal_valuation_amount += abs(valuation.value - expected_value)
-        #             if valuation.value < 0:
-        #                 internal_valuation_amount += abs(valuation.value + expected_value)
-        #             missing_internal_valuations.append({
-        #                 'move_id': move.id,
-        #                 'expected_value': expected_value,
-        #                 'actual_value': 0
-        #             })
-        # Delivery moves
+        #for adjustment
+        adjustment_moves = self.env['stock.move'].search([
+            ('state', '=', 'done'),
+            ('product_id.type', '=', 'product'), '|',
+            ('location_id.usage', '=', 'inventory'),
+            ('location_dest_id.usage', '=', 'inventory'),
+            ('missing_valuation', '=', False),
+        ])
+        # ('date', '>=', datetime(2023, 1, 1)),
+        # ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
+        internal_valuation_amount = 0.0
+        missing_internal_valuations = []
+
+        for move in adjustment_moves:
+            valuation = self.env['stock.valuation.layer'].search([('stock_move_id', '=', move.id)], limit=1)
+            product_cost = move.product_id.standard_price or 0.0
+            quantity_done = move.quantity_done
+            expected_value = product_cost * quantity_done
+
+            if valuation:
+                # print("----valuation", valuation)
+                if valuation.value != expected_value:
+                    if valuation.value > 0:
+                        adjustment_amt = abs(valuation.value - expected_value)
+                        internal_valuation_amount += abs(valuation.value - expected_value)
+                        self._create_missing_valuation(products=move.product_id, quantity=quantity_done,
+                                                                   new_price=0,
+                                                                   value=adjustment_amt)
+                        move.missing_valuation = True
+                    if valuation.value < 0:
+                        adjustment_amt = abs(valuation.value + expected_value)
+                        internal_valuation_amount += abs(valuation.value + expected_value)
+                        self._create_missing_valuation(products=move.product_id, quantity=quantity_done,
+                                                                   new_price=0,
+                                                                   value=-adjustment_amt)
+                        move.missing_valuation = True
+
+            else:
+        #         # No valuation created
+                internal_valuation_amount += expected_value
+                move.missing_valuation = True
+                # missing_receipt_valuations.append({
+                #     'move_id': move.id,
+                #     'expected_value': expected_value,
+                #     'actual_value': 0
+                # })
+                self._create_missing_valuation(products=move.product_id,quantity=quantity_done, new_price=product_cost,
+                                                           value=expected_value)
+
+                    # missing_internal_valuations.append({
+                    #     'move_id': move.id,
+                    #     'expected_value': expected_value,
+                    #     'actual_value': 0
+                    # })
+        # # Delivery moves
         delivery_moves = self.env['stock.move'].search([
             ('state', '=', 'done'),
             ('product_id.type', '=', 'product'),
             ('location_dest_id.usage', '=', 'customer'),
-            ('date', '>=', datetime(2023, 1, 1)),
-            ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
+
             ('missing_valuation', '=', False),
-        ], limit=3000)
+        ])
+        # , limit = 3000
+        # ('date', '>=', datetime(2023, 1, 1)),
+        # ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
         delivery_valuation_amount = 0.0
         missing_delivery_valuations = []
 
@@ -108,24 +137,24 @@ class ProductProduct(models.Model):
                     # delivery_valuation_amount += expected_value
                     amount = valuation.value + expected_value
                     delivery_valuation_amount += valuation.value + expected_value
-                    missing_delivery_valuations.append({
-                        'move_id': move.id,
-                        'expected_value': expected_value,
-                        'actual_value': valuation.value
-                    })
-                    valuation = self._create_missing_valuation(products=move.product_id, quantity=quantity_done, new_price=product_cost,
+                    # missing_delivery_valuations.append({
+                    #     'move_id': move.id,
+                    #     'expected_value': expected_value,
+                    #     'actual_value': valuation.value
+                    # })
+                    self._create_missing_valuation(products=move.product_id, quantity=quantity_done, new_price=product_cost,
                                                                value=-1 * abs(amount))
                     move.missing_valuation = True
                     # print("---1-valuation", valuation)
             else:
                 delivery_valuation_amount += expected_value
 
-                missing_delivery_valuations.append({
-                    'move_id': move.id,
-                    'expected_value': expected_value,
-                    'actual_value': 0
-                })
-                valuation = self._create_missing_valuation(products=move.product_id, quantity=quantity_done, new_price=0,
+                # missing_delivery_valuations.append({
+                #     'move_id': move.id,
+                #     'expected_value': expected_value,
+                #     'actual_value': 0
+                # })
+                self._create_missing_valuation(products=move.product_id, quantity=quantity_done, new_price=0,
                                                            value=-expected_value)
                 move.missing_valuation = True
                 # print("--2--valuation", valuation)
