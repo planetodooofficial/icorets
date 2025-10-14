@@ -10,7 +10,7 @@ class ProductProduct(models.Model):
             ('state', '=', 'done'),
             ('product_id.type', '=', 'product'),
             ('location_id.usage', '=', 'supplier'),
-
+            ('date', '<=', datetime(2025, 3, 31, 23, 59, 59)),
             ('missing_valuation', '=', False),
         ], limit = 3000)
         # , limit = 3000
@@ -59,6 +59,7 @@ class ProductProduct(models.Model):
             ('location_id.usage', '=', 'inventory'),
             ('location_dest_id.usage', '=', 'inventory'),
             ('missing_valuation', '=', False),
+            ('date', '<=', datetime(2025, 3, 31, 23, 59, 59)),
         ], limit = 3000)
         # ('date', '>=', datetime(2023, 1, 1)),
         # ('date', '<=', datetime(2024, 12, 31, 23, 59, 59)),
@@ -111,7 +112,7 @@ class ProductProduct(models.Model):
             ('state', '=', 'done'),
             ('product_id.type', '=', 'product'),
             ('location_dest_id.usage', '=', 'customer'),
-
+            ('date', '<=', datetime(2025, 3, 31, 23, 59, 59)),
             ('missing_valuation', '=', False),
         ], limit = 3000)
         # , limit = 3000
