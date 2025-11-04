@@ -36,6 +36,14 @@ class AccountMove(models.Model):
                                           string='Select Invoice')
     tracking_website = fields.Char(string="Tracking Website")
 
+    without_sale_cogs = fields.Boolean(string="Without Sale Cogs", compute="_compute_without_sale_invoice", store=True)
+
+    @api.depends('invoice_line_ids.sale_line_ids')
+    def _compute_without_sale_invoice(self):
+        for move in self:
+            move.without_sale_cogs = bool(move.invoice_line_ids.mapped('sale_line_ids'))
+
+
     @api.onchange('credit_invoice_ids')
     def onchange_credit_invoice_ids(self):
         self.with_context(check_move_validity=False)
