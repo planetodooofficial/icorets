@@ -139,8 +139,13 @@ class DownloadReport(Controller):
                         'UOM': invoice_line.product_id.uom_po_id.name,
                         'Size': invoice_line.product_id.size,
                         'Color': invoice_line.product_id.color,
-                        'Class': invoice_line.product_id.categ_id.parent_id.name,
-                        'SubClass': invoice_line.product_id.categ_id.name,
+                        # 'Class': invoice_line.product_id.categ_id.parent_id.name,
+                        # 'SubClass': invoice_line.product_id.categ_id.name,
+                        'Category 1': invoice_line.product_id.categ_id.parent_id.parent_id.name,
+                        'Category 2': invoice_line.product_id.categ_id.parent_id.name,
+                        'Category 3': invoice_line.product_id.categ_id.name,
+
+
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity,
                         'GRN Qty': ' ',
@@ -182,6 +187,7 @@ class DownloadReport(Controller):
                         'ASN No': invoice_line.move_id.asn_no or ' ',
                         'VIN PO No': invoice_line.move_id.vin_po_no or ' ',
                         'VIN ASN No': invoice_line.move_id.vin_asn_no or ' ',
+                        'AVG': invoice_line.price_subtotal/invoice_line.quantity if invoice_line.quantity != 0 else 0,
                         }
                 data.update({f"Total {tax.get('tax_group_name')}": tax.get('tax_group_amount')
                              for tax in taxes.get('groups_by_subtotal', {}).get('Untaxed Amount', {})})
@@ -404,8 +410,8 @@ class DownloadReport(Controller):
                         # 'Class': invoice_line.product_id.categ_id.parent_id.name,
                         # 'SubClass': invoice_line.product_id.categ_id.name,
                         'Category 1': invoice_line.product_id.categ_id.parent_id.parent_id.name or '',
-                        'Category 2 Class': invoice_line.product_id.categ_id.parent_id.name or '',
-                        'Category 3 Sub Class': invoice_line.product_id.categ_id.name or '',
+                        'Category 2': invoice_line.product_id.categ_id.parent_id.name or '',
+                        'Category 3': invoice_line.product_id.categ_id.name or '',
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity, 'Unit Price': invoice_line.price_unit,
                         'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
