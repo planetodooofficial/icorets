@@ -187,7 +187,7 @@ class DownloadReport(Controller):
                         'ASN No': invoice_line.move_id.asn_no or ' ',
                         'VIN PO No': invoice_line.move_id.vin_po_no or ' ',
                         'VIN ASN No': invoice_line.move_id.vin_asn_no or ' ',
-                        'AVG': invoice_line.price_subtotal/invoice_line.quantity if invoice_line.quantity != 0 else 0,
+                        'COST Price': invoice_line.product_id.standard_price or '',
                         }
                 data.update({f"Total {tax.get('tax_group_name')}": tax.get('tax_group_amount')
                              for tax in taxes.get('groups_by_subtotal', {}).get('Untaxed Amount', {})})
