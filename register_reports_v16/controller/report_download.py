@@ -145,6 +145,8 @@ class DownloadReport(Controller):
                         'Category 2': invoice_line.product_id.categ_id.parent_id.name,
                         'Category 3': invoice_line.product_id.categ_id.name,
 
+                        'Account': invoice_line.account_id.display_name or '',
+                        'Journal': invoice_line.move_id.journal_id.name or '',
 
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity,
@@ -412,6 +414,8 @@ class DownloadReport(Controller):
                         'Category 1': invoice_line.product_id.categ_id.parent_id.parent_id.name or '',
                         'Category 2': invoice_line.product_id.categ_id.parent_id.name or '',
                         'Category 3': invoice_line.product_id.categ_id.name or '',
+                        'Account': invoice_line.account_id.display_name or '',
+                        'Journal': invoice_line.move_id.journal_id.name or '',
                         # 'HSN Code': invoice_line.hsn_id.hsnsac_code,
                         'Quantity': invoice_line.quantity, 'Unit Price': invoice_line.price_unit,
                         'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
