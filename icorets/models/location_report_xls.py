@@ -185,6 +185,91 @@ class LocationReportWizard(models.TransientModel):
         sheet.write(0, 78, 'Closing Stock', bold_yellow)
         sheet.write(0, 79, 'Pending SOs customers', bold_yellow)
         sheet.write(0, 80, 'Pending POs vendors', bold_yellow)
+        sheet.write(0, 1, 'Creation Date', bold)
+        sheet.write(0, 2, 'Category 1', bold)
+        sheet.write(0, 3, 'Category 2', bold)
+        sheet.write(0, 4, 'Category 3', bold)
+        sheet.write(0, 5, 'Function Sport', bold)
+        sheet.write(0, 6, 'Gender', bold)
+        sheet.write(0, 7, 'Age group', bold)
+        sheet.write(0, 8, 'Title', bold)
+        sheet.write(0, 9, 'Marketplace Tittle', bold)
+        sheet.write(0, 10, 'Composition / Material', bold)
+        sheet.write(0, 11, 'Technology / Features', bold)
+        sheet.write(0, 12, 'Event', bold)
+        sheet.write(0, 13, 'HSN Code', bold)
+        sheet.write(0, 14, 'Style Code', bold)
+        sheet.write(0, 15, 'Article Code', bold)
+        sheet.write(0, 16, 'SKU', bold)
+        sheet.write(0, 17, 'EAN Code', bold)
+        sheet.write(0, 18, 'ASIN', bold)
+        sheet.write(0, 19, 'FSIN', bold)
+        sheet.write(0, 20, 'Myntra', bold)
+        sheet.write(0, 21, 'AJIO', bold)
+        sheet.write(0, 22, 'Fancode', bold)
+        sheet.write(0, 23, 'Swiggy', bold)
+        sheet.write(0, 24, 'Bigbasket', bold)
+        sheet.write(0, 25, 'Blinkit', bold)
+        sheet.write(0, 26, 'Zepto', bold)
+        sheet.write(0, 27, 'Colour', bold)
+        sheet.write(0, 28, 'Size', bold)
+        sheet.write(0, 29, 'MRP', bold)
+        sheet.write(0, 30, 'COST Price', bold)
+        sheet.write(0, 31, 'GST', bold)
+        sheet.write(0, 32, 'IHO Stock', bold)
+        sheet.write(0, 33, 'Bhiwandi Stock', bold)
+        sheet.write(0, 34, 'Delhi Stock', bold)
+        sheet.write(0, 35, 'Available Qty', bold)
+        sheet.write(0, 36, 'BHU Stock', bold)
+        sheet.write(0, 37, 'DHASA Stock', bold)
+        sheet.write(0, 38, 'ELM Stock', bold)
+        sheet.write(0, 39, 'JSP Stock', bold)
+        sheet.write(0, 40, 'JWD Stock', bold)
+        sheet.write(0, 41, 'RCP Stock', bold)
+        sheet.write(0, 42, 'UPW Stock', bold)
+        sheet.write(0, 43, 'BWMIS Stock', bold)
+        sheet.write(0, 44, 'Customer Location', bold)
+        sheet.write(0, 45, 'Vendor Location', bold)
+        sheet.write(0, 46, 'Virtual Locations/Inventory adjustment', bold)
+        sheet.write(0, 47, 'Damage/Stock', bold)
+        sheet.write(0, 48, 'Virtual Locations/Production', bold)
+        sheet.write(0, 49, 'Total Qty', bold)
+        sheet.write(0, 50, 'Quotation Qty', bold)
+        sheet.write(0, 51, 'Confirmed SO qty', bold)
+        sheet.write(0, 52, 'FREE TO USE', bold)
+        sheet.write(0, 53, 'PO Receipt Pending', bold)
+        sheet.write(0, 54, 'To Replenish', bold)
+        sheet.write(0, 55, 'Bullet Point 1', bold)
+        sheet.write(0, 56, 'Bullet Point 2', bold)
+        sheet.write(0, 57, 'Bullet Point 3', bold)
+        sheet.write(0, 58, 'Bullet Point 4', bold)
+        sheet.write(0, 59, 'Bullet Point 5', bold)
+        sheet.write(0, 60, 'Keyword', bold)
+        sheet.write(0, 61, 'Description', bold)
+        sheet.write(0, 62, 'Google Drive Link', bold)
+        sheet.write(0, 63, 'Drop Box Link', bold)
+        sheet.write(0, 64, 'Country of Origin', bold)
+        sheet.write(0, 65, 'Product Net Weight (gms)', bold)
+        sheet.write(0, 66, 'Product Length (cm)', bold)
+        sheet.write(0, 67, 'Product Breadth (cm)', bold)
+        sheet.write(0, 68, 'Product Height (cm)', bold)
+        sheet.write(0, 69, 'Package Gross Weight (gms)', bold)
+        sheet.write(0, 70, 'Package Length (cm)', bold)
+        sheet.write(0, 71, 'Package Breadth (cm)', bold)
+        sheet.write(0, 72, 'Package Height (cm)', bold)
+        # sheet.write(0, 30, '(Onhand + incoming) - outgoing', bold)
+        # sheet.write(0, 31, '(Onhand + incoming) - outgoing(With_Qtn)', bold)
+
+        sheet.write(0, 73, 'Opening Stock', bold_yellow)
+        sheet.write(0, 74, 'Purchase', bold_yellow)
+        sheet.write(0, 75, 'Purchase Return', bold_yellow)
+        sheet.write(0, 76, 'Net Purchase', bold_yellow)
+        sheet.write(0, 77, 'Sales', bold_yellow)
+        sheet.write(0, 78, 'Sales Return', bold_yellow)
+        sheet.write(0, 79, 'Net Sales', bold_yellow)
+        sheet.write(0, 80, 'Closing Stock', bold_yellow)
+        sheet.write(0, 81, 'Pending SOs customers', bold_yellow)
+        sheet.write(0, 82, 'Pending POs vendors', bold_yellow)
 
         sheet.freeze_panes(1, 0)
 
@@ -201,6 +286,7 @@ class LocationReportWizard(models.TransientModel):
 
             product_data[product_id] = {
                 'Brand': product.brand_id_rel.name or '',
+                'Creation Date': product.product_tmpl_id.create_date.strftime('%d/%m/%Y') if product.product_tmpl_id.create_date else '',
                 'Category 1': product.categ_id.parent_id.parent_id.name or '',
                 'Category 2': product.categ_id.parent_id.name or '',
                 'Category 3': product.categ_id.name or '',
@@ -232,6 +318,7 @@ class LocationReportWizard(models.TransientModel):
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
+                'Available Qty': 0,
                 'BHU Stock': '',
                 'DHASA Stock': '',
                 'ELM Stock': '',
@@ -269,6 +356,7 @@ class LocationReportWizard(models.TransientModel):
                 'Bullet Point 3': product.bullet_point_3 or '',
                 'Bullet Point 4': product.bullet_point_4 or '',
                 'Bullet Point 5': product.bullet_point_5 or '',
+                'Keyword': '',
                 'Description': product.description or '',
                 'Google Drive Link': product.google_drive_link or '',
                 'Drop Box Link': product.drop_box_link or '',
@@ -285,6 +373,7 @@ class LocationReportWizard(models.TransientModel):
                     product_data[product_id]['Bhiwandi Stock'] = quant.quantity
                 elif quant.location_id.location_id.name == 'DEL':
                     product_data[product_id]['Delhi Stock'] = quant.quantity
+                    product_data[product_id]['Available Qty'] = quant.quantity - quant.reserved_quantity
                 elif quant.location_id.location_id.name == 'BHU':
                     product_data[product_id]['BHU Stock'] = quant.quantity
                 elif quant.location_id.location_id.name == 'DHASA':
@@ -583,6 +672,91 @@ class LocationReportWizard(models.TransientModel):
             sheet.write(row, col + 68, data['Package Length (cm)'])
             sheet.write(row, col + 69, data['Package Breadth (cm)'])
             sheet.write(row, col + 70, data['Package Height (cm)'])
+            sheet.write(row, col + 1, data['Creation Date'])
+            sheet.write(row, col + 2, data['Category 1'])
+            sheet.write(row, col + 3, data['Category 2'])
+            sheet.write(row, col + 4, data['Category 3'])
+            sheet.write(row, col + 5, data['Function Sport'])
+            sheet.write(row, col + 6, data['Gender'])
+            sheet.write(row, col + 7, data['Age group'])
+            sheet.write(row, col + 8, data['Title'])
+            sheet.write(row, col + 9, data['Marketplace Tittle'])
+            sheet.write(row, col + 10, data['Composition / Material'])
+            sheet.write(row, col + 11, data['Technology / Features'])
+            sheet.write(row, col + 12, data['Event'])
+            sheet.write(row, col + 13, data['HSN Code'])
+            sheet.write(row, col + 14, data['Style Code'])
+            sheet.write(row, col + 15, data['Article Code'])
+            sheet.write(row, col + 16, data['SKU Code'])
+            sheet.write(row, col + 17, data['EAN Code'])
+            sheet.write(row, col + 18, data['ASIN'])
+            sheet.write(row, col + 19, data['FSIN'])
+            sheet.write(row, col + 20, data['Myntra'])
+            sheet.write(row, col + 21, data['AJIO'])
+            sheet.write(row, col + 22, data['Fancode'])
+            sheet.write(row, col + 23, data['Swiggy'])
+            sheet.write(row, col + 24, data['Bigbasket'])
+            sheet.write(row, col + 25, data['Blinkit'])
+            sheet.write(row, col + 26, data['Zepto'])
+            sheet.write(row, col + 27, data['Colour'])
+            sheet.write(row, col + 28, data['Size'])
+            sheet.write(row, col + 29, data['MRP'])
+            sheet.write(row, col + 30, data['COST Price'])
+            sheet.write(row, col + 31, data['GST'])
+            sheet.write(row, col + 32, data['IHO Stock'])
+            sheet.write(row, col + 33, data['Bhiwandi Stock'])
+            sheet.write(row, col + 34, data['Delhi Stock'])
+            sheet.write(row, col + 35, data['Available Qty'])
+            sheet.write(row, col + 36, data['BHU Stock'])
+            sheet.write(row, col + 37, data['DHASA Stock'])
+            sheet.write(row, col + 38, data['ELM Stock'])
+            sheet.write(row, col + 39, data['JSP Stock'])
+            sheet.write(row, col + 40, data['JWD Stock'])
+            sheet.write(row, col + 41, data['RCP Stock'])
+            sheet.write(row, col + 42, data['UPW Stock'])
+            sheet.write(row, col + 43, data['BWMIS Stock'])
+            sheet.write(row, col + 44, data['Customer Location'])
+            sheet.write(row, col + 45, data['Vendor Location'])
+            sheet.write(row, col + 46, data['Virtual Locations/Inventory adjustment'])
+            sheet.write(row, col + 47, data['Damage/Stock'])
+            sheet.write(row, col + 48, data['Virtual Locations/Production'])
+            sheet.write(row, col + 49, data['Total'])
+            sheet.write(row, col + 50, data['Quotation Qty'])
+            sheet.write(row, col + 51, data['Confirmed SO qty'])
+            sheet.write(row, col + 52, data['FREE TO USE'])
+            sheet.write(row, col + 53, data['PO Receipt Pending'])
+            sheet.write(row, col + 54, data['To Replenish'])
+
+            sheet.write(row, col + 55, data['Bullet Point 1'])
+            sheet.write(row, col + 56, data['Bullet Point 2'])
+            sheet.write(row, col + 57, data['Bullet Point 3'])
+            sheet.write(row, col + 58, data['Bullet Point 4'])
+            sheet.write(row, col + 59, data['Bullet Point 5'])
+            sheet.write(row, col + 60, data['Keyword'])
+            sheet.write(row, col + 61, data['Description'])
+            sheet.write(row, col + 62, data['Google Drive Link'])
+            sheet.write(row, col + 63, data['Drop Box Link'])
+            sheet.write(row, col + 64, data['Country of Origin'])
+
+            sheet.write(row, col + 65, data['Product Net Weight (gms)'])
+            sheet.write(row, col + 66, data['Product Length (cm)'])
+            sheet.write(row, col + 67, data['Product Breadth (cm)'])
+            sheet.write(row, col + 68, data['Product Height (cm)'])
+            sheet.write(row, col + 69, data['Package Gross Weight (gms)'])
+            sheet.write(row, col + 70, data['Package Length (cm)'])
+            sheet.write(row, col + 71, data['Package Breadth (cm)'])
+            sheet.write(row, col + 72, data['Package Height (cm)'])
+
+            sheet.write(row, col + 73, data['Opening Stock'])
+            sheet.write(row, col + 74, data['Purchase'])
+            sheet.write(row, col + 75, data['Purchase Return'])
+            sheet.write(row, col + 76, data['Net Purchase'])
+            sheet.write(row, col + 77, data['Sales'])
+            sheet.write(row, col + 78, data['Sales Return'])
+            sheet.write(row, col + 79, data['Net Sales'])
+            sheet.write(row, col + 80, data['Closing Stock'])
+            sheet.write(row, col + 81, data['Pending SOs customers'])
+            sheet.write(row, col + 82, data['Pending POs vendors'])
             # sheet.write(row, col +30, data['(Onhand + incoming) - outgoing'])
             # sheet.write(row, col + 31, data['(Onhand + incoming) - outgoing(With_Qtn)'])
 
@@ -761,6 +935,78 @@ class LocationReport(models.AbstractModel):
         sheet.write(0, 68, 'Package Length (cm)', bold)
         sheet.write(0, 69, 'Package Breadth (cm)', bold)
         sheet.write(0, 70, 'Package Height (cm)', bold)
+        sheet.write(0, 1, 'Creation Date', bold)
+        sheet.write(0, 2, 'Category 1', bold)
+        sheet.write(0, 3, 'Category 2', bold)
+        sheet.write(0, 4, 'Category 3', bold)
+        sheet.write(0, 5, 'Function Sport', bold)
+        sheet.write(0, 6, 'Gender', bold)
+        sheet.write(0, 7, 'Age group', bold)
+        sheet.write(0, 8, 'Title', bold)
+        sheet.write(0, 9, 'Marketplace Tittle', bold)
+        sheet.write(0, 10, 'Composition / Material', bold)
+        sheet.write(0, 11, 'Technology / Features', bold)
+        sheet.write(0, 12, 'Event', bold)
+        sheet.write(0, 13, 'HSN Code', bold)
+        sheet.write(0, 14, 'Style Code', bold)
+        sheet.write(0, 15, 'Article Code', bold)
+        sheet.write(0, 16, 'SKU', bold)
+        sheet.write(0, 17, 'EAN Code', bold)
+        sheet.write(0, 18, 'ASIN', bold)
+        sheet.write(0, 19, 'FSIN', bold)
+        sheet.write(0, 20, 'Myntra', bold)
+        sheet.write(0, 21, 'AJIO', bold)
+        sheet.write(0, 22, 'Fancode', bold)
+        sheet.write(0, 23, 'Swiggy', bold)
+        sheet.write(0, 24, 'Bigbasket', bold)
+        sheet.write(0, 25, 'Blinkit', bold)
+        sheet.write(0, 26, 'Zepto', bold)
+        sheet.write(0, 27, 'Colour', bold)
+        sheet.write(0, 28, 'Size', bold)
+        sheet.write(0, 29, 'MRP', bold)
+        sheet.write(0, 30, 'COST Price', bold)
+        sheet.write(0, 31, 'GST', bold)
+        sheet.write(0, 32, 'IHO Stock', bold)
+        sheet.write(0, 33, 'Bhiwandi Stock', bold)
+        sheet.write(0, 34, 'Delhi Stock', bold)
+        sheet.write(0, 35, 'Available Qty', bold)
+        sheet.write(0, 36, 'BHU Stock', bold)
+        sheet.write(0, 37, 'DHASA Stock', bold)
+        sheet.write(0, 38, 'ELM Stock', bold)
+        sheet.write(0, 39, 'JSP Stock', bold)
+        sheet.write(0, 40, 'JWD Stock', bold)
+        sheet.write(0, 41, 'RCP Stock', bold)
+        sheet.write(0, 42, 'UPW Stock', bold)
+        sheet.write(0, 43, 'BWMIS Stock', bold)
+        sheet.write(0, 44, 'Customer Location', bold)
+        sheet.write(0, 45, 'Vendor Location', bold)
+        sheet.write(0, 46, 'Virtual Locations/Inventory adjustment', bold)
+        sheet.write(0, 47, 'Virtual Locations/Scrap', bold)
+        sheet.write(0, 48, 'Virtual Locations/Production', bold)
+        sheet.write(0, 49, 'Total Qty', bold)
+        sheet.write(0, 50, 'Quotation Qty', bold)
+        sheet.write(0, 51, 'Confirmed SO qty', bold)
+        sheet.write(0, 52, 'FREE TO USE', bold)
+        sheet.write(0, 53, 'PO Receipt Pending', bold)
+        sheet.write(0, 54, 'To Replenish', bold)
+        sheet.write(0, 55, 'Bullet Point 1', bold)
+        sheet.write(0, 56, 'Bullet Point 2', bold)
+        sheet.write(0, 57, 'Bullet Point 3', bold)
+        sheet.write(0, 58, 'Bullet Point 4', bold)
+        sheet.write(0, 59, 'Bullet Point 5', bold)
+        sheet.write(0, 60, 'Keyword', bold)
+        sheet.write(0, 61, 'Description', bold)
+        sheet.write(0, 62, 'Google Drive Link', bold)
+        sheet.write(0, 63, 'Drop Box Link', bold)
+        sheet.write(0, 64, 'Country of Origin', bold)
+        sheet.write(0, 65, 'Product Net Weight (gms)', bold)
+        sheet.write(0, 66, 'Product Length (cm)', bold)
+        sheet.write(0, 67, 'Product Breadth (cm)', bold)
+        sheet.write(0, 68, 'Product Height (cm)', bold)
+        sheet.write(0, 69, 'Package Gross Weight (gms)', bold)
+        sheet.write(0, 70, 'Package Length (cm)', bold)
+        sheet.write(0, 71, 'Package Breadth (cm)', bold)
+        sheet.write(0, 72, 'Package Height (cm)', bold)
         # sheet.write(0, 30, '(Onhand + incoming) - outgoing', bold)
         # sheet.write(0, 31, '(Onhand + incoming) - outgoing(With_Qtn)', bold)
         sheet.freeze_panes(1, 0)
@@ -778,6 +1024,7 @@ class LocationReport(models.AbstractModel):
 
             product_data[product_id] = {
                 'Brand': product.brand_id_rel.name or '',
+                'Creation Date': product.product_tmpl_id.create_date.strftime('%d/%m/%Y') if product.product_tmpl_id.create_date else '',
                 'Category 1': product.categ_id.parent_id.parent_id.name or '',
                 'Category 2': product.categ_id.parent_id.name or '',
                 'Category 3': product.categ_id.name or '',
@@ -809,6 +1056,7 @@ class LocationReport(models.AbstractModel):
                 'IHO Stock': '',
                 'Bhiwandi Stock': '',
                 'Delhi Stock': '',
+                'Available Qty': 0,
                 'BHU Stock': '',
                 'DHASA Stock': '',
                 'ELM Stock': '',
@@ -846,6 +1094,7 @@ class LocationReport(models.AbstractModel):
                 'Bullet Point 3': product.bullet_point_3 or '',
                 'Bullet Point 4': product.bullet_point_4 or '',
                 'Bullet Point 5': product.bullet_point_5 or '',
+                'Keyword': '',
                 'Description': product.description or '',
                 'Google Drive Link': product.google_drive_link or '',
                 'Drop Box Link': product.drop_box_link or '',
@@ -862,6 +1111,7 @@ class LocationReport(models.AbstractModel):
                     product_data[product_id]['Bhiwandi Stock'] = quant.quantity
                 elif quant.location_id.location_id.name == 'DEL':
                     product_data[product_id]['Delhi Stock'] = quant.quantity
+                    product_data[product_id]['Available Qty'] = quant.quantity - quant.reserved_quantity
                 elif quant.location_id.location_id.name == 'BHU':
                     product_data[product_id]['BHU Stock'] = quant.quantity
                 elif quant.location_id.location_id.name == 'DHASA':
@@ -893,29 +1143,34 @@ class LocationReport(models.AbstractModel):
 
             # Find quotations related to the product
 
-            quotation_orders = self.env['sale.order'].search(
-                [('order_line.product_id', '=', product_id), ('state', '=', 'draft'), ('state', '!=', 'cancel')])
-            qty_to_deliver_qtn = sum(
-                order_line.product_uom_qty - order_line.qty_delivered for order in quotation_orders for order_line in
-                order.order_line
-                if order_line.product_id.id == product_id)
+            # Find quotations related to the product
+            self.env.cr.execute("""
+                select sum(line.product_uom_qty - line.qty_delivered) 
+                from sale_order_line as line
+                join sale_order so on line.order_id = so.id
+                where line.state = 'draft' and line.product_id = %s
+                and so.is_short_close is not true
+            """, (product_id,))
+            qty_to_deliver_qtn_data = self.env.cr.dictfetchall()
+            qty_to_deliver_qtn = qty_to_deliver_qtn_data[0].get('sum') if qty_to_deliver_qtn_data[0].get('sum') is not None else 0
             # Update 'Quotation Qty'
             product_data[product_id]['Quotation Qty'] = qty_to_deliver_qtn
 
             # Find sales orders related to the product
-            sale_orders = self.env['sale.order'].search(
-                [('order_line.product_id', '=', product_id), ('state', 'not in', ['draft', 'cancel', 'sent'])])
-            # Calculate 'Qty to Deliver' based on confirmed sales order quantities
-            qty_to_deliver = sum(
-                order_line.product_uom_qty - order_line.qty_delivered for order in sale_orders for order_line in
-                order.order_line
-                if order_line.product_id.id == product_id)
+            self.env.cr.execute("""
+                select sum(line.product_uom_qty - line.qty_delivered) 
+                from sale_order_line as line
+                join sale_order so on line.order_id = so.id
+                where line.state not in ('draft', 'cancel', 'sent') and line.product_id = %s 
+                and so.is_short_close is not true
+            """, (product_id,))
+            qty_to_deliver_data = self.env.cr.dictfetchall()
+            qty_to_deliver = qty_to_deliver_data[0].get('sum') if qty_to_deliver_data[0].get('sum') is not None else 0
             # Update 'Reserved Qty'
             product_data[product_id]['Confirmed SO qty'] = qty_to_deliver
 
             # Update 'FREE TO USE'
             free_to_use = 0
-            # product_data[product_id]['FREE TO USE'] = product.qty_available - qty_to_deliver
             if product.qty_available < qty_to_deliver:
                 product_data[product_id]['FREE TO USE'] = 0
             else:
@@ -923,15 +1178,14 @@ class LocationReport(models.AbstractModel):
                 free_to_use = product.qty_available - qty_to_deliver
 
             # Fetch purchase orders related to the product
-            purchase_orders = self.env['purchase.order'].search([('order_line.product_id', '=', product_id), (
-                'state', 'not in', ['draft', 'to approve', 'cancel', 'sent'])])
-
-            # Calculate 'Ordered - Received' based on unprocessed purchase order quantities
-            order_pending_qty = sum(
-                order_line.product_qty - order_line.qty_received for order in purchase_orders for order_line in
-                order.order_line
-                if order_line.product_id.id == product_id)
-
+            self.env.cr.execute("""
+                select sum(line.product_qty - line.qty_received) 
+                from purchase_order_line as line
+                join purchase_order po on line.order_id = po.id
+                where po.state not in ('draft', 'to approve', 'cancel', 'sent') and line.product_id = %s
+            """, (product_id,))
+            order_pending_data = self.env.cr.dictfetchall()
+            order_pending_qty = order_pending_data[0].get('sum') if order_pending_data[0].get('sum') is not None else 0
             # Update 'Ordered - Received'
             product_data[product_id]['PO Receipt Pending'] = order_pending_qty
 
@@ -943,13 +1197,16 @@ class LocationReport(models.AbstractModel):
                 if product_data[product_id]['To Replenish'] < 0:
                     product_data[product_id]['To Replenish'] = 0
 
-            quotation_orders = self.env['sale.order'].search(
-                [('order_line.product_id', '=', product_id), ('state', '=', 'draft'), ('state', '!=', 'cancel')])
-
             # Calculate outgoing quantity based on sale orders and quotation orders
-            quotation_outgoing_qty = sum(
-                order_line.product_uom_qty for order in quotation_orders for order_line in order.order_line
-                if order_line.product_id.id == product_id)
+            self.env.cr.execute("""
+                select sum(line.product_uom_qty) 
+                from sale_order_line as line
+                join sale_order so on line.order_id = so.id
+                where line.state = 'draft' and line.product_id = %s
+                and so.is_short_close is not true
+            """, (product_id,))
+            quotation_outgoing_data = self.env.cr.dictfetchall()
+            quotation_outgoing_qty = quotation_outgoing_data[0].get('sum') if quotation_outgoing_data[0].get('sum') is not None else 0
 
             # Total outgoing quantityy
             outgoing_qty = product.outgoing_qty + quotation_outgoing_qty
@@ -1038,6 +1295,80 @@ class LocationReport(models.AbstractModel):
             sheet.write(row, col + 68, data['Package Length (cm)'])
             sheet.write(row, col + 69, data['Package Breadth (cm)'])
             sheet.write(row, col + 70, data['Package Height (cm)'])
+            sheet.write(row, col + 1, data['Creation Date'])
+            sheet.write(row, col + 2, data['Category 1'])
+            sheet.write(row, col + 3, data['Category 2'])
+            sheet.write(row, col + 4, data['Category 3'])
+            sheet.write(row, col + 5, data['Function Sport'])
+            sheet.write(row, col + 6, data['Gender'])
+            sheet.write(row, col + 7, data['Age group'])
+            sheet.write(row, col + 8, data['Title'])
+            sheet.write(row, col + 9, data['Marketplace Tittle'])
+            sheet.write(row, col + 10, data['Composition / Material'])
+            sheet.write(row, col + 11, data['Technology / Features'])
+            sheet.write(row, col + 12, data['Event'])
+            sheet.write(row, col + 13, data['HSN Code'])
+            sheet.write(row, col + 14, data['Style Code'])
+            sheet.write(row, col + 15, data['Article Code'])
+            sheet.write(row, col + 16, data['SKU Code'])
+            sheet.write(row, col + 17, data['EAN Code'])
+            sheet.write(row, col + 18, data['ASIN'])
+            sheet.write(row, col + 19, data['FSIN'])
+            sheet.write(row, col + 20, data['Myntra'])
+            sheet.write(row, col + 21, data['AJIO'])
+            sheet.write(row, col + 22, data['Fancode'])
+            sheet.write(row, col + 23, data['Swiggy'])
+            sheet.write(row, col + 24, data['Bigbasket'])
+            sheet.write(row, col + 25, data['Blinkit'])
+            sheet.write(row, col + 26, data['Zepto'])
+            sheet.write(row, col + 27, data['Colour'])
+            sheet.write(row, col + 28, data['Size'])
+            sheet.write(row, col + 29, data['MRP'])
+            sheet.write(row, col + 30, data['COST Price'])
+            sheet.write(row, col + 31, data['GST'])
+            sheet.write(row, col + 32, data['IHO Stock'])
+            sheet.write(row, col + 33, data['Bhiwandi Stock'])
+            sheet.write(row, col + 34, data['Delhi Stock'])
+            sheet.write(row, col + 35, data['Available Qty'])
+            sheet.write(row, col + 36, data['BHU Stock'])
+            sheet.write(row, col + 37, data['DHASA Stock'])
+            sheet.write(row, col + 38, data['ELM Stock'])
+            sheet.write(row, col + 39, data['JSP Stock'])
+            sheet.write(row, col + 40, data['JWD Stock'])
+            sheet.write(row, col + 41, data['RCP Stock'])
+            sheet.write(row, col + 42, data['UPW Stock'])
+            sheet.write(row, col + 43, data['BWMIS Stock'])
+            sheet.write(row, col + 44, data['Customer Location'])
+            sheet.write(row, col + 45, data['Vendor Location'])
+            sheet.write(row, col + 46, data['Virtual Locations/Inventory adjustment'])
+            sheet.write(row, col + 47, data['Virtual Locations/Scrap'])
+            sheet.write(row, col + 48, data['Virtual Locations/Production'])
+            sheet.write(row, col + 49, data['Total'])
+            sheet.write(row, col + 50, data['Quotation Qty'])
+            sheet.write(row, col + 51, data['Confirmed SO qty'])
+            sheet.write(row, col + 52, data['FREE TO USE'])
+            sheet.write(row, col + 53, data['PO Receipt Pending'])
+            sheet.write(row, col + 54, data['To Replenish'])
+
+            sheet.write(row, col + 55, data['Bullet Point 1'])
+            sheet.write(row, col + 56, data['Bullet Point 2'])
+            sheet.write(row, col + 57, data['Bullet Point 3'])
+            sheet.write(row, col + 58, data['Bullet Point 4'])
+            sheet.write(row, col + 59, data['Bullet Point 5'])
+            sheet.write(row, col + 60, data['Keyword'])
+            sheet.write(row, col + 61, data['Description'])
+            sheet.write(row, col + 62, data['Google Drive Link'])
+            sheet.write(row, col + 63, data['Drop Box Link'])
+            sheet.write(row, col + 64, data['Country of Origin'])
+
+            sheet.write(row, col + 65, data['Product Net Weight (gms)'])
+            sheet.write(row, col + 66, data['Product Length (cm)'])
+            sheet.write(row, col + 67, data['Product Breadth (cm)'])
+            sheet.write(row, col + 68, data['Product Height (cm)'])
+            sheet.write(row, col + 69, data['Package Gross Weight (gms)'])
+            sheet.write(row, col + 70, data['Package Length (cm)'])
+            sheet.write(row, col + 71, data['Package Breadth (cm)'])
+            sheet.write(row, col + 72, data['Package Height (cm)'])
             # sheet.write(row, col +30, data['(Onhand + incoming) - outgoing'])
             # sheet.write(row, col + 31, data['(Onhand + incoming) - outgoing(With_Qtn)'])
 
