@@ -39,8 +39,10 @@ class AccountEdiFormat(models.Model):
             default_endpoint = DEFAULT_IAP_TEST_ENDPOINT
         endpoint = self.env["ir.config_parameter"].sudo().get_param("l10n_in_edi.endpoint", default_endpoint)
         url = "%s%s" % (endpoint, url_path)
+        _logger.info("EDI Request URL: %s, Params: %s", url, params)
         try:
             response = jsonrpc(url, params=params, timeout=25)
+            _logger.info("EDI Response: %s", response)
             if response and not response.get("error"):
                 if not service.token_validity:
                     service.token_validity = fields.Datetime.to_datetime(
