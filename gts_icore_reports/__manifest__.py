@@ -13,6 +13,7 @@
     'demo': [],
     'data': [
             'security/ir.model.access.csv',
+            'report/ewaybill_invoice_report.xml',
             'report/report_actions.xml',
             'wizard/stock_location_wise_view.xml',
             'wizard/grs_details_view.xml',

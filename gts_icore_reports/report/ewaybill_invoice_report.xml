@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="paperformat_ewaybill" model="report.paperformat">
+        <field name="name">E-Way Bill Invoice</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">20</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">15</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="ewaybill_invoice_report_action" model="ir.actions.report">
+        <field name="name">E-Way Bill Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">gts_icore_reports.ewaybill_invoice_forms</field>
+        <field name="report_file">gts_icore_reports.ewaybill_invoice_forms</field>
+        <field name="print_report_name">'EWayBill_%s' % (object.name or '').replace('/','_')</field>
+        <field name="paperformat_id" ref="gts_icore_reports.paperformat_ewaybill"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+    </record>
+
+    <!-- Main entry template -->
+    <template id="ewaybill_invoice_forms">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="gts_icore_reports.ewaybill_invoice_body" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Report body template -->
+    <template id="ewaybill_invoice_body">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="gts_icore_reports.report_invoice_layout_ewaybill">
+                <style>
+                    table { font-size: 12px; border-collapse: collapse; }
+                    th, td { border: 1px solid black; padding: 4px 6px; }
+                    .header-row { background-color: #87CEEB; }
+                    .text-center { text-align: center; }
+                    .text-right { text-align: right; }
+                </style>
+                <div class="page">
+
+                    <!-- Title -->
+                    <table style="width:100%; margin-bottom: 8px;">
+                        <tr>
+                            <th class="text-center" colspan="2"
+                                style="font-size:15px; padding: 6px; border: 1px solid black;">
+                                <strong>E-Way Bill Invoice</strong>
+                            </th>
+                        </tr>
+                    </table>
+
+                    <!-- Invoice Name / Header Info -->
+                    <table style="width:100%; margin-bottom: 8px;">
+                        <tr>
+                            <td style="width:50%; border: 1px solid black; padding: 4px 6px;">
+                                <strong>Invoice No. : </strong>
+                                <span t-esc="o.name"/>
+                            </td>
+                            <td style="width:50%; border: 1px solid black; padding: 4px 6px;">
+                                <strong>Invoice Date : </strong>
+                                <span t-esc="o.invoice_date" t-options="{'widget': 'date'}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid black; padding: 4px 6px;">
+                                <strong>Customer : </strong>
+                                <span t-esc="o.partner_id.name"/>
+                            </td>
+                            <td style="border: 1px solid black; padding: 4px 6px;">
+                                <strong>GSTIN : </strong>
+                                <span t-esc="o.partner_id.vat"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Invoice Lines Table: 5 columns only -->
+                    <table class="table table-sm o_main_table" style="width:100%;">
+                        <thead>
+                            <tr class="header-row">
+                                <th class="text-center" style="width:3%;">
+                                    <strong>Sr.</strong>
+                                </th>
+                                <th class="text-center" style="width:38%;">
+                                    <strong>Description</strong>
+                                </th>
+                                <th class="text-center" style="width:13%;">
+                                    <strong>HSN</strong>
+                                </th>
+                                <th class="text-center" style="width:8%;">
+                                    <strong>Qty</strong>
+                                </th>
+                                <th class="text-center" style="width:15%;">
+                                    <strong>Price / Unit</strong>
+                                </th>
+                                <th class="text-center" style="width:18%;">
+                                    <strong>Total Price Excl. Tax</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="sr_no" t-value="1"/>
+                            <t t-foreach="o.invoice_line_ids.filtered(lambda l: l.display_type == 'product')" t-as="line">
+                                <tr style="text-align:center;">
+                                    <td>
+                                        <t t-esc="sr_no"/>
+                                        <t t-set="sr_no" t-value="sr_no + 1"/>
+                                    </td>
+                                    <td style="text-align:left;">
+                                        <t t-esc="line.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.product_id.l10n_in_hsn_code or ''"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.quantity"/>
+                                        <t t-if="line.product_uom_id">
+                                            &#160;<t t-esc="line.product_uom_id.name"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="'%.2f' % line.price_unit"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="'%.2f' % line.price_subtotal"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <!-- Total Row -->
+                            <tr style="font-weight:bold; background-color:#f0f0f0;">
+                                <td colspan="3" class="text-center">
+                                    <strong>Total</strong>
+                                </td>
+                                <td class="text-center">
+                                    <t t-esc="sum(l.quantity for l in o.invoice_line_ids.filtered(lambda l: l.display_type == 'product'))"/>
+                                </td>
+                                <td/>
+                                <td class="text-right">
+                                    <t t-esc="'%.2f' % sum(l.price_subtotal for l in o.invoice_line_ids.filtered(lambda l: l.display_type == 'product'))"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Tax Summary -->
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Layout wrapper (header with logo + article div) -->
+    <template id="external_layout_ewaybill">
+        <div t-attf-class="header o_company_#{company.id}_layout">
+            <img t-if="o.company_id.logo"
+                 t-att-src="image_data_uri(o.company_id.logo)"
+                 style="height:55px; width:200px; margin-top:10px;"
+                 alt="Logo"/>
+        </div>
+
+        <div t-attf-class="article o_report_layout_striped o_company_#{company.id}_layout"
+             t-att-data-oe-model="o and o._name"
+             t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-if="o.state == 'cancel'">
+                <div class="backgroundimage"
+                     style="position:absolute;opacity:0.50;z-index:1000;transform:rotate(300deg);-webkit-transform:rotate(300deg);width:135%;">
+                    <p style="font-size:100px;color:red;">CANCELLED</p>
+                </div>
+            </t>
+            <t t-raw="0"/>
+        </div>
+
+        <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
+            <div class="text-center">
+                <div t-field="company.website"/>
+                <div t-if="report_type == 'pdf'">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Layout wrapper resolver -->
+    <template id="report_invoice_layout_ewaybill">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+        <t t-if="not company">
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+        <t t-call="gts_icore_reports.external_layout_ewaybill">
+            <t t-raw="0"/>
+        </t>
+    </template>
+
+</odoo>
