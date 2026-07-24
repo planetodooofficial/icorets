@@ -103,6 +103,12 @@ class DownloadReport(Controller):
             gst_data = {}
             # tot_qty = []
 
+            def convert_curr(amount, move):
+                if move.currency_id and move.company_id.currency_id and move.currency_id != move.company_id.currency_id:
+                    date = move.invoice_date or move.date
+                    return move.currency_id._convert(amount, move.company_id.currency_id, move.company_id, date)
+                return amount
+
             for invoice_line in invoices.invoice_line_ids.filtered(
                     lambda line: not line.display_type in ['line_section', 'line_note']):
                 taxes = invoice_line.move_id.tax_totals
@@ -162,11 +168,11 @@ class DownloadReport(Controller):
                         'Discount': invoice_line.discount,
                         'Price Subtotal': invoice_line.price_subtotal,
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
-                        'Bill Net Amt': invoice_line.price_unit * invoice_line.quantity,
+                        'Bill Net Amt': convert_curr(invoice_line.price_unit * invoice_line.quantity, invoice_line.move_id),
                         'Price Total': invoice_line.price_total,
-                        'Invoice Untaxed Amt': un_tax_amt,
-                        'Invoice Tax Amount': invoice_line.tax_amount_line,
-                        'Invoice Total Amt': total_amt,
+                        'Invoice Untaxed Amt': convert_curr(un_tax_amt, invoice_line.move_id),
+                        'Invoice Tax Amount': convert_curr(invoice_line.tax_amount_line, invoice_line.move_id),
+                        'Invoice Total Amt': convert_curr(total_amt, invoice_line.move_id),
                         'Payment Ref': invoice_line.move_id.payment_reference if invoice_line.move_id.payment_reference else ' ',
 
                         'Customer Appointment Date': invoice_line.move_id.customer_appointment_date or False,
@@ -373,6 +379,13 @@ class DownloadReport(Controller):
         def get_detail_bills_data(invoices, sheet_name):
             data_rows = list()
             gst_data = {}
+
+            def convert_curr(amount, move):
+                if move.currency_id and move.company_id.currency_id and move.currency_id != move.company_id.currency_id:
+                    date = move.invoice_date or move.date
+                    return move.currency_id._convert(amount, move.company_id.currency_id, move.company_id, date)
+                return amount
+
             for invoice_line in invoices.invoice_line_ids.filtered(
                     lambda line: not line.display_type in ['line_section', 'line_note']):
                 taxes = invoice_line.move_id.tax_totals
@@ -421,10 +434,10 @@ class DownloadReport(Controller):
                         'Discount': invoice_line.discount, 'Price Subtotal': invoice_line.price_subtotal,
                         # 'Price Total': invoice_line.price_total, commented on purpose
                         'Taxes': ','.join(map(lambda x: (x.description or x.name), invoice_line.tax_ids)),
-                        'Bill Net Amt': invoice_line.price_unit * invoice_line.quantity,
-                        'Bill Untaxed Amt': un_tax_amt,
+                        'Bill Net Amt': convert_curr(invoice_line.price_unit * invoice_line.quantity, invoice_line.move_id),
+                        'Bill Untaxed Amt': convert_curr(un_tax_amt, invoice_line.move_id),
 
-                        'Bill Tax Amount': invoice_line.tax_amount_line, 'Bill Total Amt': final_total}
+                        'Bill Tax Amount': convert_curr(invoice_line.tax_amount_line, invoice_line.move_id), 'Bill Total Amt': convert_curr(final_total, invoice_line.move_id)}
 
                 if invoice_line.analytic_distribution:
                     analytic_account = request.env['account.analytic.account'].sudo().search(
