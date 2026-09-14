@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="inherited_res_partner" model="ir.ui.view">
+        <field name="name">inherited.res.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="string">GST No</attribute>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Vendor Registration" name="vendor_registration">
+                    <group>
+                        <group string="Registration Details">
+                            <field name="is_approved"/>
+                            <field name="entity_type"/>
+                            <field name="pan_no"/>
+                            <field name="cin"/>
+                            <field name="iec_number"/>
+                            <field name="is_msme"/>
+                        </group>
+                        <group string="Documents">
+                            <field name="pan_card" filename="pan_file_name"/>
+                            <field name="pan_file_name" invisible="1"/>
+                            <field name="gst_doc" filename="gst_doc_name"/>
+                            <field name="gst_doc_name" invisible="1"/>
+                            <field name="cancelled_cheque" filename="check_file_name"/>
+                            <field name="check_file_name" invisible="1"/>
+                            <field name="msme_doc" invisible="is_msme != 'yes'" filename="msme_doc_name"/>
+                            <field name="msme_doc_name" invisible="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

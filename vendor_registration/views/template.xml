@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template inherit_id="portal.address_form_fields" id="portal_address_form_fields_extend">
+        <xpath expr="//div[@id='div_vat']" position="after">
+            <t t-set="partner_rec" t-value="partner_sudo or partner or request.env.user.partner_id"/>
+
+            <div class="col-lg-6 mb-2">
+                <label for="pan_no" class="col-form-label label-optional">PAN NO</label>
+                <input type="text" name="pan_no" id="pan_no" class="form-control" t-att-value="partner_rec.pan_no"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label for="entity_type" class="col-form-label label-optional">Type of Entity</label>
+                <select id="entity_type_selection" class="form-select" name="entity_type">
+                    <option value="" t-att-selected="not partner_rec.entity_type">Select...</option>
+                    <option value="Sole Proprietorships" t-att-selected="partner_rec.entity_type == 'Sole Proprietorships'">Sole Proprietorships</option>
+                    <option value="Partnership" t-att-selected="partner_rec.entity_type == 'Partnership'">Partnership</option>
+                    <option value="LLP" t-att-selected="partner_rec.entity_type == 'LLP'">LLP</option>
+                    <option value="PVT LTD" t-att-selected="partner_rec.entity_type == 'PVT LTD'">PVT LTD</option>
+                    <option value="Public LTD" t-att-selected="partner_rec.entity_type == 'Public LTD'">Public LTD</option>
+                </select>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label for="l10n_in_gst_treatment" class="col-form-label label-optional">GST Treatment</label>
+                <select id="gst_type_selection" class="form-select" name="l10n_in_gst_treatment">
+                    <option value="" t-att-selected="not partner_rec.l10n_in_gst_treatment">Select...</option>
+                    <option value="regular" t-att-selected="partner_rec.l10n_in_gst_treatment == 'regular'">Registered Business - Regular</option>
+                    <option value="composition" t-att-selected="partner_rec.l10n_in_gst_treatment == 'composition'">Registered Business - Composition</option>
+                    <option value="unregistered" t-att-selected="partner_rec.l10n_in_gst_treatment == 'unregistered'">Unregistered Business</option>
+                    <option value="consumer" t-att-selected="partner_rec.l10n_in_gst_treatment == 'consumer'">Consumer</option>
+                    <option value="overseas" t-att-selected="partner_rec.l10n_in_gst_treatment == 'overseas'">Overseas</option>
+                    <option value="special_economic_zone" t-att-selected="partner_rec.l10n_in_gst_treatment == 'special_economic_zone'">Special Economic Zone</option>
+                    <option value="deemed_export" t-att-selected="partner_rec.l10n_in_gst_treatment == 'deemed_export'">Deemed Export</option>
+                    <option value="uin_holders" t-att-selected="partner_rec.l10n_in_gst_treatment == 'uin_holders'">UIN Holders</option>
+                </select>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label for="is_msme" class="col-form-label label-optional">MSME Registered</label>
+                <select id="is_msme_selection" class="form-select" name="is_msme">
+                    <option value="no" t-att-selected="partner_rec.is_msme != 'yes'">No</option>
+                    <option value="yes" t-att-selected="partner_rec.is_msme == 'yes'">Yes</option>
+                </select>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="msme_doc">
+                    MSME Certificate
+                    <t t-if="partner_rec.msme_doc">
+                        <a t-att-href="partner_rec.download_msme" target="_blank" class="ms-2 text-decoration-none" title="Download MSME Certificate">
+                            <i class="fa fa-download"/>
+                        </a>
+                    </t>
+                </label>
+                <input class="form-control" type="file" id="msme_doc" name="msme_doc"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="pan_card">
+                    PAN Card
+                    <t t-if="partner_rec.pan_card">
+                        <a t-att-href="partner_rec.download_pan" target="_blank" class="ms-2 text-decoration-none" title="Download PAN Card">
+                            <i class="fa fa-download"/>
+                        </a>
+                    </t>
+                </label>
+                <input class="form-control" type="file" id="pan_card" name="pan_card"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="cancelled_cheque">
+                    Cancelled Cheque
+                    <t t-if="partner_rec.cancelled_cheque">
+                        <a t-att-href="partner_rec.download_cheque" target="_blank" class="ms-2 text-decoration-none" title="Download Cancelled Cheque">
+                            <i class="fa fa-download"/>
+                        </a>
+                    </t>
+                </label>
+                <input class="form-control" type="file" id="cancelled_cheque" name="cancelled_cheque"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="gst_doc">
+                    GST Document
+                    <t t-if="partner_rec.gst_doc">
+                        <a t-att-href="partner_rec.download_gst" target="_blank" class="ms-2 text-decoration-none" title="Download GST Document">
+                            <i class="fa fa-download"/>
+                        </a>
+                    </t>
+                </label>
+                <input class="form-control" type="file" id="gst_doc" name="gst_doc"/>
+            </div>
+
+            <!-- Bank Details Section -->
+            <t t-set="bank_account" t-value="partner_rec.bank_ids and partner_rec.bank_ids[0] or False"/>
+            <div class="col-12 mt-3 mb-1">
+                <h5 class="fw-bold">Bank Details</h5>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="bank_id">Bank Name</label>
+                <input type="text" id="bank_id" name="bank_id" class="form-control"
+                       t-att-value="bank_account.bank_id.name if bank_account and bank_account.bank_id else ''"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="acc_number">USD Account Number</label>
+                <input type="text" id="acc_number" name="acc_number" class="form-control"
+                       t-att-value="bank_account.acc_number if bank_account else ''"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="usd_account_name">USD Account Name</label>
+                <input type="text" id="usd_account_name" name="usd_account_name" class="form-control"
+                       t-att-value="bank_account.bank_id.usd_account_name if bank_account and bank_account.bank_id else ''"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="ifsc_number">IFSC Number</label>
+                <input type="text" id="ifsc_number" name="ifsc_number" class="form-control"
+                       t-att-value="bank_account.bank_id.bic if bank_account and bank_account.bank_id else ''"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="swift_code">Swift Code</label>
+                <input type="text" id="swift_code" name="swift_code" class="form-control"
+                       t-att-value="bank_account.bank_id.swift_code if bank_account and bank_account.bank_id else ''"/>
+            </div>
+
+            <div class="col-lg-6 mb-2">
+                <label class="col-form-label label-optional" for="currency_id">Currency</label>
+                <input type="text" id="currency_id" name="currency_id" class="form-control"
+                       t-att-value="bank_account.bank_id.currency_id.name if bank_account and bank_account.bank_id and bank_account.bank_id.currency_id else ''"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template inherit_id="portal.portal_my_details" id="portal_my_details_extend">
+        <xpath expr="//form" position="attributes">
+            <attribute name="enctype">multipart/form-data</attribute>
+        </xpath>
+    </template>
+</odoo>

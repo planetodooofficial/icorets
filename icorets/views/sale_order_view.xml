@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Inheriting Sale Order Form -->
+    <record id="inherit_sale_order_form" model="ir.ui.view">
+        <field name="name">inherit.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='partner_details']/field[@name='partner_shipping_id']"
+                   position="replace"/>
+            <xpath expr="//notebook//page[@name='other_information']/group/group[1]/field[@name='user_id']"
+                   position="after">
+                <field name="reason_id"/>
+                <field name="desc"/>
+                <field name="is_short_close" invisible="1"/>
+                <field name="closer_date"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="employee_id" string="Employee" options="{'no_create': True,'no_edit': True}"/>
+            </xpath>
+
+            <xpath expr="//field[@name='validity_date']" position="before">
+                <field name="l10n_in_gst_treatment"/>
+                <field name="partner_shipping_id"
+                       widget="res_partner_many2one"
+                       context="{'default_type': 'delivery', 'show_address': 1, 'show_vat': False, 'default_parent_id': partner_id}"
+                       options="{'no_quick_create': True, 'always_reload': True}"
+                       readonly="state in ['cancel', 'sale']"/>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
+                <attribute name="widget">res_partner_many2one</attribute>
+                <attribute name="context">{'default_type': 'invoice', 'show_address': 1, 'show_vat': False, 'default_parent_id': partner_id}</attribute>
+                <attribute name="options">{'no_quick_create': True, 'always_reload': True}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_invoice_id']" position="after">
+                <field name="warehouse_id" readonly="0"
+                       options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
+                <field name="location_id" domain="[('warehouse_id','=',warehouse_id)]"
+                       readonly="state != 'draft'"
+                       options="{'no_open': True, 'no_edit': True, 'no_create': True}"/>
+                <field name="gstin_id" domain="[('is_gstin', '=', 'True')]"
+                       options="{'no_open': True, 'no_edit': True, 'no_create': True}"
+                       readonly="state == 'sale'"/>
+                <field name="journal_id" options="{'no_create': True}" readonly="state == 'sale'"/>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_header']" position="after">
+                <hr style="2px solid #000;"/>
+            </xpath>
+
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="client_order_ref" string="PO No"/>
+                <field name="event"/>
+                <field name="is_fo" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_info']//field[@name='journal_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']//field[@name='product_uom_qty']" position="before">
+                <field name="stock_quantity" readonly="1" force_save="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']//field[@name='price_unit']" position="after">
+                <field name="hsn_c" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//field[@name='name']" position="before">
+                <field name="sale_price_product" optional="hide"/>
+                <field name="article_code" optional="hide"/>
+                <field name="size" optional="hide"/>
+                <field name="color" optional="hide"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_open_fo_wiz" string="Confirm" type="object" class="oe_highlight"
+                        invisible="not is_fo or state == 'done'"/>
+            </xpath>
+            <xpath expr="//button[@id='action_confirm']" position="attributes">
+                <attribute name="invisible">state != 'sent' or is_fo</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_cancel']" position="before">
+                <button name="short_close" type="object" string="Short Close" class="oe_highlight"
+                        invisible="is_short_close"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                <attribute name="invisible">state != 'draft' or is_fo</attribute>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_fo_so" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                        invisible="fo_so_count == 0">
+                    <field name="fo_so_count" widget="statinfo" string="SO"/>
+                </button>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Short close server action -->
+    <record model="ir.actions.server" id="action_short_close_sale_order">
+        <field name="name">Short Close Sale Order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                action = records.short_close_sale_order()
+        </field>
+    </record>
+
+</odoo>

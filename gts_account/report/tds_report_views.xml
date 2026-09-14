@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="wizard_button_report_xlsx" model="ir.actions.report">
+        <field name="name">TDS Report</field>
+        <field name="model">wizard.action.button</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">gts_account.account_move_line_report</field>
+        <field name="report_file">account_move_line_report</field>
+    </record>
+</odoo>

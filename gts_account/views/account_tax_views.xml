@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="account_tax_view_inherit" model="ir.ui.view">
+        <field name="name">account.tax.form.inherit</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tax_scope']" position="after">
+                <field name="section_name" required="is_tds"/>
+                <field name="exempt_limit"/>
+                <field name="deductee_type_id" options="{'no_create': True, 'no_edit': True}"/>
+                <field name="gstin_unit_id"/>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="after">
+                <field name="is_tds" invisible="type_tax_use != 'purchase'"/>
+                <field name="is_a_default"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

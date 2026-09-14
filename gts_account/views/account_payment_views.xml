@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_account_payment_form_inherit_gts" model="ir.ui.view">
+        <field name="name">account.payment.form.inherit.gts</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_reconcile_lines" type="object" class="oe_stat_button" string="Reconcile" invisible="state != 'posted'"/>
+                <button name="send_for_checking" string="Send For Checking" type="object" groups="gts_account.group_payments_maker" invisible="to_check or is_checked or state != 'draft'"/>
+                <button name="button_set_checked" string="Approve" type="object" groups="gts_account.group_payments_checker" invisible="not to_check or is_checked"/>
+            </xpath>
+
+            <xpath expr="//group[@name='group1']/field[@name='payment_type']" position="before">
+                <field name="is_internal_transfer" readonly="1"/>
+                <field name="destination_journal_id" invisible="not is_internal_transfer"/>
+            </xpath>
+
+            <xpath expr="//group[@name='group2']" position="inside">
+                <field name="is_advance"/>
+                <field name="to_check" invisible="1"/>
+                <field name="is_checked" readonly="1"/>
+                <field name="checker_id" groups="base.group_erp_manager" readonly="1"/>
+                <field name="pending_amt" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//group[last()]" position="after">
+                <notebook>
+                    <page string="Reconcile" invisible="state != 'posted'">
+                        <field name="partial_lines" context="{'default_partner_id': partner_id}" nolabel="1">
+                            <list editable="bottom" readonly="reconciled_id">
+                                <field name="state" readonly="reconciled_id" force_save="1" required="1"/>
+                                <field name="sale_order_id" readonly="state != 'advance' or parent.payment_type == 'outbound'" required="state == 'advance' and parent.payment_type == 'inbound'" options="{'no_create': True, 'no_edit': True, 'no_open': True}" />
+                                <field name="purchase_order_id" readonly="state != 'advance' or parent.payment_type == 'inbound'" required="state == 'advance' and parent.payment_type == 'outbound'" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                                <field name="payment_id" column_invisible="True"/>
+                                <field name="reconciled_id" column_invisible="True"/>
+                                <field name="partner_id" column_invisible="True"/>
+                                <field name="move_line" options="{'no_create': True, 'no_edit': True, 'no_open': True}" readonly="state != 'against_ref' or reconciled_id"/>
+                                <field name="description" readonly="reconciled_id"/>
+                                <field name="payment_residual_amt" readonly="1" force_save="1"/>
+                                <field name="move_id" column_invisible="True"/>
+                                <field name="move_amt" force_save="1"/>
+                                <field name="residual_amount" force_save="1"/>
+                                <field name="amount" readonly="reconciled_id" sum="Total Amount"/>
+                                <button name="button_undo_reconciliation" type="object" invisible="not reconciled_id" title="Revert reconciliation" icon="fa-undo"/>
+                            </list>
+                        </field>
+                    </page>
+
+                    <page string="Advances" invisible="not is_advance or not partner_id">
+                        <field name="advance_order_ids" context="{'default_partner_id': partner_id}">
+                            <list editable="bottom">
+                                <field name="payment_id" column_invisible="True"/>
+                                <field name="sale_id" domain="[('partner_id', '=', partner_id)]" column_invisible="parent.payment_type != 'inbound'" required="parent.payment_type == 'inbound'" options="{'no_create': True, 'no_edit': True}"/>
+                                <field name="purchase_id" domain="[('partner_id', '=', partner_id)]" column_invisible="parent.payment_type != 'outbound'" required="parent.payment_type == 'outbound'" options="{'no_create': True, 'no_edit': True}"/>
+                                <field name="partner_id" readonly="1"/>
+                                <field name="payment_terms"/>
+                                <field name="order_amount"/>
+                                <field name="advance_amount"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_contra_entry" model="ir.actions.act_window">
+        <field name="name">Contra Entries</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_payment_type': 'outbound', 'is_contra_entry': True, 'default_partner_type': 'supplier', 'search_default_transfers_filter': 1, 'default_move_journal_types': ('bank', 'cash')}</field>
+        <field name="domain">[('is_internal_transfer', '=', True)]</field>
+    </record>
+</odoo>

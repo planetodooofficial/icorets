@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="shop_import_logs_view_list" model="ir.ui.view">
+        <field name="name">shop.import.logs.view.list</field>
+        <field name="model">shop.import.logs</field>
+        <field name="arch" type="xml">
+            <list string="Shop Import Logs" create="0" edit="0"
+                  decoration-success="state == 'success'"
+                  decoration-warning="state == 'exception'"
+            >
+                <field name="name" readonly="1" optional="hide"/>
+                <field name="shop_id" readonly="1"/>
+                <field name="operation_performed" readonly="1"/>
+                <field name="start_date" readonly="1"/>
+                <field name="end_date" readonly="1"/>
+                <field name="count" readonly="1"/>
+                <field name="state" optional="hide"/>
+                <field name="message" readonly="1"/>
+                <field name="error_message" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="shop_import_logs_view_search" model="ir.ui.view">
+        <field name="name">shop.import.logs.view.search</field>
+        <field name="model">shop.import.logs</field>
+        <field name="arch" type="xml">
+            <search string="Search Import Logs">
+                <field name="shop_id"/>
+                <field name="operation_performed"/>
+                <field name="state"/>
+                <filter string="Success" name="state_success" domain="[('state', '=', 'success')]"/>
+                <filter string="Exception" name="state_exception" domain="[('state', '=', 'exception')]"/>
+                <group>
+                    <filter string="Shop" name="group_by_shop" context="{'group_by': 'shop_id'}"/>
+                    <filter string="State" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action  -->
+    <record id="action_shop_import_logs" model="ir.actions.act_window">
+        <field name="name">Shop Import Logs</field>
+        <field name="res_model">shop.import.logs</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new shop import logs.
+            </p>
+        </field>
+    </record>
+
+</odoo>

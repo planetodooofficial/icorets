@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Report Action -->
+    <record id="get_sale_order_xls" model="ir.actions.report">
+        <field name="name">Picking List</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">icorets.saleorder_report_xls</field>
+        <field name="report_file">Picking List</field>
+    </record>
+
+    <!-- Picking form inherited -->
+    <record model="ir.ui.view" id="stock_picking_inherited_view_transfers">
+        <field name="name">stock.picking.inherited.transfers</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button string="Download Sale Order" name="get_report_xlsx" type="object" class="btn-primary"
+                        invisible="state == 'done'"/>
+                <button string="Updating Picking List" name="update_picking_list_wizard" type="object"
+                        class="btn-primary" invisible="state == 'done'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

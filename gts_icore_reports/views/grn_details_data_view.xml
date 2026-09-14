@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_grn_details_data_invoice_tree" model="ir.ui.view">
+        <field name="name">grn.details.data.list</field>
+        <field name="model">grn.details.data</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="invoice_no"/>
+                <field name="payment_ref"/>
+                <field name="invoice_date"/>
+                <field name="salesperson"/>
+                <field name="customer"/>
+                <field name="city"/>
+                <field name="state"/>
+                <field name="pin"/>
+                <field name="gst_no"/>
+                <field name="analytic"/>
+                <field name="product"/>
+                <field name="mrp"/>
+                <field name="article_code"/>
+                <field name="so_number"/>
+                <field name="po_number"/>
+                <field name="sku"/>
+                <field name="ean"/>
+                <field name="brand"/>
+                <field name="uom"/>
+                <field name="size"/>
+                <field name="color"/>
+                <field name="invoice_class"/>
+                <field name="subclass"/>
+                <field name="quantity"/>
+                <field name="grn_quantity"/>
+                <field name="shortage"/>
+                <field name="transporter"/>
+                <field name="delivery_status"/>
+                <field name="delivery_date"/>
+                <field name="pod_status"/>
+                <field name="remark"/>
+                <field name="unit_price"/>
+                <field name="discount"/>
+                <field name="price_subtotal"/>
+                <field name="taxes"/>
+                <field name="bill_net_amt"/>
+                <field name="price_total"/>
+                <field name="invoice_untaxed_amt"/>
+                <field name="invoice_tax_amount"/>
+                <field name="invoice_total_amt"/>
+                <field name="total_sgst" optional="hide"/>
+                <field name="total_cgst" optional="hide"/>
+                <field name="sgst_sale_2_5_mh" optional="hide"/>
+                <field name="cgst_sale_2_5_mh" optional="hide"/>
+                <field name="total_igst" optional="hide"/>
+                <field name="igst_12_output_mh" optional="hide"/>
+                <field name="igst_5_output_mh" optional="hide"/>
+                <field name="sgst_sale_6_mh" optional="hide"/>
+                <field name="cgst_sale_6_mh" optional="hide"/>
+                <field name="sgst_sale_9_mh" optional="hide"/>
+                <field name="cgst_sale_9_mh" optional="hide"/>
+                <field name="igst_18_output_mh" optional="hide"/>
+                <field name="igst_5_output_dl" optional="hide"/>
+                <field name="sgst_sale_9" optional="hide"/>
+                <field name="cgst_sale_9" optional="hide"/>
+                <field name="igst_18" optional="hide"/>
+                <field name="igst_0_output_mh" optional="hide"/>
+
+                <field name="customer_appointment_date" optional="hide"/>
+                <field name="transporter_name" optional="hide"/>
+                <field name="lr_number" optional="hide"/>
+                <field name="logistic_number" optional="hide"/>
+                <field name="customer_delivery_number" optional="hide"/>
+
+                <field name="quick_commerce" optional="hide"/>
+                <field name="no_of_box" optional="hide"/>
+                <field name="po_expiry_date" optional="hide"/>
+                <field name="eta" optional="hide"/>
+                <field name="timing" optional="hide"/>
+                <field name="appointment" optional="hide"/>
+                <field name="cn_number" optional="hide"/>
+                <field name="dn_number" optional="hide"/>
+                <field name="old_po" optional="hide"/>
+                <field name="reason" optional="hide"/>
+                <field name="remarks" optional="hide"/>
+                <field name="asn_no" optional="hide"/>
+                <field name="vin_po_no" optional="hide"/>
+                <field name="vin_asn_no" optional="hide"/>
+                <field name="ship_from" optional="hide"/>
+                <field name="ship_to" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+
+    <record id="action_grn_details_data_invoice" model="ir.actions.act_window">
+        <field name="name">GRN Details Report</field>
+        <field name="res_model">grn.details.data</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

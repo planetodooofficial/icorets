@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Product Variant Easy Edit View -->
+    <record id="product_variant_form_view_inherit" model="ir.ui.view">
+        <field name="name">product.variant.only.form.view.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="after">
+                <field name="variants_asin"/>
+                <field name="variants_func_spo"/>
+                <field name="variants_gender"/>
+                <field name="variants_tech_feat"/>
+                <field name="variants_fsn"/>
+                <field name="variant_article_code"/>
+                <field name="brand_id_rel"/>
+            </xpath>
+
+            <xpath expr="//group[@name='pricing']" position="inside">
+                <field name="variant_packaging_cost"/>
+                <field name="variant_total_cost"/>
+                <field name="color"/>
+                <field name="size"/>
+                <field name="buin"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Variant Full Form View -->
+    <record id="view_icore_variant_form" model="ir.ui.view">
+        <field name="name">view.icore.variant</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='general_information']" position="after">
+                <page string="Product Information">
+                    <group string="Details">
+                        <group>
+                            <field name="brand_id_rel"/>
+                            <field name="variants_ean_code"/>
+                            <field name="variants_asin"/>
+                            <field name="variants_func_spo"/>
+                            <field name="variants_gender"/>
+                            <field name="variants_tech_feat"/>
+                            <field name="variants_fsn"/>
+                            <field name="variant_article_code"/>
+                            <field name="buin"/>
+                            <field name="age_group"/>
+                            <field name="myntra"/>
+                            <field name="ajio"/>
+                            <field name="fancode"/>
+                            <field name="blinkit"/>
+                            <field name="zepto"/>
+                            <field name="swiggy"/>
+                            <field name="bigbasket"/>
+
+                            <field name="bullet_point_1"/>
+                            <field name="bullet_point_2"/>
+                            <field name="bullet_point_3"/>
+                            <field name="bullet_point_4"/>
+                            <field name="bullet_point_5"/>
+                        </group>
+                        <group>
+                            <field name="variant_total_cost"/>
+                            <field name="variant_packaging_cost"/>
+                            <field name="color"/>
+                            <field name="size"/>
+                            <field name="product_net_weight"/>
+                            <field name="product_dimension1"/>
+                            <field name="product_dimension2"/>
+                            <field name="product_dimension3"/>
+                            <field name="package_dimension1"/>
+                            <field name="package_dimension2"/>
+                            <field name="package_dimension3"/>
+                            <field name="package_weight"/>
+
+                            <field name="market_place_tittle"/>
+                            <field name="description"/>
+                            <field name="google_drive_link"/>
+                            <field name="drop_box_link"/>
+                            <field name="country_origin"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Variant Tree View -->
+    <record id="view_icore_variant_tree" model="ir.ui.view">
+        <field name="name">view.icore.variant.tree</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="brand_id_rel" optional="hide"/>
+                <field name="variant_article_code"/>
+                <field name="variants_asin"/>
+                <field name="variants_fsn"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_po_einvoice_service,po.einvoice.service,model_po_einvoice_service,base.group_user,1,1,1,1
+access_po_einvoice_transact,po.einvoice.transact,model_po_einvoice_transact,base.group_user,1,1,1,1
+access_po_ewaybill_service,po.ewaybill.service,model_po_ewaybill_service,base.group_user,1,1,1,1
+access_l10n_in_ewaybill_transaction,l10n.in.ewaybill.transaction,model_l10n_in_ewaybill_transaction,base.group_user,1,1,1,1
+access_l10n_in_ewaybill_type,l10n.in.ewaybill.type,model_l10n_in_ewaybill_type,base.group_user,1,1,1,1
+access_config_einv_logins,config.einv.logins,model_config_einv_logins,base.group_user,1,1,1,1
