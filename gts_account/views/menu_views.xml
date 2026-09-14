@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========================================================= -->
+    <!-- Configuration Root & Re-parented Menus                    -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_accounting_config_root"
+              name="Configuration"
+              parent="account.menu_finance_entries"
+              sequence="2"/>
+
+    <menuitem id="account.menu_action_account_form"
+              name="Chart of Accounts"
+              action="account.action_account_form"
+              parent="gts_account.menu_accounting_config_root"
+              sequence="1"/>
+
+    <menuitem id="account.menu_action_payment_term_form"
+              name="Payment Terms"
+              action="account.action_payment_term_form"
+              parent="gts_account.menu_accounting_config_root"
+              sequence="2"/>
+
+    <menuitem id="account.menu_action_tax_form"
+              name="Taxes"
+              action="account.action_tax_form"
+              parent="gts_account.menu_accounting_config_root"
+              sequence="3"/>
+
+    <menuitem id="account.menu_action_currency_form"
+              name="Currencies"
+              action="base.action_currency_form"
+              parent="gts_account.menu_accounting_config_root"
+              sequence="4"/>
+
+    <!-- ========================================================= -->
+    <!-- Master Data Menus (HSN, TDS Sections, Deductee Types)     -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_action_change_deductee_type"
+              name="Deductee Types"
+              action="action_view_deductee_type"
+              parent="account.menu_finance_entries"
+              sequence="56"/>
+
+    <menuitem id="menu_section_tds"
+              name="TDS Sections"
+              action="section_tds_action"
+              parent="account.account_account_menu"
+              sequence="9"/>
+
+    <menuitem id="menu_action_hsn_code1"
+              name="HSN / SAC Code"
+              action="action_hsn_code"
+              parent="account.account_account_menu"
+              sequence="56"/>
+
+    <menuitem id="menu_action_hsn_code_config"
+              name="HSN / SAC Code"
+              action="action_hsn_code"
+              parent="gts_account.menu_accounting_config_root"
+              sequence="6"/>
+
+    <!-- ========================================================= -->
+    <!-- Accounting Transactions & Misc Receipts/Payments          -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_contra_entry"
+              name="Contra Entries"
+              action="action_contra_entry"
+              parent="account.account_transactions_menu"
+              sequence="2"/>
+
+    <menuitem id="menu_bank_receipts"
+              name="Receipts - Misc"
+              parent="account.menu_finance_receivables"
+              sequence="4"
+              action="action_bank_receipts"/>
+
+    <menuitem id="menu_pay_payments"
+              name="Payments - Misc"
+              parent="account.menu_finance_payables"
+              sequence="4"
+              action="action_pay_payments"/>
+
+    <!-- ========================================================= -->
+    <!-- Accounting Approvals (Maker / Checker)                    -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_to_check"
+              name="Accounting Approval"
+              sequence="4"
+              groups="gts_account.group_account_checker,gts_account.group_payments_checker"/>
+
+    <menuitem id="menu_entries_to_approve"
+              name="Entries To Approve"
+              sequence="1"
+              parent="menu_to_check"
+              action="action_entries_to_approve"
+              groups="gts_account.group_account_checker"/>
+
+    <menuitem id="menu_payments_to_approve"
+              name="Payments To Approve"
+              sequence="2"
+              parent="menu_to_check"
+              action="action_payments_to_approve"
+              groups="gts_account.group_payments_checker"/>
+
+    <!-- ========================================================= -->
+    <!-- Reports & Statements                                      -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_action_account_report_partner_ledger_details"
+              name="Partner Ledger Details"
+              parent="account.account_reports_partners_reports_menu"
+              sequence="1"
+              action="action_account_report_partner_ledger_details"
+              groups="account.group_account_readonly"/>
+
+    <menuitem id="menu_mail_wizard"
+              name="Mail Partner Ledger"
+              parent="account.menu_finance_reports"
+              action="action_mail_wizard"
+              sequence="50"
+              groups="base.group_user"/>
+
+    <menuitem id="menu_statement_partner_report_action"
+              name="Send Customer Statement Report"
+              action="statement_of_partner_report"
+              parent="account.menu_finance_reports"
+              sequence="52"/>
+
+</odoo>

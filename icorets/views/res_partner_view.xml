@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Cust Alias Name in Partner Form -->
+    <record model="ir.ui.view" id="inherit_view_partner_form">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_type']" position="after">
+                <group>
+                    <group>
+                        <field name="cust_alias_name"/>
+                    </group>
+                    <group></group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Deductee type adjustment -->
+    <record id="inherit_res_partner_deductee" model="ir.ui.view">
+        <field name="name">inherit.res.partner.deductee.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="gts_account.partner_form_inherited"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='deductee_type_id']" position="replace">
+                <field name="deductee_type_id" required="0" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

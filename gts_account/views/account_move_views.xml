@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Partial Reconcile List View -->
+    <record id="partial_reconcile_tree_view_wizard" model="ir.ui.view">
+        <field name="name">partial.reconcile.list.view</field>
+        <field name="model">partial.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="state" readonly="reconciled_id" required="1"/>
+                <field name="payment_id" column_invisible="True"/>
+                <field name="entry_id" column_invisible="True"/>
+                <field name="reconciled_id" column_invisible="True"/>
+                <field name="partner_id" column_invisible="True"/>
+                <field name="custom_payment_type" column_invisible="True"/>
+                <field name="move_line" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" readonly="reconciled_id or state != 'against_ref'"/>
+                <field name="sale_order_id" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" readonly="custom_payment_type != 'inbound' or state != 'advance'" required="state == 'advance' and custom_payment_type == 'inbound'"/>
+                <field name="purchase_order_id" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" readonly="custom_payment_type != 'outbound' or state != 'advance'" required="state == 'advance' and custom_payment_type == 'outbound'"/>
+                <field name="description" readonly="reconciled_id"/>
+                <field name="payment_line" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" column_invisible="True"/>
+                <field name="move_id" column_invisible="True"/>
+                <field name="payment_residual_amt"/>
+                <field name="move_amt" force_save="1"/>
+                <field name="residual_amount" force_save="1"/>
+                <field name="amount" readonly="reconciled_id" sum="Total Amount"/>
+                <button name="unlink" type="object" invisible="reconciled_id or not id" icon="fa-trash"/>
+                <button name="button_undo_reconciliation" type="object" invisible="not reconciled_id" title="Revert reconciliation" icon="fa-undo"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Account Move Form View Inherit -->
+    <record id="view_account_move_form_inherit_gts" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.gts</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Header buttons -->
+            <button name="button_cancel" position="before">
+                <button name="%(gts_account.action_upload_document_menu)d" string="POD Upload" class="oe_highlight"
+                        type="action" invisible="move_type not in ('out_invoice', 'out_refund', 'in_refund')"/>
+            </button>
+            <xpath expr="//header" position="inside">
+                <button name="action_reconcile_lines" type="object" class="oe_stat_button" string="Reconcile"
+                        invisible="state != 'posted' or context.get('display_field', True)"/>
+                <button name="send_for_checking" type="object" string="Send for Checking"
+                        invisible="to_check or is_checked or state != 'draft'" groups="gts_account.group_account_maker"/>
+                <button name="button_set_checked" type="object" string="Approve"
+                        invisible="not to_check or is_checked" groups="gts_account.group_account_checker"/>
+                <button name="reject" type="object" string="Reject"
+                        invisible="not to_check or is_checked" groups="gts_account.group_account_checker"/>
+            </xpath>
+
+            <!-- Top Fields -->
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="po_expiry_date" invisible="move_type not in ('out_invoice', 'in_invoice')"/>
+                <field name="old_po" invisible="move_type not in ('out_invoice', 'in_invoice')"/>
+            </xpath>
+            <xpath expr="//label[@for='journal_id']" position="before">
+                <field name="gstin_id" domain="[('is_gstin', '=', True)]" readonly="state == 'posted'" invisible="move_type == 'entry'"/>
+            </xpath>
+            <xpath expr="//div[@name='journal_div']" position="after">
+                <field name="custom_payment_type" invisible="1"/>
+                <field name="adv_pay_amt" invisible="context.get('display_field', True)"
+                       readonly="state in ('posted', 'cancel')"/>
+                <field name="payment_method_line_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"
+                       invisible="context.get('display_field', True)"
+                       readonly="state in ('posted', 'cancel')"/>
+                <field name="available_payment_method_line_ids" invisible="1"/>
+            </xpath>
+            <xpath expr="//group[@id='header_right_group']" position="inside">
+                <field name="is_checked" readonly="True"/>
+                <field name="to_check" readonly="True"/>
+                <field name="checker_id" groups="base.group_erp_manager" readonly="1"/>
+            </xpath>
+            <xpath expr="//form//group[1]/group[2]" position="inside">
+                <field name="credit_invoice_ids" widget="many2many_tags"
+                       invisible="move_type != 'out_refund'"
+                       domain="[('move_type', '=', 'out_invoice'), ('partner_id', '=', partner_id)]"/>
+            </xpath>
+
+            <!-- TDS Tax & Payment Reference -->
+            <xpath expr="//field[@name='payment_reference']" position="after">
+                <field name="deductee_type_id" invisible="1"/>
+                <field name="taxes_id" options="{'no_create': True, 'no_open': False, 'no_edit': True}"
+                       domain="[('is_tds', '=', True)]"
+                       invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt')"/>
+            </xpath>
+
+            <!-- HSN on Invoice Lines -->
+            <xpath expr="//field[@name='invoice_line_ids']//field[@name='price_unit']" position="after">
+                <field name="hsn_id" options="{'no_create': True, 'no_open': False, 'no_edit': True}"/>
+            </xpath>
+
+            <!-- Line IDs adjustments -->
+            <xpath expr="//field[@name='line_ids']//field[@name='account_id']" position="after">
+                <field name="is_os_line" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']//field[last()]" position="after">
+                <button name="action_reconcile_wiz" icon="fa-edit" title="Reconcile" type="object"
+                        invisible="parent.state != 'posted' or not is_account_reconcile or context.get('display_field', True)"/>
+            </xpath>
+
+            <!-- Button Box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="get_current_financial_year_moves" class="oe_stat_button" type="object" icon="fa-pencil-square-o">
+                    <field name="total_invoiced" widget="statinfo" string="Invoiced"/>
+                </button>
+            </xpath>
+
+            <!-- Logistics & Transport Page Tab -->
+            <xpath expr="//page[@id='other_tab']" position="after">
+                <page id="logistics_tab" string="Logistics &amp; Transport" name="logistics_info"
+                      invisible="move_type == 'entry'">
+                    <group>
+                        <group name="transport_left">
+                            <field name="transporter_name"/>
+                            <field name="lr_number"/>
+                            <field name="logistic_number" invisible="1"/>
+                            <field name="logistic_charge"/>
+                            <field name="tracking_website" widget="url"/>
+                            <field name="customer_delivery_number"/>
+                            <field name="quick_commerce"/>
+                            <field name="eta"/>
+                            <field name="timing"/>
+                            <field name="pod_document_name" invisible="1"/>
+                            <field name="pod_document_id" filename="pod_document_name" readonly="1"/>
+                        </group>
+                        <group name="transport_right">
+                            <field name="asn_no"/>
+                            <field name="vin_po_no"/>
+                            <field name="vin_asn_no"/>
+                            <field name="shortage"/>
+                            <field name="appointment"/>
+                            <field name="customer_appointment_date"/>
+                            <field name="cn_number"/>
+                            <field name="dn_number"/>
+                            <field name="reason"/>
+                            <field name="remarks"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <!-- Reconcile Page -->
+            <xpath expr="//notebook/page[last()]" position="after">
+                <page invisible="state != 'posted' or context.get('display_field', True)" string="Reconcile">
+                    <field name="partial_lines" nolabel="1" context="{'default_partner_id': partner_id, 'default_entry_id': id}">
+                        <list editable="bottom" create="0">
+                            <field name="payment_id" column_invisible="True"/>
+                            <field name="entry_id" column_invisible="True"/>
+                            <field name="reconciled_id" column_invisible="True"/>
+                            <field name="partner_id" column_invisible="True"/>
+                            <field name="move_line" readonly="1" force_save="1" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                            <field name="payment_line" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" readonly="1" force_save="1"/>
+                            <field name="move_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}" readonly="1" force_save="1"/>
+                            <field name="move_amt" force_save="1" readonly="1"/>
+                            <field name="residual_amount" force_save="1" readonly="1"/>
+                            <field name="amount" readonly="1" sum="Total Amount"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Invoice List view inherit for COGS -->
+    <record model="ir.ui.view" id="view_invoice_tree_inherit_cogs">
+        <field name="name">account.move.view.tree.inherit.cogs</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='status_in_payment']" position="after">
+                <field name="without_sale_cogs" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Customer Statement Server Action -->
+    <record id="statement_of_partner_report" model="ir.actions.server">
+        <field name="name">Customer Statement</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">list</field>
+        <field name="group_ids" eval="[(4, ref('base.group_erp_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = model.statement_partner_report()</field>
+    </record>
+
+    <!-- Misc Bank Receipts & Payments Actions -->
+    <record id="action_pay_payments" model="ir.actions.act_window">
+        <field name="name">Pay Payments</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_move_type': 'entry', 'default_custom_payment_type': 'outbound', 'display_field': False}</field>
+        <field name="domain">[('custom_payment_type', '=', 'outbound')]</field>
+    </record>
+
+    <record id="action_bank_receipts" model="ir.actions.act_window">
+        <field name="name">Bank Receipts</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'default_move_type': 'entry', 'default_custom_payment_type': 'inbound', 'display_field': False}</field>
+        <field name="domain">[('custom_payment_type', '=', 'inbound')]</field>
+    </record>
+
+    <!-- Approval Actions -->
+    <record id="action_entries_to_approve" model="ir.actions.act_window">
+        <field name="name">To Check</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('checker_id', '=', uid), ('to_check', '=', True)]</field>
+    </record>
+
+    <record id="action_payments_to_approve" model="ir.actions.act_window">
+        <field name="name">Payments To Approve</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,kanban,form,graph</field>
+        <field name="view_id" ref="account.view_account_payment_tree"/>
+        <field name="domain">[('checker_id', '=', uid), ('to_check', '=', True)]</field>
+    </record>
+
+</odoo>

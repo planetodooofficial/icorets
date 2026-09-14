@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Upload Packing list manual wizard -->
+    <record id="view_bag_entry_manual_wizard_form" model="ir.ui.view">
+        <field name="name">packing.list.manual.wizard.form</field>
+        <field name="model">packing.list.manual</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="alert_notification"/>
+                <group>
+                    <group>
+                        <field name="file_name" invisible="1"/>
+                        <field name="upload_file" options="{'accepted_file_extensions':'.xlsx'}" filename="file_name"/>
+                    </group>
+                    <group>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Confirm" type="object" class="btn btn-outline-success"/>
+                    <button string="Cancel" class="btn btn-outline-danger" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

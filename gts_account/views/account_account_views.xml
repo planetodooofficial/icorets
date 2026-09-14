@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_account_account_form_inherit" model="ir.ui.view">
+        <field name="name">account.account.form.inherit</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]/group[2]" position="inside">
+                <field name="is_tds"/>
+                <field name="is_vat"/>
+                <field name="gstin_unit_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_account_tree_inherit" model="ir.ui.view">
+        <field name="name">account.account.list.inherit</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="gstin_unit_id" optional="hide"/>
+                <field name="is_tds" optional="hide"/>
+                <field name="is_vat" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="purchase_invoice">
+        <t t-call="web.html_container">
+            <t t-call="gts_account.custom_purchase_invoice">
+                <div class="page">
+                    <style/>
+                    <t t-foreach="docs" t-as="doc">
+
+                        <table style="width:100%">
+                            <tr>
+                                <td style="width:50%;border: 1px solid" rowspan="2">
+                                    <p class="text-center">
+                                        <strong style="font-size:25px"><t t-out="doc.company_id.name"/></strong>
+                                        <br/>
+                                        <span class="text-center">
+                                            <t t-out="doc.company_id.street"/><br/>
+                                            <t t-out="doc.company_id.street2"/><br/>
+                                            <t t-out="doc.company_id.city"/> - <t t-out="doc.company_id.zip"/><br/>
+                                            Phone: <t t-out="doc.company_id.phone"/><br/>
+                                            Website: <t t-out="doc.company_id.website"/><br/>
+                                        </span>
+                                        <strong>GST No: <t t-out="doc.company_id.vat"/></strong>
+                                        <br/>
+                                    </p>
+                                    <table style="border-top: 1px solid; width:100%;">
+                                        <tr>
+                                            <td> &#160;To : </td>
+                                            <td>
+                                                <span>
+                                                    <t t-if="doc.partner_shipping_id.name">
+                                                        <b><span t-field="doc.partner_shipping_id.name"/></b>
+                                                    </t>
+                                                    <t t-else=""><b><span t-field="doc.partner_id.name"/></b></t> <br/>
+
+                                                    <t t-if="doc.partner_shipping_id.street">
+                                                        <span t-field="doc.partner_shipping_id.street"/>,
+                                                    </t>
+                                                    <t t-else=""><span t-field="doc.partner_id.street"/>,</t>
+
+                                                    <t t-if="doc.partner_shipping_id.street2">
+                                                        <span t-field="doc.partner_shipping_id.street2"/>
+                                                    </t>
+                                                    <t t-else=""><span t-field="doc.partner_id.street2"/></t><br/>
+
+                                                    <t t-if="doc.partner_shipping_id.city">
+                                                        <span t-field="doc.partner_shipping_id.city"/>,
+                                                    </t>
+                                                    <t t-else=""><span t-field="doc.partner_id.city"/>,</t>
+
+                                                    <t t-if="doc.partner_shipping_id.state_id.name">
+                                                        <span t-field="doc.partner_shipping_id.state_id.name"/>
+                                                    </t>
+                                                    <t t-else=""><span t-field="doc.partner_id.state_id.name"/></t><br/>
+
+                                                    <t t-if="doc.partner_shipping_id.country_id.name">
+                                                        <span t-field="doc.partner_shipping_id.country_id.name"/>,
+                                                    </t>
+                                                    <t t-else=""><span t-field="doc.partner_id.country_id.name"/>,</t>
+
+                                                    <t t-if="doc.partner_shipping_id.zip">
+                                                        <span t-field="doc.partner_shipping_id.zip"/>
+                                                    </t>
+                                                    <t t-else=""><span t-field="doc.partner_id.zip"/></t><br/>
+
+                                                    <t t-if="doc.partner_shipping_id.phone">
+                                                        Tel. : <span t-field="doc.partner_shipping_id.phone"/>
+                                                    </t>
+                                                    <t t-else="">Tel. : <span t-field="doc.partner_id.phone"/></t><br/>
+
+                                                    <t t-if="doc.partner_shipping_id.email">
+                                                        Email : <span t-field="doc.partner_shipping_id.email"/>
+                                                    </t>
+                                                    <t t-else="">Email : <span t-field="doc.partner_id.email"/></t><br/>
+
+                                                    <t t-if="doc.partner_shipping_id.vat">
+                                                        GSTIN / UIN : <span t-field="doc.partner_shipping_id.vat"/>
+                                                    </t>
+                                                    <t t-else="">GSTIN / UIN : <span t-field="doc.partner_id.vat"/></t><br/>
+
+                                                    <t t-if="doc.partner_shipping_id.state_id.name">
+                                                        State Name : <span t-field="doc.partner_shipping_id.state_id.name"/>
+                                                    </t>
+                                                    <t t-else="">State Name : <span t-field="doc.partner_id.state_id.name"/></t><br/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="border: 1px solid">
+                                    <table style="width:100%">
+                                        <tr>
+                                            <td>
+                                                <p class="text-center">
+                                                    <strong> PURCHASE INVOICE </strong>
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <table style="border-top: 1px solid; width:100%;">
+                                        <tr>
+                                            <td style="border-right: 1px solid;width:50%"> &#160;Voucher No. :
+                                                <br/>
+                                                <b>&#160;<span t-field="doc.name"/></b>
+                                            </td>
+                                            <td style="width:50%"> &#160;Dated :
+                                                <br/>
+                                                <b>&#160;<span t-field="doc.invoice_date"/></b>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table style="width:100%; border: 1px solid black; margin-top: 10px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid black; background-color: #f2f2f2;">
+                                    <th style="border-right: 1px solid black; padding: 4px;">#</th>
+                                    <th style="border-right: 1px solid black; padding: 4px;">Description</th>
+                                    <th style="border-right: 1px solid black; padding: 4px;">HSN/SAC</th>
+                                    <th style="border-right: 1px solid black; padding: 4px; text-align: right;">Qty</th>
+                                    <th style="border-right: 1px solid black; padding: 4px; text-align: right;">Rate</th>
+                                    <th style="border-right: 1px solid black; padding: 4px; text-align: right;">Taxes</th>
+                                    <th style="padding: 4px; text-align: right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="i" t-value="1"/>
+                                <t t-foreach="doc.invoice_line_ids.filtered(lambda l: l.display_type not in ('line_section', 'line_note'))" t-as="line">
+                                    <tr style="border-bottom: 1px solid #ddd;">
+                                        <td style="border-right: 1px solid black; padding: 4px;"><t t-out="i"/></td>
+                                        <td style="border-right: 1px solid black; padding: 4px;"><span t-field="line.name"/></td>
+                                        <td style="border-right: 1px solid black; padding: 4px;"><span t-field="line.hsn_id.hsnsac_code"/></td>
+                                        <td style="border-right: 1px solid black; padding: 4px; text-align: right;"><span t-field="line.quantity"/> <span t-field="line.product_uom_id.name"/></td>
+                                        <td style="border-right: 1px solid black; padding: 4px; text-align: right;"><span t-field="line.price_unit"/></td>
+                                        <td style="border-right: 1px solid black; padding: 4px; text-align: right;">
+                                            <span t-esc="', '.join(map(lambda x: (x.name), line.tax_ids))"/>
+                                        </td>
+                                        <td style="padding: 4px; text-align: right;"><span t-field="line.price_subtotal"/></td>
+                                    </tr>
+                                    <t t-set="i" t-value="i + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <table style="width:100%; margin-top: 10px;">
+                            <tr>
+                                <td style="width: 60%; vertical-align: top;">
+                                    <p><strong>Remarks:</strong> <span t-field="doc.narration"/></p>
+                                </td>
+                                <td style="width: 40%;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="padding: 4px;"><strong>Untaxed Amount:</strong></td>
+                                            <td style="text-align: right; padding: 4px;"><span t-field="doc.amount_untaxed"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 4px;"><strong>Taxes:</strong></td>
+                                            <td style="text-align: right; padding: 4px;"><span t-field="doc.amount_tax"/></td>
+                                        </tr>
+                                        <tr style="border-top: 1px solid black;">
+                                            <td style="padding: 4px;"><strong>Total:</strong></td>
+                                            <td style="text-align: right; padding: 4px;"><strong><span t-field="doc.amount_total"/></strong></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="external_layout_standard_purchase_invoice">
+        <div t-attf-class="header o_company_#{company.id}_layout">
+            <div class="o_boxed_header"/>
+        </div>
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="o_boxed_header"/>
+            <t t-out="0"/>
+        </div>
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+            <div class="text-center" style="border-top: 1px solid black;">
+                <table style="width:100%"> </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="custom_purchase_invoice">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+        <t t-if="not company">
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+        <t t-call="gts_account.external_layout_standard_purchase_invoice">
+            <t t-out="0"/>
+        </t>
+    </template>
+
+    <record id="paperformat_procurement_report_portrait1" model="report.paperformat">
+        <field name="name">paperformat_procurement_report_portrait</field>
+        <field name="default" eval="True" />
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">35</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">30</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_purchase_invoice" model="ir.actions.report">
+        <field name="name">Purchase Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">gts_account.purchase_invoice</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="paperformat_id" ref="gts_account.paperformat_procurement_report_portrait1"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

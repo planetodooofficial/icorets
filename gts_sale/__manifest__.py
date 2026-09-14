@@ -1,0 +1,23 @@
+{
+    'name': 'GTS Sale',
+    'version': '19.0.1.0.0',
+    'summary': 'GTS Sales',
+    'description': 'GTS Sale customization',
+    'author': 'Geotechnosoft',
+    'maintainer': 'Geotechnosoft',
+    'company': 'Geotechnosoft',
+    'website': 'https://planet-odoo.com/',
+    'depends': ['base', 'sale', 'account', 'gts_account', 'icorets'],
+    'category': 'Sales/Sales',
+    'demo': [],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/sale_order_view.xml',
+        # 'views/account_move_view.xml',
+        'wizard/invoice_partner_update_view.xml',
+        'report/sale_report_inherit_views.xml',
+    ],
+    'license': 'LGPL-3',
+    'installable': True,
+    'auto_install': False,
+}

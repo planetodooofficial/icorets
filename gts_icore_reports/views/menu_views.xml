@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========================================================= -->
+    <!-- Accounting Reports & Registers Menus                      -->
+    <!-- ========================================================= -->
+    <!-- Sales Registers (Receivables) -->
+    <menuitem id="menu_detail_register_report"
+              name="Detail Sales Register"
+              parent="account.menu_finance_receivables"
+              action="action_detail_sales_register"
+              sequence="150"/>
+
+    <menuitem id="menu_register_report"
+              name="Sales Register"
+              parent="account.menu_finance_receivables"
+              action="action_sales_register"
+              sequence="151"/>
+
+    <!-- Purchase Registers (Payables) -->
+    <menuitem id="menu_detail_purchase_report"
+              name="Detail Purchase Register"
+              parent="account.menu_finance_payables"
+              action="action_detail_purchase_register"
+              sequence="150"/>
+
+    <menuitem id="menu_purchase_report"
+              name="Purchase Register"
+              parent="account.menu_finance_payables"
+              action="action_purchase_register"
+              sequence="151"/>
+
+    <!-- ========================================================= -->
+    <!-- Inventory & Stock Warehouse Reports Menus                 -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_stock_register"
+              name="Stock Register"
+              action="action_stock_register"
+              parent="stock.menu_warehouse_report"
+              sequence="185"/>
+
+    <menuitem id="menu_grn_details"
+              name="GRN Details Import"
+              parent="stock.menu_warehouse_report"
+              action="action_grn_details"
+              sequence="190"/>
+
+    <menuitem id="menu_grn_details_reports"
+              name="GRN Details Reports"
+              parent="stock.menu_warehouse_report"
+              action="action_grn_details_data_invoice"
+              sequence="191"/>
+
+    <menuitem id="menu_stock_register_excel_report"
+              name="Stock Register PO Excel Report"
+              action="stock_register_excel_report_action"
+              parent="stock.menu_warehouse_report"
+              sequence="200"/>
+
+    <menuitem id="menu_stock_location_wise_report"
+              name="Stock Location Wise Report"
+              action="stock_location_wise_report_action"
+              parent="stock.menu_warehouse_report"
+              sequence="201"/>
+
+</odoo>

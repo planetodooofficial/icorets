@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="paperformat_batch_deposit" model="report.paperformat">
+        <field name="name">Purchase Order Report</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="purchase_order_report" model="ir.actions.report">
+        <field name="name">Purchase Order Report</field>
+        <field name="model">purchase.order</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">icorets.purchase_order_report_forms</field>
+        <field name="report_file">icorets.purchase_order_report_forms</field>
+        <field name="print_report_name">'Purchase Order -PO# %s' % (object.name)</field>
+        <field name="paperformat_id" ref="icorets.paperformat_batch_deposit"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+    </record>
+
+    <template id="purchase_order_report_forms">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="icorets.report_invoice_layout_po">
+                    <style>
+                        table {
+                        font-size: 12px;
+                        }
+                    </style>
+                    <div class="page">
+                        <table style="width:100%;margin-top: 10px">
+                            <tr style="border:1px solid black;">
+                                <td style="border:1px solid black;font-size: 16px" class="text-center" colspan="3"><b>PURCHASE ORDER</b></td>
+                            </tr>
+                            <tr style="border:1px solid black;">
+                                <td style="height:70px;border:1px solid black;padding-left: 3px"><b>Vendor : <t t-esc="o.partner_id.name"/></b><br/>
+                                    Address : <t t-esc="o.partner_id.street"/><br/>
+                                    <t t-esc="o.partner_id.street2"/><br/>
+                                    <t t-esc="o.partner_id.city"/>,
+                                    <t t-esc="o.partner_id.zip"/>,
+                                    <t t-esc="o.partner_id.state_id.name"/>,
+                                    <t t-esc="o.partner_id.country_id.name"/><br/>
+                                    State Code : <t t-esc="o.partner_id.state_id.code"/><br/>
+                                    GSTIN Number : <t t-esc="o.partner_id.vat"/>
+
+                                </td>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px">
+                                    <b>Billing Address :
+                                    <t t-esc="o.gstin_id.name"/></b><br/>
+                                    <t t-esc="o.gstin_id.street"/>
+                                    <br/>
+                                    <t t-esc="o.gstin_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.gstin_id.city"/>,<t t-esc="o.gstin_id.zip"/>
+                                    <t t-esc="o.gstin_id.state_id.name"/>,
+                                    <t t-esc="o.gstin_id.country_id.name"/>
+                                    <br/>
+                                    <strong>GST Number :</strong> <t t-esc="o.gstin_id.vat"/><br/>
+                                </td>
+                                <td style="height:70px;border:1px solid black;padding-left: 3px">
+                                    <b>Shipping Address :
+                                    <t t-esc="o.warehouse_id.partner_id.name"/></b> <br/>
+                                    <t t-esc="o.warehouse_id.partner_id.street"/>
+                                    <br/>
+                                    <t t-esc="o.warehouse_id.partner_id.street2"/>
+                                    <br/>
+                                    <t t-esc="o.warehouse_id.partner_id.city"/>,<t t-esc="o.warehouse_id.partner_id.zip"/>
+                                    <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,
+                                    <t t-esc="o.warehouse_id.partner_id.country_id.name"/>
+
+                                </td>
+                            </tr>
+                            <!--                            <tr style="border:1px solid black;">-->
+                            <!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
+                            <!--                                    <br/>-->
+                            <!--                                    <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
+                            <!--                                    <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
+                            <!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/><br/>-->
+                            <!--                                </td>-->
+                            <!--                                <td></td>-->
+                            <!--                                <td></td>-->
+                            <!--                                <td></td>-->
+                            <!--                                <td style="height:70px;border:1px solid black;padding-left: 3px">-->
+                            <!--                                    <b>Shipping Address:</b><br/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.street"/>-->
+                            <!--                                    <br/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.street2"/>-->
+                            <!--                                    <br/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.city"/>,<t t-esc="o.warehouse_id.partner_id.zip"/>-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.state_id.name"/>,-->
+                            <!--                                    <t t-esc="o.warehouse_id.partner_id.country_id.name"/>-->
+
+                            <!--                                </td>-->
+                            <!--                            </tr>-->
+                        </table>
+
+                        <table class="table table-sm o_main_table" style="width:100%">
+                            <tr style="background-color:#87CEEB">
+                                <td class="text-center" width="2%">
+                                    <strong>Sr.</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>ART#</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>EAN</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>DESCRIPTION</strong>
+                                </td>
+                                <td class="text-center" width="15%">
+                                    <strong>REMARKS</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>HSN CODE</strong>
+                                </td>
+                                <td class="text-center" width="7%">
+                                    <strong>SIZE</strong>
+                                </td>
+                                <td class="text-center" width="7%">
+                                    <strong>QTY</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>Price/Qty</strong>
+                                </td>
+                                <td class="text-center" width="10%">
+                                    <strong>Total Taxable Amount</strong>
+                                </td>
+                                <td class="text-center" width="15%">
+                                    <strong>GST%</strong>
+                                </td>
+                                <td class="text-center" width="12%">
+                                    <strong>GST AMT</strong>
+                                </td>
+                                <td class="text-center" width="15%">
+                                    <strong>Total Amount</strong>
+                                </td>
+                            </tr>
+                            <t t-set="sr_no" t-value="1"/>
+                            <t t-foreach="o.order_line" t-as="line">
+                                <tr style="height:20px;text-align:center">
+                                    <td>
+                                        <t t-esc="sr_no"/>
+                                        <t t-set="sr_no" t-value="sr_no+1"/>
+                                    </td>
+
+                                    <td>
+                                        <t t-esc="line.product_id.variant_article_code"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.product_id.barcode"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.product_id.name"/><br/>
+                                        Color: <t t-esc="line.product_id.color"/>
+                                    </td>
+                                    <td style="text-align: left;width=20%">
+                                        <t t-esc="line.remark"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.hsn_c.hsnsac_code"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="line.product_id.size"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="int(line.product_qty)"/> <t t-esc="line.product_uom_id.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="'%.2f'% line.price_unit"/>
+                                    </td>
+                                    <td>
+                                        <t t-esc="'%.2f'% line.price_subtotal"/>
+                                    </td>
+                                    <td style="width=15%">
+                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))"/>
+                                    </td>
+
+                                    <td style="text-align: right;width=12%">
+                                        <t t-esc="'%.2f'% line.tax_amount_line" />
+                                    </td>
+
+                                    <td style="width=12%">
+                                        <t t-esc="'%.2f'% line.price_total"/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <tr>
+                                <td colspan="7"> <b>TOTAL</b></td>
+                                <td style="text-align: center">
+                                    <t t-esc="sum(l.product_qty for l in o.order_line) "/>
+                                </td>
+                                <td style="text-align: center">
+<!--                                    <t t-esc="sum(l.price_unit for l in o.order_line) "/>-->
+                                </td>
+                                <td style="text-align: center">
+                                    <t t-esc="round(sum(l.price_subtotal for l in o.order_line),2)"/>
+                                </td>
+                                <td></td>
+                                <td style="text-align: center">
+                                    <t t-esc="round(sum(l.tax_amount_line for l in o.order_line),2) "/>
+                                </td>
+                                <td style="text-align: center">
+                                    <t t-esc="round(sum(l.price_total for l in o.order_line),2) "/>
+                                </td>
+                            </tr>
+                        </table>
+<!--                        <div class="clearfix mb-4">-->
+<!--                            <div id="total" class="row">-->
+<!--                                <div t-attf-class="#{'col-3' if report_type != 'html' else 'col-sm-5 col-md-6'} ms-auto">-->
+<!--                                    <table class="table table-sm" style="page-break-inside: avoid;">-->
+
+<!--                                        &lt;!&ndash;Tax totals&ndash;&gt;-->
+<!--                                        <t t-set="tax_totals" t-value="o.tax_totals"/>-->
+<!--                                        <t t-call="account.document_tax_totals"/>-->
+
+<!--                                        &lt;!&ndash;Payments&ndash;&gt;-->
+<!--                                    </table>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <strong style="text-align: left;font-size: 12px">Amt. Chargeble (In Words) :- -->
+
+<!--                                <span style="font-size: 12px" t-esc="o.currency_id.amount_to_text(o.amount_total)"/> only-->
+<!--                        </strong>-->
+
+                                              <div class="clearfix mb-4">
+                        <div id="total" class="row">
+
+
+                            <!-- Amt. Chargeable (In Words) (right column) -->
+                            <div class="col-6">
+                                <strong style="text-align: left; font-size: 12px">Amt. Chargeable (In Words) :-
+                                        <span style="font-size: 12px" t-esc="o.currency_id.amount_to_text(o.amount_total)"/> only
+                                </strong>
+                            </div>
+                                                        <!-- Tax totals (left column) -->
+
+                            <div class="col-6">
+                                <table class="table table-sm" style="page-break-inside: avoid;">
+                                    <!-- Tax totals -->
+                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                    <t t-set="currency" t-value="o.currency_id"/>
+                                    <t t-call="account.document_tax_totals"/>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                        <br/>
+                        <table style="width:100%;margin-top: 10px;page-break-inside : avoid">
+                            <!--                            <tr>-->
+                            <!--                                <td colspan="2">-->
+                            <!--                                    <b>APPROVED BY :</b> <t t-esc="request.env.user.name"/>-->
+                            <!--                                </td>-->
+                            <!--                                <td></td>-->
+                            <!--                            </tr>-->
+                            <tr style="border:1px solid black">
+                                <td style="width:50%;border:1px solid black">PAYMENT TERM</td>
+                                <td style="text-align:center;width:50%;border:1px solid black">For iCOREts Private
+                                    Limites
+                                </td>
+                            </tr>
+                            <tr style="border:1px solid black">
+                                <td style="height:100px;border:1px solid black;vertical-align: top"><span t-field="o.payment_term_id.name" t-if="o.payment_term_id"/></td>
+                                <td style="height:100px;border:1px solid black"></td>
+                            </tr>
+
+                            <tr style="border:1px solid black">
+                                <td style="text-align:center;border:1px solid black"><b>Subject to Mumbai
+                                    Jurisdiction</b>
+                                </td>
+                                <td style="text-align:center;border:1px solid black"><b>Authorized Signatory</b></td>
+                            </tr>
+                            <tr style="border:1px solid black">
+                                <td colspan="2" style="text-align:center;border:1px solid black">iCOREts Private
+                                    Limited: Studio 150, Satguru
+                                    Nanik Ind, Jay Coach, Plot
+                                    No
+                                    498, Western Express Highway, Goregaon East, Mumbai, Maharashtra 400063, India.
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!--    #header and layout-->
+    <template id="external_layout_stripped_invoice_po">
+
+        <div t-attf-class="header o_company_#{company.id}_layout" att-style="report_header_style">
+
+            <!--            <table style="width: 100%;border-0px !important">-->
+            <!--                <tr>-->
+            <!--                    <td style="width:60%;float: left;vertical-align: bottom;border-right: 0px;">-->
+            <!--                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/>-->
+            <!--                    </td>-->
+            <!--                    <td style="width:35%;float: right;vertical-align: center;font-size: 14px;text-align: right;border-right: 0px !important;border-bottom: 0px !important;border-top: 0px !important;">-->
+            <!--                        <span>PURCHASE ORDER</span>-->
+            <!--                    </td>-->
+            <!--                    <td style="vertical-align: bottom;width:35%;font-weight: bold;text-align: left; font-size: 16px;">-->
+            <!--                                    <span style="valign: top;text-align: left;">-->
+            <!--                                        <b>PO Number :</b> <t t-esc="o.name"/><br/>-->
+            <!--                                     <b>PO Date :</b> <t t-esc="o.date_approve"/><br/>-->
+            <!--                                    <b>Delivery Month : </b> <t t-esc="o.date_planned"/><br/>-->
+            <!--                                    </span>-->
+
+
+            <!--                    </td>-->
+            <!--                </tr>-->
+            <!--            </table>-->
+
+            <!--            Format 2-->
+            <!--            <div><img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 77px;width: 200px;" alt="Logo"/></div>-->
+            <!--            <div><span><b>Purchase Order</b></span></div>-->
+            <div class="absolute">
+                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="height: 60px;width: 200px;" alt="Logo"/>
+            </div>
+            <div style="position: absolute;top: 10px;left: 990px;width: 300px;font-size: 14px">
+                <b>PO Number :</b> <t t-esc="o.name"/><br/>
+                <b>PO Date :</b> <span t-field="o.date_order" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                <b>Delivery Month : </b> <span t-field="o.date_planned" t-options='{"format": "dd/MM/yyyy"}'/><br/>
+                <b>Approved By :</b> <t t-esc="request.env.user.name"/>
+            </div>
+
+
+        </div>
+
+
+        <div t-attf-class="article o_report_layout_striped o_company_#{company.id}_layout"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div>
+
+            </div>
+
+            <t t-raw="0"/>
+        </div>
+        <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
+            <div class="text-center">
+                <div t-field="company.website"/>
+                <div t-if="report_type == 'pdf'">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_invoice_layout_po">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+
+        <t t-call="icorets.external_layout_stripped_invoice_po">
+            <t t-raw="0"/>
+        </t>
+    </template>
+
+
+</odoo>

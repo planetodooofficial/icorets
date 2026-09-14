@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="forecast_seq" model="ir.sequence">
+            <field name="name">Forecast Orders Sequence</field>
+            <field name="code">forecast.order</field>
+            <field name="prefix">FO</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

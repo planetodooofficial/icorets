@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="purchase_order_form_inherited" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherited.gts</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="send_for_checking" type="object" string="Send For Checking"
+                        invisible="to_check or is_checked or state in ('purchase', 'lock', 'cancel')"
+                        groups="gts_account.group_purchase_maker"/>
+                <button name="button_set_checked" type="object" string="Approve"
+                        invisible="not to_check or is_checked or state not in ('draft', 'sent_to_check')"
+                        groups="gts_account.group_purchase_checker"/>
+            </xpath>
+            <xpath expr="//form//group[1]/group[2]" position="inside">
+                <field name="to_check" invisible="1"/>
+                <field name="is_checked" readonly="1"/>
+                <field name="gstin_id" domain="[('is_gstin', '=', True)]" readonly="state == 'purchase'"/>
+                <field name="l10n_in_journal_id" domain="[('type', '=', 'purchase')]" options="{'no_create': True}"/>
+            </xpath>
+            <xpath expr="//page[@name='purchase_delivery_invoice']" position="before">
+                <page name="payment_by_terms" string="Payments By Terms" invisible="state not in ('purchase', 'done')">
+                    <field name="payments_by_terms">
+                        <list>
+                            <field name="sequence" widget="handle"/>
+                            <field name="company_id" column_invisible="True"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="name"/>
+                            <field name="percent"/>
+                            <field name="value" widget="monetary"/>
+                            <field name="due_date"/>
+                            <field name="payment_recv_date"/>
+                            <field name="amount_received" widget="monetary"/>
+                            <button name="open_create_payment_wizard" type="object" string="Create Payment"/>
+                            <button name="view_payments" type="object" string="View Payments" invisible="amount_received == 0"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//field[@name='price_unit']" position="after">
+                <field name="hsn_id" optional="hide" options="{'no_create': True, 'no_open': False, 'no_edit': True}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

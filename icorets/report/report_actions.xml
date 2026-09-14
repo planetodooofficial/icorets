@@ -1,0 +1,9 @@
+<odoo>
+    <record id="stock_variant_report_action_excel" model="ir.actions.report">
+        <field name="name">Stock Variant PO Report (Excel)</field>
+        <field name="model">stock.variant.report</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">icorets.stock_variant_excel</field>
+        <field name="report_file">Stock Variant PO Report (Excel)</field>
+    </record>
+</odoo>

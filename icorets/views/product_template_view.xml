@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- For adding style code on product Kanban view -->
+    <record model="ir.ui.view" id="product_kanban_inherited_view">
+        <field name="name">product.kanban.inherited</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='list_price']/parent::*" position="replace">
+                <div name="product_lst_price" class="mt-1">
+                    Style Code:
+                    <field name="style_code"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="product_attribute_inherited_view">
+        <field name="name">product.attribute.inherited</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='create_variant']" position="after">
+                <field name="is_colour"/>
+                <field name="is_size"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product template form view inherit -->
+    <record id="product_template_only_form_view_inherit" model="ir.ui.view">
+        <field name="name">product.template.only.form.view.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='general_information']" position="after">
+                <page string="Extra Information">
+                    <group string="Other Details">
+                        <group>
+                            <field name="occasion"/>
+                            <field name="material"/>
+                            <field name="style_code"/>
+                            <field name="func_spo"/>
+                            <field name="gender"/>
+                            <field name="tech_feat"/>
+                            <field name="brand_id"/>
+                            <field name="parent_buin"/>
+                            <field name="age_group"/>
+                            <field name="product_dimension1"/>
+                            <field name="product_dimension2"/>
+                            <field name="product_dimension3"/>
+                            <field name="market_place_tittle"/>
+                            <field name="bullet_point_1"/>
+                            <field name="bullet_point_2"/>
+                            <field name="bullet_point_3"/>
+                            <field name="bullet_point_4"/>
+                            <field name="bullet_point_5"/>
+                        </group>
+                        <group>
+                            <field name="user_defined_miscallaneous1"/>
+                            <field name="user_defined_miscallaneous2"/>
+                            <field name="user_defined_miscallaneous3"/>
+                            <field name="user_defined_miscallaneous4"/>
+                            <field name="user_defined_miscallaneous5"/>
+                            <field name="product_net_weight"/>
+                            <field name="package_dimension1"/>
+                            <field name="package_dimension2"/>
+                            <field name="package_dimension3"/>
+                            <field name="package_weight"/>
+
+                            <field name="description"/>
+                            <field name="google_drive_link"/>
+                            <field name="drop_box_link"/>
+                        </group>
+                    </group>
+                    <group string="Technical Specifications">
+                        <field name="manufactured_by"/>
+                        <field name="marketed_by"/>
+                        <field name="country_origin"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Import Attributes Form -->
+    <record model="ir.ui.view" id="view_import_attributes_form">
+        <field name="name">Import Attributes</field>
+        <field name="model">import.attributes</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="upload_attributes_file"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="import_product" string="Submit" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_import_attributes_form">
+        <field name="name">Import Attributes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">import.attributes</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_attributes_branch" name="Import Attributes"
+              action="action_import_attributes_form" parent="stock.menu_stock_inventory_control" sequence="50"/>
+
+    <!-- Update Attributes Form -->
+    <record model="ir.ui.view" id="view_update_attributes_form">
+        <field name="name">Update Attributes</field>
+        <field name="model">update.attributes</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="upload_attributes_file"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="update_variants" string="Submit" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_update_attributes_form">
+        <field name="name">Update Attributes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">update.attributes</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_update_attributes_branch" name="Update Attributes"
+              action="action_update_attributes_form" parent="stock.menu_stock_inventory_control" sequence="60"/>
+
+    <!-- Product Brand Views -->
+    <record model="ir.ui.view" id="view_brand_form">
+        <field name="name">Product Brand</field>
+        <field name="model">product.brand</field>
+        <field name="arch" type="xml">
+            <form string="Brand">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_brand_tree">
+        <field name="name">Product Brand List</field>
+        <field name="model">product.brand</field>
+        <field name="arch" type="xml">
+            <list string="Brand" editable="bottom">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_brand_form">
+        <field name="name">Product Brands</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.brand</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" eval="False"/>
+    </record>
+
+    <menuitem id="menu_brand" name="Brands"
+              action="action_brand_form" parent="stock.menu_stock_inventory_control" sequence="30"/>
+
+    <!-- Reason Views -->
+    <record id="reason_reason_view_form" model="ir.ui.view">
+        <field name="name">reason.reason.view.form</field>
+        <field name="model">reason.reason</field>
+        <field name="arch" type="xml">
+            <form string="Reason">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="reason_reason_view_tree" model="ir.ui.view">
+        <field name="name">reason.reason.view.tree</field>
+        <field name="model">reason.reason</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="reason_reason_action" model="ir.actions.act_window">
+        <field name="name">Reason</field>
+        <field name="res_model">reason.reason</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_reason_reason"
+              action="icorets.reason_reason_action"
+              parent="sale.sale_order_menu"
+              sequence="53"/>
+
+</odoo>

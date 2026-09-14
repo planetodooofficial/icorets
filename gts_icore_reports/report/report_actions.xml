@@ -1,0 +1,19 @@
+<odoo>
+
+    <record id="stock_register_po_report_action_excel" model="ir.actions.report">
+        <field name="name">Stock Register PO Report (Excel)</field>
+        <field name="model">stock.register.po.report</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">gts_icore_reports.stock_register_excel</field>
+        <field name="report_file">Stock Register PO Report (Excel)</field>
+    </record>
+
+    <record id="stock_location_wise_report_action_excel" model="ir.actions.report">
+        <field name="name">Stock Location Wise Report (Excel)</field>
+        <field name="model">stock.register.po.report</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">gts_icore_reports.stock_location_wise_excel</field>
+        <field name="report_file">Stock Location Wise Report (Excel)</field>
+    </record>
+
+</odoo>
