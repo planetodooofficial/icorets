@@ -75,6 +75,7 @@ class AccountMove(models.Model):
     @api.depends('invoice_line_ids.sale_line_ids')
     def _compute_without_sale_invoice(self):
         for move in self:
+            print("----move", move)
             move.without_sale_cogs = bool(move.invoice_line_ids.mapped('sale_line_ids'))
 
     @api.onchange('credit_invoice_ids')
