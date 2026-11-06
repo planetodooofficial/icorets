@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_gst_code" model="ir.ui.view">
+        <field name="name">res.partner.form.gst.code</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='website']" position="after">
+                <field name="gst_code" placeholder="e.g. DL, CH, HR, MH"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

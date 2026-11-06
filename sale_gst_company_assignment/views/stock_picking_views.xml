@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stock Picking Form: Add is_company_transferred -->
+    <record id="view_picking_form_company_transferred" model="ir.ui.view">
+        <field name="name">stock.picking.form.company.transferred</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Stock Picking List: Add is_company_transferred -->
+    <record id="vpicktree_company_transferred" model="ir.ui.view">
+        <field name="name">stock.picking.list.company.transferred</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="is_company_transferred" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Stock Picking Search: Add Filter for is_company_transferred -->
+    
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sale Order Form: Add is_company_transferred -->
+    <record id="view_order_form_company_transferred" model="ir.ui.view">
+        <field name="name">sale.order.form.company.transferred</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order List: Add is_company_transferred -->
+    <record id="view_order_tree_company_transferred" model="ir.ui.view">
+        <field name="name">sale.order.list.company.transferred</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="is_company_transferred" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Sale Order Search: Add Filter for is_company_transferred -->
+    <record id="view_sales_order_filter_company_transferred" model="ir.ui.view">
+        <field name="name">sale.order.search.company.transferred</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="before">
+            </xpath>
+        </field>
+    </record>
+</odoo>

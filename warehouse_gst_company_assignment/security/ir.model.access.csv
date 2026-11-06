@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_warehouse_gst_company_match_wizard,warehouse.gst.company.match.wizard,model_warehouse_gst_company_match_wizard,base.group_user,1,1,1,1
+access_warehouse_gst_company_match_wizard_line,warehouse.gst.company.match.wizard.line,model_warehouse_gst_company_match_wizard_line,base.group_user,1,1,1,1
+access_warehouse_gst_assignment_log,warehouse.gst.assignment.log,model_warehouse_gst_assignment_log,base.group_user,1,1,1,1
+access_warehouse_gst_assignment_log_line,warehouse.gst.assignment.log.line,model_warehouse_gst_assignment_log_line,base.group_user,1,1,1,1

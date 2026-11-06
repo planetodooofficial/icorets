@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_journal_picking_match_wizard_form" model="ir.ui.view">
+        <field name="name">journal.picking.match.wizard.form</field>
+        <field name="model">journal.picking.match.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reassign Journal Entries by Stock Picking Match">
+                <field name="state" invisible="1"/>
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="state == 'done'">
+                        <strong>How this works:</strong><br/>
+                        1. Scans journal entries in this journal where the reference (e.g. <code>DEL/OUT/2627/199738 - product name</code>), entry name, or line description matches a <strong>Stock Picking number</strong>.<br/>
+                        2. Identifies the <strong>company set on that matching stock picking</strong> (e.g. Company ID 3).<br/>
+                        3. Swaps the company on the journal entry from its current company to the picking's company. (The stock picking itself is not altered).
+                    </div>
+
+                    <group string="Filter Criteria">
+                        <field name="journal_id" options="{'no_open': True}"/>
+                        <field name="source_company_id" options="{'no_create': True}" placeholder="All Companies / Leave blank to scan all"/>
+                    </group>
+
+                    <group string="Summary Statistics" invisible="state == 'draft'">
+                        <group>
+                            <field name="count_total_entries" readonly="1"/>
+                            <field name="count_matched_entries" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="count_unmatched_entries" readonly="1"/>
+                            <field name="count_matched_lines" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook invisible="state == 'draft'">
+                        <page string="Matching Breakdown &amp; Branch Preview" name="preview_page">
+                            <field name="match_summary" widget="html" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <footer>
+                    <button name="action_fetch_matches"
+                            string="🔍 1. Fetch &amp; Preview Matches"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state == 'done'"/>
+                    <button name="action_reassign_by_picking"
+                            string="🚀 2. Swap Company from Matched Pickings"
+                            type="object"
+                            class="btn-danger"
+                            confirm="Are you sure you want to swap the company on these journal entries to match their respective stock pickings?"
+                            invisible="state != 'fetched'"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

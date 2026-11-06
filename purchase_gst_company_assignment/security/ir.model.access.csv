@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_company_reassignment_tool_user,purchase.company.reassignment.tool.user,model_purchase_company_reassignment_tool,base.group_user,1,1,1,1
+access_purchase_company_reassignment_log_user,purchase.company.reassignment.log.user,model_purchase_company_reassignment_log,base.group_user,1,1,1,1

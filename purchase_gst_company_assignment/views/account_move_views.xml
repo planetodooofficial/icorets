@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Account Move Form: Add is_company_transferred for Purchase/Bills -->
+    <record id="view_purchase_move_form_company_transferred" model="ir.ui.view">
+        <field name="name">account.move.form.purchase.company.transferred</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_date']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Move Search: Add Filter -->
+    <record id="view_purchase_account_move_filter_company_transferred" model="ir.ui.view">
+        <field name="name">account.move.search.purchase.company.transferred</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+            </xpath>
+        </field>
+    </record>
+</odoo>

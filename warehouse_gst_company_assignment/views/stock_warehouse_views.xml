@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Warehouse Form: Match Company Button, Smart Button for Logs, and is_company_transferred Field -->
+    <record id="view_warehouse_form_gst_company_match" model="ir.ui.view">
+        <field name="name">stock.warehouse.form.gst.company.match</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_match_company_by_gst_code"
+                            string="Match Company by GST Code"
+                            type="object"
+                            class="btn-primary"
+                            help="Automatically find and assign the correct branch company based on the warehouse contact GST code."/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Warehouse List View: Add is_company_transferred Field -->
+    <record id="view_warehouse_tree_gst_company_match" model="ir.ui.view">
+        <field name="name">stock.warehouse.list.gst.company.match</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.view_warehouse_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="is_company_transferred" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Warehouse Search View: Add Filter for is_company_transferred -->
+    <record id="view_warehouse_search_gst_company_match" model="ir.ui.view">
+        <field name="name">stock.warehouse.search.gst.company.match</field>
+        <field name="model">stock.warehouse</field>
+        <field name="inherit_id" ref="stock.stock_warehouse_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Mass Action: Match Company by GST Code in Warehouse List View -->
+    <record id="action_server_mass_match_warehouse_gst_company" model="ir.actions.server">
+        <field name="name">Mass Match Company by GST Code</field>
+        <field name="model_id" ref="stock.model_stock_warehouse"/>
+        <field name="binding_model_id" ref="stock.model_stock_warehouse"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_open_gst_company_match_wizard()</field>
+    </record>
+</odoo>

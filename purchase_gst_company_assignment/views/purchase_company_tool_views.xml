@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tool Form View -->
+    <record id="view_purchase_company_reassignment_tool_form" model="ir.ui.view">
+        <field name="name">purchase.company.reassignment.tool.form</field>
+        <field name="model">purchase.company.reassignment.tool</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Order Company Reassignment Control Tool">
+                <header>
+                    <button name="action_fetch_records_count"
+                            string="🔍 Fetch Record Counts"
+                            type="object"
+                            class="btn-primary"/>
+                    <button name="action_update_all"
+                            string="🚀 Update Entire Pipeline"
+                            type="object"
+                            class="btn-danger"
+                            confirm="Are you sure you want to permanently reassign company_id across all POs, lines, receipts, stock moves, vendor bills, payments, bank transactions, and reconciliations?"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <!-- Setup & Filter Criteria -->
+                    <group>
+                        <group string="Company &amp; GST Matching">
+                            <field name="source_company_id" options="{'no_create': True}"/>
+                            <field name="gstin_id" domain="[('is_gstin', '=', True)]" options="{'no_create': True}"/>
+                            <field name="gst_code"/>
+                            <field name="target_company_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Execution Info">
+                            <field name="last_fetch_date"/>
+                        </group>
+                    </group>
+
+                    <!-- Notebook with Logs -->
+                    <notebook>
+                        <page string="Audit Execution History" name="audit_logs">
+                            <field name="log_ids" readonly="1">
+                                <list decoration-success="status == 'success'"
+                                      decoration-muted="status == 'nothing_to_update'"
+                                      decoration-danger="status == 'failed'">
+                                    <field name="name"/>
+                                    <field name="execution_date"/>
+                                    <field name="user_id"/>
+                                    <field name="action_type"/>
+                                    <field name="records_updated"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="summary"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tool Tree / List View -->
+    <record id="view_purchase_company_reassignment_tool_tree" model="ir.ui.view">
+        <field name="name">purchase.company.reassignment.tool.list</field>
+        <field name="model">purchase.company.reassignment.tool</field>
+        <field name="arch" type="xml">
+            <list string="PO Company Reassignment Tool">
+                <field name="name"/>
+                <field name="source_company_id"/>
+                <field name="gstin_id"/>
+                <field name="gst_code"/>
+                <field name="target_company_id"/>
+                <field name="last_fetch_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_purchase_company_reassignment_tool" model="ir.actions.act_window">
+        <field name="name">PO Company Reassignment Tool</field>
+        <field name="res_model">purchase.company.reassignment.tool</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new PO Company Reassignment session to fetch and reassign purchase orders and related records.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <!-- Purchase > Configuration > PO Company Reassignment Tool -->
+    <menuitem id="menu_purchase_company_reassignment_tool"
+              name="PO Company Reassignment by GST"
+              parent="purchase.menu_purchase_config"
+              action="action_purchase_company_reassignment_tool"
+              sequence="90"/>
+</odoo>

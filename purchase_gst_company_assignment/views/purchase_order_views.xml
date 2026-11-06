@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Purchase Order Form View: Add is_company_transferred -->
+    <record id="view_purchase_order_form_company_transferred" model="ir.ui.view">
+        <field name="name">purchase.order.form.company.transferred</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Purchase Order List View: Add is_company_transferred -->
+    <record id="view_purchase_order_tree_company_transferred" model="ir.ui.view">
+        <field name="name">purchase.order.list.company.transferred</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="is_company_transferred" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Purchase Order Search View: Add Filter for is_company_transferred -->
+    <record id="view_purchase_order_filter_company_transferred" model="ir.ui.view">
+        <field name="name">purchase.order.search.company.transferred</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_purchases']" position="before">
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ======================================================== -->
+    <!-- 1. Stock Location Views                                  -->
+    <!-- ======================================================== -->
+    <record id="view_location_form_gst_company" model="ir.ui.view">
+        <field name="name">stock.location.form.gst.company</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_location_tree2_gst_company" model="ir.ui.view">
+        <field name="name">stock.location.list.gst.company</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_tree2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+                <field name="is_company_transferred" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ======================================================== -->
+    <!-- 2. Stock Picking Type (Operation Type) Views             -->
+    <!-- ======================================================== -->
+    <record id="view_picking_type_form_gst_company" model="ir.ui.view">
+        <field name="name">stock.picking.type.form.gst.company</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ======================================================== -->
+    <!-- 3. Stock Rule Views                                      -->
+    <!-- ======================================================== -->
+    <record id="view_stock_rule_form_gst_company" model="ir.ui.view">
+        <field name="name">stock.rule.form.gst.company</field>
+        <field name="model">stock.rule</field>
+        <field name="inherit_id" ref="stock.view_stock_rule_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ======================================================== -->
+    <!-- 4. Stock Warehouse Orderpoint (Reordering Rule) Views     -->
+    <!-- ======================================================== -->
+    <record id="view_warehouse_orderpoint_form_gst_company" model="ir.ui.view">
+        <field name="name">stock.warehouse.orderpoint.form.gst.company</field>
+        <field name="model">stock.warehouse.orderpoint</field>
+        <field name="inherit_id" ref="stock.view_warehouse_orderpoint_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_warehouse_orderpoint_tree_gst_company" model="ir.ui.view">
+        <field name="name">stock.warehouse.orderpoint.list.gst.company</field>
+        <field name="model">stock.warehouse.orderpoint</field>
+        <field name="inherit_id" ref="stock.view_warehouse_orderpoint_tree_editable"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="is_company_transferred" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ======================================================== -->
+    <!-- 5. Stock Route Views                                     -->
+    <!-- ======================================================== -->
+    <record id="stock_location_route_form_gst_company" model="ir.ui.view">
+        <field name="name">stock.location.route.form.gst.company</field>
+        <field name="model">stock.route</field>
+        <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id'][@groups='base.group_multi_company']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

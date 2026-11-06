@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_journal_company_reassign_wizard_form" model="ir.ui.view">
+        <field name="name">journal.company.reassign.wizard.form</field>
+        <field name="model">journal.company.reassign.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reassign Journal Entries to Branch Company">
+                <field name="state" invisible="1"/>
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="state == 'done'">
+                        <strong>Step 1:</strong> Select the target branch company and click <strong>Fetch Matching Records</strong>.<br/>
+                        <strong>Step 2:</strong> Review the fetched counts and click <strong>Change Company on Records</strong>.
+                    </div>
+
+                    <group string="Company Setup">
+                        <group>
+                            <field name="journal_id" options="{'no_open': True}"/>
+                            <field name="source_company_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="target_company_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+
+                    <group string="Matching Results" invisible="state == 'draft'">
+                        <group string="Journal Entries">
+                            <field name="count_matching_entries" readonly="1"/>
+                            <field name="count_matching_lines" readonly="1"/>
+                        </group>
+                        <group string="Linked Sale Orders &amp; Operations">
+                            <field name="count_linked_sos" readonly="1"/>
+                            <field name="count_linked_pickings" readonly="1"/>
+                            <field name="count_linked_stock_moves" readonly="1"/>
+                            <field name="count_linked_payments" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+
+                <footer>
+                    <button name="action_fetch_records"
+                            string="🔍 1. Fetch Matching Records"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state == 'done'"/>
+                    <button name="action_reassign_company"
+                            string="🚀 2. Change Company on Records"
+                            type="object"
+                            class="btn-danger"
+                            confirm="Are you sure you want to permanently reassign these journal entries and items to the selected branch company?"
+                            invisible="state != 'fetched'"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

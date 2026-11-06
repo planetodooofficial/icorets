@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tool Form View -->
+    <record id="view_sale_company_reassignment_tool_form" model="ir.ui.view">
+        <field name="name">sale.company.reassignment.tool.form</field>
+        <field name="model">sale.company.reassignment.tool</field>
+        <field name="arch" type="xml">
+            <form string="Sale Order Company Reassignment Control Tool">
+                <header>
+                    <button name="action_fetch_records_count"
+                            string="🔍 Fetch Record Counts"
+                            type="object"
+                            class="btn-secondary"/>
+                    <button name="action_update_selected_model"
+                            string="⚙️ Update Selected Model"
+                            type="object"
+                            class="btn-primary"
+                            confirm="Are you sure you want to update the selected model and its related records to the target branch company?"/>
+                    <button name="action_update_all"
+                            string="🚀 Update Entire Pipeline"
+                            type="object"
+                            class="btn-danger"
+                            confirm="Are you sure you want to permanently reassign company_id across all SOs, lines, deliveries, stock moves, invoices, payments, and reconciliations?"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <!-- Setup & Filter Criteria -->
+                    <group>
+                        <group string="Company &amp; GST Matching">
+                            <field name="source_company_id" options="{'no_create': True}"/>
+                            <field name="gstin_id" domain="[('is_gstin', '=', True)]" options="{'no_create': True}"/>
+                            <field name="gst_code"/>
+                            <field name="target_company_id" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Model-wise Update &amp; Status">
+                            <field name="model_target"/>
+                            <field name="count_selected_model" invisible="1" readonly="1"/>
+                            <field name="last_fetch_date"/>
+                        </group>
+                    </group>
+
+                    <!-- Notebook with Logs -->
+                    <notebook>
+                        <page string="Audit Execution History" name="audit_logs">
+                            <field name="log_ids" readonly="1">
+                                <list decoration-success="status == 'success'"
+                                      decoration-muted="status == 'nothing_to_update'"
+                                      decoration-danger="status == 'failed'">
+                                    <field name="name"/>
+                                    <field name="execution_date"/>
+                                    <field name="user_id"/>
+                                    <field name="action_type"/>
+                                    <field name="records_updated"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="summary"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tool Tree / List View -->
+    <record id="view_sale_company_reassignment_tool_tree" model="ir.ui.view">
+        <field name="name">sale.company.reassignment.tool.list</field>
+        <field name="model">sale.company.reassignment.tool</field>
+        <field name="arch" type="xml">
+            <list string="SO Company Reassignment Tool">
+                <field name="name"/>
+                <field name="source_company_id"/>
+                <field name="gstin_id"/>
+                <field name="gst_code"/>
+                <field name="target_company_id"/>
+                <field name="last_fetch_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_sale_company_reassignment_tool" model="ir.actions.act_window">
+        <field name="name">SO Company Reassignment Tool</field>
+        <field name="res_model">sale.company.reassignment.tool</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new SO Company Reassignment session to fetch and reassign orders and related records.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <!-- Sales > Configuration > SO Company Reassignment Tool -->
+    <menuitem id="menu_sale_company_reassignment_tool"
+              name="SO Company Reassignment by GST"
+              parent="sale.menu_sale_config"
+              action="action_sale_company_reassignment_tool"
+              sequence="90"/>
+</odoo>

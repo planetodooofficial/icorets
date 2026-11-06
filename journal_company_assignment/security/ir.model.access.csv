@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_journal_company_reassign_wizard_mgr,journal.company.reassign.wizard.manager,model_journal_company_reassign_wizard,account.group_account_manager,1,1,1,1
+access_journal_company_reassign_wizard_usr,journal.company.reassign.wizard.user,model_journal_company_reassign_wizard,base.group_user,1,1,1,1
+access_journal_picking_match_wizard_mgr,journal.picking.match.wizard.manager,model_journal_picking_match_wizard,account.group_account_manager,1,1,1,1
+access_journal_picking_match_wizard_usr,journal.picking.match.wizard.user,model_journal_picking_match_wizard,base.group_user,1,1,1,1
+access_journal_company_reassignment_log_mgr,journal.company.reassignment.log.manager,model_journal_company_reassignment_log,account.group_account_manager,1,1,1,1
+access_journal_company_reassignment_log_usr,journal.company.reassignment.log.user,model_journal_company_reassignment_log,base.group_user,1,1,1,1

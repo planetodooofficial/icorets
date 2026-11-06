@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Account Payment Form: Add is_company_transferred -->
+    <record id="view_account_payment_form_company_transferred" model="ir.ui.view">
+        <field name="name">account.payment.form.company.transferred</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Payment Tree: Add is_company_transferred -->
+    <record id="view_account_payment_tree_company_transferred" model="ir.ui.view">
+        <field name="name">account.payment.list.company.transferred</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="is_company_transferred" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Payment Search: Add Filter for is_company_transferred -->
+    <record id="view_account_payment_search_company_transferred" model="ir.ui.view">
+        <field name="name">account.payment.search.company.transferred</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inbound_filter']" position="before">
+            </xpath>
+        </field>
+    </record>
+</odoo>

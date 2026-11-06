@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Log List View -->
+    <record id="view_journal_company_reassignment_log_list" model="ir.ui.view">
+        <field name="name">journal.company.reassignment.log.list</field>
+        <field name="model">journal.company.reassignment.log</field>
+        <field name="arch" type="xml">
+            <list string="Journal Company Reassignment Logs"
+                  decoration-success="status == 'success'"
+                  decoration-muted="status == 'nothing_to_update'"
+                  decoration-danger="status == 'failed'"
+                  create="false"
+                  edit="false">
+                <field name="name"/>
+                <field name="execution_date"/>
+                <field name="user_id"/>
+                <field name="journal_id"/>
+                <field name="source_company_id"/>
+                <field name="target_company_id"/>
+                <field name="action_type" widget="badge"/>
+                <field name="records_updated"/>
+                <field name="status" widget="badge"/>
+                <field name="summary"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Log Form View -->
+    <record id="view_journal_company_reassignment_log_form" model="ir.ui.view">
+        <field name="name">journal.company.reassignment.log.form</field>
+        <field name="model">journal.company.reassignment.log</field>
+        <field name="arch" type="xml">
+            <form string="Journal Company Reassignment Log" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Execution Metadata">
+                            <field name="execution_date"/>
+                            <field name="user_id"/>
+                            <field name="action_type" widget="badge"/>
+                            <field name="records_updated"/>
+                            <field name="status" widget="badge"/>
+                        </group>
+                        <group string="Journal &amp; Company Details">
+                            <field name="journal_id"/>
+                            <field name="source_company_id"/>
+                            <field name="target_company_id"/>
+                        </group>
+                    </group>
+                    <group string="Execution Summary &amp; Breakdown">
+                        <field name="summary" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Log Search View -->
+    <record id="view_journal_company_reassignment_log_search" model="ir.ui.view">
+        <field name="name">journal.company.reassignment.log.search</field>
+        <field name="model">journal.company.reassignment.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Reassignment Logs">
+                <field name="name"/>
+                <field name="journal_id"/>
+                <field name="source_company_id"/>
+                <field name="target_company_id"/>
+                <field name="user_id"/>
+                <separator/>
+                <filter string="Successful" name="filter_success" domain="[('status', '=', 'success')]"/>
+                <filter string="Failed" name="filter_failed" domain="[('status', '=', 'failed')]"/>
+                <group>
+                    <filter string="Journal" name="group_by_journal" context="{'group_by': 'journal_id'}"/>
+                    <filter string="Target Company" name="group_by_target" context="{'group_by': 'target_company_id'}"/>
+                    <filter string="Method" name="group_by_method" context="{'group_by': 'action_type'}"/>
+                    <filter string="Execution Date" name="group_by_date" context="{'group_by': 'execution_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_journal_company_reassignment_log" model="ir.actions.act_window">
+        <field name="name">Journal Reassignment Logs</field>
+        <field name="res_model">journal.company.reassignment.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_journal_company_reassignment_log_search"/>
+    </record>
+
+    <!-- Menu Item under Accounting > Configuration -->
+    <menuitem id="menu_journal_company_reassignment_log"
+              name="Journal Reassignment Logs"
+              parent="account.menu_finance_configuration"
+              action="action_journal_company_reassignment_log"
+              sequence="120"/>
+</odoo>

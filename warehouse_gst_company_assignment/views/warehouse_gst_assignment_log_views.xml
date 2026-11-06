@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ======================================================== -->
+    <!-- Log Line Views                                           -->
+    <!-- ======================================================== -->
+
+    <record id="view_warehouse_gst_assignment_log_line_tree" model="ir.ui.view">
+        <field name="name">warehouse.gst.assignment.log.line.list</field>
+        <field name="model">warehouse.gst.assignment.log.line</field>
+        <field name="arch" type="xml">
+            <list string="GST Assignment Log Details"
+                  create="false" edit="false" delete="false"
+                  decoration-success="status == 'success'"
+                  decoration-info="status == 'already_matched'"
+                  decoration-warning="status == 'skipped'"
+                  decoration-danger="status == 'failed'">
+                <field name="execution_date"/>
+                <field name="warehouse_id"/>
+                <field name="partner_id"/>
+                <field name="gst_code"/>
+                <field name="src_company_id"/>
+                <field name="dest_company_id"/>
+                <field name="status" widget="badge"/>
+                <field name="is_done" widget="boolean_toggle"/>
+                <field name="locations_count" string="Locs"/>
+                <field name="picking_types_count" string="Op Types"/>
+                <field name="rules_count" string="Rules"/>
+                <field name="orderpoints_count" string="Orderpts"/>
+                <field name="history_summary" string="History Status" optional="hide"/>
+                <field name="message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_warehouse_gst_assignment_log_line_form" model="ir.ui.view">
+        <field name="name">warehouse.gst.assignment.log.line.form</field>
+        <field name="model">warehouse.gst.assignment.log.line</field>
+        <field name="arch" type="xml">
+            <form string="GST Assignment Log Detail" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="log_id"/>
+                            <field name="execution_date"/>
+                            <field name="status" widget="badge"/>
+                            <field name="is_done" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="warehouse_id"/>
+                            <field name="partner_id"/>
+                            <field name="gst_code"/>
+                            <field name="src_company_id"/>
+                            <field name="dest_company_id"/>
+                        </group>
+                    </group>
+                    <group string="Affected Configuration Records">
+                        <group>
+                            <field name="locations_count"/>
+                            <field name="picking_types_count"/>
+                        </group>
+                        <group>
+                            <field name="rules_count"/>
+                            <field name="orderpoints_count"/>
+                        </group>
+                    </group>
+                    <group string="Safety &amp; Execution Details">
+                        <field name="history_summary"/>
+                        <field name="message"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_warehouse_gst_assignment_log_line_search" model="ir.ui.view">
+        <field name="name">warehouse.gst.assignment.log.line.search</field>
+        <field name="model">warehouse.gst.assignment.log.line</field>
+        <field name="arch" type="xml">
+            <search string="Search GST Assignment Log Details">
+                <field name="warehouse_id"/>
+                <field name="partner_id"/>
+                <field name="gst_code"/>
+                <field name="src_company_id"/>
+                <field name="dest_company_id"/>
+                <separator/>
+                <filter string="Done (Assigned / Already Matched)" name="filter_done" domain="[('is_done', '=', True)]"/>
+                <filter string="Not Done (Skipped / Failed)" name="filter_not_done" domain="[('is_done', '=', False)]"/>
+                <separator/>
+                <filter string="Successfully Transferred" name="filter_success" domain="[('status', '=', 'success')]"/>
+                <filter string="Already Matched" name="filter_already_matched" domain="[('status', '=', 'already_matched')]"/>
+                <filter string="Skipped (No GST)" name="filter_skipped" domain="[('status', '=', 'skipped')]"/>
+                <filter string="Failed" name="filter_failed" domain="[('status', '=', 'failed')]"/>
+                <group>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Warehouse" name="group_warehouse" context="{'group_by': 'warehouse_id'}"/>
+                    <filter string="Target Company" name="group_target_company" context="{'group_by': 'dest_company_id'}"/>
+                    <filter string="Execution Date" name="group_date" context="{'group_by': 'execution_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ======================================================== -->
+    <!-- Master Log Views                                         -->
+    <!-- ======================================================== -->
+
+    <record id="view_warehouse_gst_assignment_log_tree" model="ir.ui.view">
+        <field name="name">warehouse.gst.assignment.log.list</field>
+        <field name="model">warehouse.gst.assignment.log</field>
+        <field name="arch" type="xml">
+            <list string="Warehouse GST Assignment Logs" create="false" edit="false">
+                <field name="name"/>
+                <field name="execution_date"/>
+                <field name="user_id"/>
+                <field name="source" widget="badge"/>
+                <field name="total_processed"/>
+                <field name="total_success" decoration-success="total_success &gt; 0"/>
+                <field name="total_already_matched" decoration-info="total_already_matched &gt; 0"/>
+                <field name="total_skipped" decoration-muted="total_skipped &gt; 0"/>
+                <field name="total_failed" decoration-danger="total_failed &gt; 0"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_warehouse_gst_assignment_log_form" model="ir.ui.view">
+        <field name="name">warehouse.gst.assignment.log.form</field>
+        <field name="model">warehouse.gst.assignment.log</field>
+        <field name="arch" type="xml">
+            <form string="Warehouse GST Assignment Log" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="execution_date"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="source" widget="badge"/>
+                        </group>
+                    </group>
+
+                    <!-- Summary KPI Cards -->
+                    <div class="row g-2 mb-3">
+                        <div class="col">
+                            <div class="card text-center shadow-sm p-2 bg-light">
+                                <div class="text-muted small">Total Evaluated</div>
+                                <h4 class="mb-0 text-dark"><field name="total_processed"/></h4>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card text-center shadow-sm p-2 bg-light">
+                                <div class="text-muted small">Updated</div>
+                                <h4 class="mb-0 text-success"><field name="total_success"/></h4>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card text-center shadow-sm p-2 bg-light">
+                                <div class="text-muted small">Already Matched</div>
+                                <h4 class="mb-0 text-info"><field name="total_already_matched"/></h4>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card text-center shadow-sm p-2 bg-light">
+                                <div class="text-muted small">Skipped (No GST)</div>
+                                <h4 class="mb-0 text-secondary"><field name="total_skipped"/></h4>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card text-center shadow-sm p-2 bg-light">
+                                <div class="text-muted small">Failed</div>
+                                <h4 class="mb-0 text-danger"><field name="total_failed"/></h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <notebook>
+                        <page string="Itemized Details" name="lines">
+                            <field name="line_ids">
+                                <list decoration-success="status == 'success'"
+                                      decoration-info="status == 'already_matched'"
+                                      decoration-warning="status == 'skipped'"
+                                      decoration-danger="status == 'failed'">
+                                    <field name="warehouse_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="gst_code"/>
+                                    <field name="src_company_id"/>
+                                    <field name="dest_company_id"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="is_done" widget="boolean_toggle"/>
+                                    <field name="locations_count" string="Locs"/>
+                                    <field name="picking_types_count" string="Op Types"/>
+                                    <field name="rules_count" string="Rules"/>
+                                    <field name="orderpoints_count" string="Orderpts"/>
+                                    <field name="history_summary" string="History Status" optional="hide"/>
+                                    <field name="message"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Execution Log" name="summary">
+                            <field name="summary" widget="ace" readonly="1" class="w-100" style="min-height: 250px; font-family: monospace;"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_warehouse_gst_assignment_log_search" model="ir.ui.view">
+        <field name="name">warehouse.gst.assignment.log.search</field>
+        <field name="model">warehouse.gst.assignment.log</field>
+        <field name="arch" type="xml">
+            <search string="Search GST Assignment Logs">
+                <field name="name"/>
+                <field name="user_id"/>
+                <separator/>
+                <filter string="Has Failures" name="filter_has_failed" domain="[('total_failed', '&gt;', 0)]"/>
+                <filter string="Has Skipped" name="filter_has_skipped" domain="[('total_skipped', '&gt;', 0)]"/>
+                <filter string="Has Updates" name="filter_has_success" domain="[('total_success', '&gt;', 0)]"/>
+                <group>
+                    <filter string="Source" name="group_source" context="{'group_by': 'source'}"/>
+                    <filter string="Executed By" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Execution Date" name="group_date" context="{'group_by': 'execution_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ======================================================== -->
+    <!-- Window Actions and Menus                                 -->
+    <!-- ======================================================== -->
+
+    <record id="action_warehouse_gst_assignment_log" model="ir.actions.act_window">
+        <field name="name">Warehouse GST Assignment Logs</field>
+        <field name="res_model">warehouse.gst.assignment.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_warehouse_gst_assignment_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No GST company assignment logs found!
+            </p>
+            <p>
+                Logs are automatically created whenever you run "Match Company by GST Code"
+                from the warehouse form or the batch wizard.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_warehouse_gst_assignment_log_line" model="ir.actions.act_window">
+        <field name="name">Warehouse GST Assignment Log Details</field>
+        <field name="res_model">warehouse.gst.assignment.log.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_warehouse_gst_assignment_log_line_search"/>
+    </record>
+
+    <!-- Menu Item under Inventory > Configuration > Warehouse Management -->
+    <menuitem id="menu_warehouse_gst_assignment_log"
+              name="Warehouse GST Assignment Logs"
+              parent="stock.menu_warehouse_config"
+              action="action_warehouse_gst_assignment_log"
+              sequence="50"/>
+</odoo>

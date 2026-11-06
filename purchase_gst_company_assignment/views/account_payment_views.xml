@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Account Payment Form View: Add is_company_transferred -->
+    <record id="view_purchase_account_payment_form_company_transferred" model="ir.ui.view">
+        <field name="name">account.payment.form.purchase.company.transferred</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="is_company_transferred" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Payment Search: Add Filter -->
+    <record id="view_purchase_account_payment_search_company_transferred" model="ir.ui.view">
+        <field name="name">account.payment.search.purchase.company.transferred</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+            </xpath>
+        </field>
+    </record>
+</odoo>

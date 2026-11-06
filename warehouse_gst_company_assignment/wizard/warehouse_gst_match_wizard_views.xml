@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_warehouse_gst_company_match_wizard_form" model="ir.ui.view">
+        <field name="name">warehouse.gst.company.match.wizard.form</field>
+        <field name="model">warehouse.gst.company.match.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Match Warehouse Company by GST Code">
+                <field name="state" invisible="1"/>
+                <field name="persistent_log_id" invisible="1"/>
+
+                <!-- Header Banner in Draft -->
+                <div class="alert alert-info mb-3" role="alert" invisible="state != 'draft'">
+                    <strong>Automatic Branch Assignment by GST Code:</strong>
+                    Matches <code>warehouse.partner_id.gst_code</code> with <code>res.company.gst_code_matching_com</code>
+                    under the parent company hierarchy.
+                    <br/>
+                    <strong>Safety Scope:</strong> Directly reassigns warehouse ownership and exclusively owned configuration
+                    (<code>stock.location</code>, <code>stock.picking.type</code>, <code>stock.rule</code>, <code>stock.warehouse.orderpoint</code>, <code>stock.route</code>, <code>stock.quant</code>).
+                </div>
+
+                <!-- Setup Fields in Draft -->
+                <group invisible="state != 'draft'">
+                    <group>
+                        <field name="preserve_history" widget="boolean_toggle"/>
+                    </group>
+                    <group>
+                        <field name="warehouse_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                </group>
+
+                <!-- Prominent Status Banner in Done State -->
+                <div class="alert alert-success mb-3 shadow-sm" role="alert" invisible="state != 'done'">
+                    <h4 class="alert-heading mb-1">✅ Execution Completed!</h4>
+                    <p class="mb-2">
+                        Warehouse company ownership and eligible configuration records have been updated in your database.
+                    </p>
+                    <button name="action_view_persistent_log"
+                            string="📋 View Saved Execution Log"
+                            type="object"
+                            class="btn btn-outline-success fw-bold"
+                            invisible="not persistent_log_id"/>
+                </div>
+
+                <!-- Statistics Metrics in Done State -->
+                <div class="row g-2 mb-3" invisible="state != 'done'">
+                    <div class="col">
+                        <div class="card text-center shadow-sm p-2 bg-light">
+                            <div class="text-muted small">Total Evaluated</div>
+                            <h4 class="mb-0 text-dark"><field name="total_processed"/></h4>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center shadow-sm p-2 bg-light">
+                            <div class="text-muted small">Updated</div>
+                            <h4 class="mb-0 text-success"><field name="total_success"/></h4>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center shadow-sm p-2 bg-light">
+                            <div class="text-muted small">Already Matched</div>
+                            <h4 class="mb-0 text-info"><field name="total_already_matched"/></h4>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center shadow-sm p-2 bg-light">
+                            <div class="text-muted small">Skipped (No GST)</div>
+                            <h4 class="mb-0 text-secondary"><field name="total_skipped"/></h4>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card text-center shadow-sm p-2 bg-light">
+                            <div class="text-muted small">Failed</div>
+                            <h4 class="mb-0 text-danger"><field name="total_failed"/></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Notebook in Done State -->
+                <notebook invisible="state != 'done'">
+                    <page string="Itemized Results" name="results_table">
+                        <field name="line_ids" readonly="1">
+                            <list decoration-success="status == 'success'"
+                                  decoration-info="status == 'already_matched'"
+                                  decoration-muted="status == 'skipped'"
+                                  decoration-danger="status == 'failed'">
+                                <field name="warehouse_id"/>
+                                <field name="partner_id"/>
+                                <field name="gst_code"/>
+                                <field name="current_company_id"/>
+                                <field name="target_company_id"/>
+                                <field name="status" widget="badge"/>
+                                <field name="is_done" widget="boolean_toggle" string="Is Done"/>
+                                <field name="locations_count" string="Locs"/>
+                                <field name="picking_types_count" string="Op Types"/>
+                                <field name="rules_count" string="Rules"/>
+                                <field name="orderpoints_count" string="Orderpts"/>
+                                <field name="history_summary" string="History Status" optional="hide"/>
+                                <field name="message"/>
+                            </list>
+                        </field>
+                    </page>
+                    <page string="Log Summary" name="log_summary">
+                        <field name="result_summary" widget="ace" readonly="1" class="w-100" style="min-height: 250px; font-family: monospace;"/>
+                    </page>
+                </notebook>
+
+                <footer>
+                    <button name="action_process"
+                            string="Run Matching"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <!--button name="action_view_persistent_log"
+                            string="View Audit Log"
+                            type="object"
+                            class="btn-outline-primary"
+                            invisible="state != 'done' or not persistent_log_id"/-->
+                    <button name="action_reset"
+                            string="Run Again / Reconfigure"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'done'"/>
+                    <button string="Close"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Line Form View for the popup modal shown when clicking a line -->
+    <record id="view_warehouse_gst_company_match_wizard_line_form" model="ir.ui.view">
+        <field name="name">warehouse.gst.company.match.wizard.line.form</field>
+        <field name="model">warehouse.gst.company.match.wizard.line</field>
+        <field name="arch" type="xml">
+            <form string="Processing Result Detail" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="warehouse_id"/>
+                            <field name="partner_id"/>
+                            <field name="gst_code"/>
+                            <field name="status" widget="badge"/>
+                            <field name="is_done" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="current_company_id"/>
+                            <field name="target_company_id"/>
+                            <field name="history_summary"/>
+                        </group>
+                    </group>
+                    <group string="Affected Configuration Counts">
+                        <group>
+                            <field name="locations_count"/>
+                            <field name="picking_types_count"/>
+                        </group>
+                        <group>
+                            <field name="rules_count"/>
+                            <field name="orderpoints_count"/>
+                        </group>
+                    </group>
+                    <group string="Details / Error Message">
+                        <field name="message" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
