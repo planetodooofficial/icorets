@@ -13,6 +13,7 @@ class ProductProduct(models.Model):
             ('date', '<=', datetime(2025, 3, 31, 23, 59, 59)),
             ('missing_valuation', '=', False),
         ], limit=3000)
+        print("------")
 
         receipt_valuation_amount = 0.0
 
