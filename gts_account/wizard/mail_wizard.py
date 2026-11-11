@@ -11,6 +11,13 @@ class MailWizard(models.TransientModel):
         string='To',
         required=True
     )
+    # cc_partner_ids = fields.Many2many(
+    #     'res.partner',
+    #     relation='mail_wizard_cc_partner_rel',
+    #     column1='wizard_id',
+    #     column2='partner_id',
+    #     string='CC'
+    # )
     cc_partner_ids = fields.Many2many(
         'res.partner',
         relation='mail_wizard_cc_partner_rel',
