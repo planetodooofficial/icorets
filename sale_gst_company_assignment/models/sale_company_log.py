@@ -58,6 +58,7 @@ class SaleCompanyReassignmentLog(models.Model):
             ("sale_order", "Sale Orders"),
             ("sale_order_line", "Sale Order Lines"),
             ("stock_picking", "Delivery Pickings"),
+            ("stock_picking_by_type", "Stock Pickings by Operation Type"),
             ("stock_move", "Stock Moves & Lines"),
             ("account_move", "Invoices & Entries"),
             ("account_move_line", "Invoice Lines & Items"),

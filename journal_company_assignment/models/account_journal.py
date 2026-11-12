@@ -61,5 +61,22 @@ class AccountJournal(models.Model):
             "context": {
                 "default_journal_id": self.id,
                 "default_source_company_id": self.company_id.id,
+                "default_match_type": "picking",
+            },
+        }
+
+    def action_open_bill_match_wizard(self):
+        """Open Button 3 Wizard: Reassign by Bill / Invoice / Credit-Debit Note match for this journal."""
+        self.ensure_one()
+        return {
+            "name": _("Reassign Journal Entries by Bill / Invoice Match"),
+            "type": "ir.actions.act_window",
+            "res_model": "journal.picking.match.wizard",
+            "view_mode": "form",
+            "target": "new",
+            "context": {
+                "default_journal_id": self.id,
+                "default_source_company_id": self.company_id.id,
+                "default_match_type": "bill",
             },
         }
