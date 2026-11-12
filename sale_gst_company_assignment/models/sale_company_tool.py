@@ -49,6 +49,7 @@ class SaleCompanyReassignmentTool(models.Model):
             ("sale_order", "1. Sale Orders (sale.order)"),
             ("sale_order_line", "2. Sale Order Lines (sale.order.line)"),
             ("stock_picking", "3. Delivery Orders (stock.picking)"),
+            ("stock_picking_by_type", "3b. Stock Pickings by Operation Type Company (stock.picking -> picking_type_id.company_id)"),
             ("stock_move", "4. Stock Moves & Lines (stock.move, stock.move.line)"),
             ("account_move", "5. Invoices & Journal Entries (account.move & Related Classes)"),
             ("account_move_line", "6. Invoice Lines & Items (account.move.line)"),
@@ -60,7 +61,18 @@ class SaleCompanyReassignmentTool(models.Model):
         help="Choose a specific model to update individually or select All to update the full pipeline.",
     )
 
-    @api.onchange("model_target")
+    picking_type_scope = fields.Selection(
+        [
+            ("pipeline", "Pipeline Pickings (Linked to Matching Sale Orders)"),
+            ("source_company", "All Pickings in Source Company"),
+        ],
+        string="Picking Scope for Operation Type",
+        default="pipeline",
+        required=True,
+        help="Choose whether to evaluate only pickings linked to the current SO pipeline or all pickings in the source company whose company differs from their operation type.",
+    )
+
+    @api.onchange("model_target", "picking_type_scope")
     def _onchange_model_target(self):
         for rec in self:
             if rec.model_target == "all":
@@ -77,6 +89,8 @@ class SaleCompanyReassignmentTool(models.Model):
                 rec.count_selected_model = rec.count_sale_order_lines
             elif rec.model_target == "stock_picking":
                 rec.count_selected_model = rec.count_pickings
+            elif rec.model_target == "stock_picking_by_type":
+                rec.count_selected_model = rec.count_pickings_by_type
             elif rec.model_target == "stock_move":
                 rec.count_selected_model = rec.count_stock_moves + rec.count_move_lines
             elif rec.model_target == "account_move":
@@ -94,6 +108,7 @@ class SaleCompanyReassignmentTool(models.Model):
     count_sale_orders = fields.Integer(string="Sale Orders", readonly=True)
     count_sale_order_lines = fields.Integer(string="Sale Order Lines", readonly=True)
     count_pickings = fields.Integer(string="Pickings / Deliveries", readonly=True)
+    count_pickings_by_type = fields.Integer(string="Pickings by Operation Type", readonly=True)
     count_stock_moves = fields.Integer(string="Stock Moves", readonly=True)
     count_move_lines = fields.Integer(string="Stock Move Lines", readonly=True)
     count_invoices = fields.Integer(string="Invoices / Moves", readonly=True)
@@ -107,6 +122,10 @@ class SaleCompanyReassignmentTool(models.Model):
     count_selected_model = fields.Integer(string="Count of Selected Model", readonly=True)
 
     last_fetch_date = fields.Datetime(string="Last Counted At", readonly=True)
+    picking_type_match_summary = fields.Html(
+        string="Pickings by Op Type Summary",
+        readonly=True,
+    )
     log_ids = fields.One2many(
         "sale.company.reassignment.log",
         "tool_id",
@@ -535,6 +554,48 @@ class SaleCompanyReassignmentTool(models.Model):
             "statement_ids": statement_ids,
         }
 
+    def _get_candidate_pickings_by_type(self):
+        """Find pickings where company_id differs from picking_type_id.company_id.
+        Supports both pipeline scope and source company scope."""
+        self.ensure_one()
+        cr = self.env.cr
+
+        # 1. Pipeline scope
+        if self.picking_type_scope == "pipeline":
+            so_ids = self._get_matching_so_ids()
+            records = self._get_related_record_ids(so_ids)
+            p_ids = records.get("picking_ids", [])
+            if p_ids:
+                cr.execute("""
+                    SELECT sp.id, sp.name, sp.company_id, spt.company_id, c1.name, c2.name
+                    FROM stock_picking sp
+                    JOIN stock_picking_type spt ON sp.picking_type_id = spt.id
+                    LEFT JOIN res_company c1 ON sp.company_id = c1.id
+                    LEFT JOIN res_company c2 ON spt.company_id = c2.id
+                    WHERE sp.id IN %s
+                      AND spt.company_id IS NOT NULL
+                      AND sp.company_id != spt.company_id;
+                """, [tuple(p_ids)])
+                rows = cr.fetchall()
+                if rows:
+                    return rows
+
+        # 2. Source company scope (or fallback if pipeline has no matching pickings)
+        if self.source_company_id:
+            cr.execute("""
+                SELECT sp.id, sp.name, sp.company_id, spt.company_id, c1.name, c2.name
+                FROM stock_picking sp
+                JOIN stock_picking_type spt ON sp.picking_type_id = spt.id
+                LEFT JOIN res_company c1 ON sp.company_id = c1.id
+                LEFT JOIN res_company c2 ON spt.company_id = c2.id
+                WHERE sp.company_id = %s
+                  AND spt.company_id IS NOT NULL
+                  AND sp.company_id != spt.company_id;
+            """, [self.source_company_id.id])
+            return cr.fetchall()
+
+        return []
+
     def action_fetch_records_count(self):
         """Fetch and populate record counts across all models based on current selections."""
         self.ensure_one()
@@ -555,6 +616,9 @@ class SaleCompanyReassignmentTool(models.Model):
         c_stline = len(records["st_line_ids"])
         c_stat = len(records["statement_ids"])
 
+        # Count pickings differing from their picking_type_id's company
+        c_pick_by_type = len(self._get_candidate_pickings_by_type())
+
         selected_count = 0
         if self.model_target == "all":
             selected_count = (
@@ -567,6 +631,8 @@ class SaleCompanyReassignmentTool(models.Model):
             selected_count = c_sol
         elif self.model_target == "stock_picking":
             selected_count = c_pick
+        elif self.model_target == "stock_picking_by_type":
+            selected_count = c_pick_by_type
         elif self.model_target == "stock_move":
             selected_count = c_move + c_mline
         elif self.model_target == "account_move":
@@ -580,6 +646,7 @@ class SaleCompanyReassignmentTool(models.Model):
             "count_sale_orders": c_so,
             "count_sale_order_lines": c_sol,
             "count_pickings": c_pick,
+            "count_pickings_by_type": c_pick_by_type,
             "count_stock_moves": c_move,
             "count_move_lines": c_mline,
             "count_invoices": c_inv,
@@ -595,12 +662,13 @@ class SaleCompanyReassignmentTool(models.Model):
         })
 
         msg = _(
-            "Found %(so)s SOs, %(sol)s Lines, %(pick)s Pickings, %(move)s Moves, "
+            "Found %(so)s SOs, %(sol)s Lines, %(pick)s Pickings (%(pick_by_type)s differing from Op Type), %(move)s Moves, "
             "%(inv)s Invoices, %(iline)s Invoice Lines, %(pay)s Payments, %(pmove)s Payment Moves, "
             "%(pline)s Payment Lines, %(rec)s Reconciliations, %(stline)s Bank Transactions, %(stat)s Statements.",
             so=c_so,
             sol=c_sol,
             pick=c_pick,
+            pick_by_type=c_pick_by_type,
             move=c_move + c_mline,
             inv=c_inv,
             iline=c_iline,
@@ -725,6 +793,161 @@ class SaleCompanyReassignmentTool(models.Model):
         self._create_log_entry("stock_picking", count, summary, "success")
         self.action_fetch_records_count()
         return self._notify_result(_("Pickings Updated"), summary)
+
+    def action_fetch_pickings_by_type(self):
+        """Fetch candidate stock pickings whose company differs from picking_type_id.company_id
+        and generate a visual count & breakdown summary on the form."""
+        self.ensure_one()
+        cr = self.env.cr
+        from collections import defaultdict
+
+        mismatches = self._get_candidate_pickings_by_type()
+        count = len(mismatches)
+
+        # Count moves linked to these pickings
+        count_moves = 0
+        target_counts = defaultdict(list)
+        for r in mismatches:
+            p_id, p_name, cur_comp_id, tgt_comp_id, cur_comp_name, tgt_comp_name = r[0], r[1], r[2], r[3], r[4], r[5]
+            target_counts[(tgt_comp_id, tgt_comp_name or f"Company ID {tgt_comp_id}")].append(p_name)
+
+        if mismatches:
+            p_tuple = tuple(r[0] for r in mismatches)
+            cr.execute("SELECT count(id) FROM stock_move WHERE picking_id IN %s;", [p_tuple])
+            count_moves = cr.fetchone()[0] or 0
+
+        # Build HTML summary table
+        if count > 0:
+            table_rows = []
+            for (comp_id, comp_name), pick_names in target_counts.items():
+                sample_p = ", ".join(sorted(set(pick_names))[:5])
+                if len(set(pick_names)) > 5:
+                    sample_p += f" ... (+{len(set(pick_names)) - 5} more)"
+                table_rows.append(f"""
+                    <tr>
+                        <td style="padding: 6px; border: 1px solid #ddd;"><strong>{comp_name}</strong> (ID: {comp_id})</td>
+                        <td style="padding: 6px; border: 1px solid #ddd; text-align: center; color: #2e7d32;"><strong>{len(pick_names)}</strong></td>
+                        <td style="padding: 6px; border: 1px solid #ddd;"><code>{sample_p}</code></td>
+                    </tr>
+                """)
+
+            summary_html = f"""
+                <div class="alert alert-info" style="margin-bottom: 10px; font-size: 13px;">
+                    <strong>📦 Pickings Differing from Operation Type Company:</strong>
+                    <span style="font-size: 16px; color: #d32f2f; font-weight: bold;"> {count} pickings</span>
+                    ({count_moves} stock moves) ready to update.
+                </div>
+                <table class="table table-bordered table-sm" style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 10px;">
+                    <thead style="background-color: #f1f8e9;">
+                        <tr>
+                            <th style="padding: 6px; border: 1px solid #ddd;">Target Branch Company (from Operation Type)</th>
+                            <th style="padding: 6px; border: 1px solid #ddd; text-align: center;">Pickings Count</th>
+                            <th style="padding: 6px; border: 1px solid #ddd;">Sample Picking Numbers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {"".join(table_rows)}
+                    </tbody>
+                </table>
+            """
+        else:
+            summary_html = """
+                <div class="alert alert-success" style="margin-bottom: 10px; font-size: 13px;">
+                    <strong>✅ All candidate Stock Pickings already match their Operation Type company. (0 records to update)</strong>
+                </div>
+            """
+
+        self.write({
+            "count_pickings_by_type": count,
+            "picking_type_match_summary": summary_html,
+            "last_fetch_date": fields.Datetime.now(),
+        })
+
+        if self.model_target == "stock_picking_by_type":
+            self.write({"count_selected_model": count})
+
+        msg = _(
+            "Found %(count)s Stock Pickings (and %(moves)s Moves) where company differs from Operation Type.",
+            count=count,
+            moves=count_moves,
+        )
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Pickings by Operation Type Fetched"),
+                "message": msg,
+                "type": "info",
+                "sticky": False,
+            },
+        }
+
+    def action_update_pickings_by_type(self):
+        """Update company_id on stock.picking (and related stock moves & move lines)
+        based on each picking's picking_type_id.company_id."""
+        self.ensure_one()
+        self._ensure_transferred_columns_exist()
+
+        cr = self.env.cr
+        from collections import defaultdict
+
+        mismatches = self._get_candidate_pickings_by_type()
+        if not mismatches:
+            summary = _("All candidate Stock Pickings already match their Operation Type company. Nothing to update.")
+            self._create_log_entry("stock_picking_by_type", 0, summary, "nothing_to_update")
+            self.action_fetch_pickings_by_type()
+            return self._notify_result(_("Nothing to Update"), summary)
+
+        target_group = defaultdict(list)
+        for r in mismatches:
+            p_id, p_name, cur_comp, target_comp = r[0], r[1], r[2], r[3]
+            target_group[target_comp].append(p_id)
+
+        total_pickings = 0
+        total_moves = 0
+        total_move_lines = 0
+
+        with cr.savepoint():
+            for target_comp_id, p_ids in target_group.items():
+                p_tuple = tuple(p_ids)
+
+                # 1. Update stock_picking to target operation type company
+                cr.execute("""
+                    UPDATE stock_picking
+                    SET company_id = %s, is_company_transferred = TRUE
+                    WHERE id IN %s;
+                """, [target_comp_id, p_tuple])
+                total_pickings += len(p_ids)
+
+                # 2. Update linked stock_move to match picking company
+                cr.execute("""
+                    UPDATE stock_move
+                    SET company_id = %s, is_company_transferred = TRUE
+                    WHERE picking_id IN %s;
+                """, [target_comp_id, p_tuple])
+                total_moves += cr.rowcount
+
+                # 3. Update linked stock_move_line to match picking company
+                cr.execute("""
+                    UPDATE stock_move_line
+                    SET company_id = %s, is_company_transferred = TRUE
+                    WHERE picking_id IN %s;
+                """, [target_comp_id, p_tuple])
+                total_move_lines += cr.rowcount
+
+        self.env.invalidate_all()
+
+        summary = _(
+            "Updated %(pick)s Stock Pickings (and %(moves)s Moves, %(mlines)s Move Lines) "
+            "to match their Operation Type (picking_type_id) company across %(comps)s branch company/companies.",
+            pick=total_pickings,
+            moves=total_moves,
+            mlines=total_move_lines,
+            comps=len(target_group),
+        )
+        self._create_log_entry("stock_picking_by_type", total_pickings, summary, "success")
+        self.action_fetch_pickings_by_type()
+        return self._notify_result(_("Pickings Updated by Operation Type"), summary)
 
     def action_update_stock_moves(self):
         """Update company_id on stock.move and stock.move.line records."""
@@ -1214,6 +1437,8 @@ class SaleCompanyReassignmentTool(models.Model):
             return self.action_update_sale_order_lines()
         elif self.model_target == "stock_picking":
             return self.action_update_pickings()
+        elif self.model_target == "stock_picking_by_type":
+            return self.action_update_pickings_by_type()
         elif self.model_target == "stock_move":
             return self.action_update_stock_moves()
         elif self.model_target == "account_move":

@@ -46,6 +46,7 @@ class JournalCompanyReassignmentLog(models.Model):
         [
             ("manual", "Manual / Batch Reassignment"),
             ("picking_match", "Stock Picking String Match"),
+            ("bill_match", "Bill / Invoice / Note Match"),
         ],
         string="Reassignment Method",
         readonly=True,

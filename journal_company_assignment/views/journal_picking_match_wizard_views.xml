@@ -4,17 +4,24 @@
         <field name="name">journal.picking.match.wizard.form</field>
         <field name="model">journal.picking.match.wizard</field>
         <field name="arch" type="xml">
-            <form string="Reassign Journal Entries by Stock Picking Match">
+            <form string="Reassign Journal Entries by Document Match">
                 <field name="state" invisible="1"/>
                 <sheet>
-                    <div class="alert alert-info" role="alert" invisible="state == 'done'">
-                        <strong>How this works:</strong><br/>
-                        1. Scans journal entries in this journal where the reference (e.g. <code>DEL/OUT/2627/199738 - product name</code>), entry name, or line description matches a <strong>Stock Picking number</strong>.<br/>
-                        2. Identifies the <strong>company set on that matching stock picking</strong> (e.g. Company ID 3).<br/>
-                        3. Swaps the company on the journal entry from its current company to the picking's company. (The stock picking itself is not altered).
+                    <div class="alert alert-info" role="alert" invisible="state == 'done' or match_type != 'picking'">
+                        <strong>Stock Picking Match:</strong><br/>
+                        1. Scans journal entries in this journal where the reference matches a <strong>Stock Picking</strong> (e.g. <code>DEL/OUT/...</code>, <code>DEL/RET/...</code>).<br/>
+                        2. Identifies the <strong>company set on that stock picking</strong>.<br/>
+                        3. Swaps the company on the journal entry to the picking's company. (The original picking is not altered).
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="state == 'done' or match_type != 'bill'">
+                        <strong>Bill / Invoice / Credit &amp; Debit Note Match:</strong><br/>
+                        1. Scans journal entries in this journal where the reference matches a <strong>Vendor Bill, Customer Invoice, Credit Note, or Debit Note</strong> (e.g. <code>BLIPDL/2627/1174</code>, <code>BILL/...</code>, <code>INV/...</code>, <code>RINV/...</code>).<br/>
+                        2. Identifies the <strong>company set on that bill/invoice/note</strong>.<br/>
+                        3. Swaps the company on the journal entry to the matched document's company. (The original bill/invoice is not altered).
                     </div>
 
                     <group string="Filter Criteria">
+                        <field name="match_type" widget="radio" readonly="state != 'draft'"/>
                         <field name="journal_id" options="{'no_open': True}"/>
                         <field name="source_company_id" options="{'no_create': True}" placeholder="All Companies / Leave blank to scan all"/>
                     </group>
@@ -38,17 +45,32 @@
                 </sheet>
 
                 <footer>
+                    <!-- Picking matching buttons -->
                     <button name="action_fetch_matches"
-                            string="🔍 1. Fetch &amp; Preview Matches"
+                            string="🔍 1. Fetch Picking Matches"
                             type="object"
                             class="btn-primary"
                             invisible="state == 'done'"/>
                     <button name="action_reassign_by_picking"
-                            string="🚀 2. Swap Company from Matched Pickings"
+                            string="📦 2. Swap Company from Matched Pickings"
                             type="object"
                             class="btn-danger"
-                            confirm="Are you sure you want to swap the company on these journal entries to match their respective stock pickings?"
-                            invisible="state != 'fetched'"/>
+                            confirm="Are you sure you want to swap the company on these journal entries to match their respective Stock Pickings?"
+                            invisible="state != 'fetched' or match_type != 'picking'"/>
+
+                    <!-- Dedicated Bill / Invoice / Note matching buttons -->
+                    <button name="action_fetch_bill_matches"
+                            string="🔍 1. Fetch Bill / Note Matches"
+                            type="object"
+                            class="btn-info"
+                            invisible="state == 'done'"/>
+                    <button name="action_reassign_by_bill"
+                            string="📄 2. Swap Company from Matched Bills / Notes"
+                            type="object"
+                            class="btn-danger"
+                            confirm="Are you sure you want to swap the company on these journal entries to match their respective Bills, Invoices, Credit Notes, or Debit Notes?"
+                            invisible="state != 'fetched' or match_type != 'bill'"/>
+
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

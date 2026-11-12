@@ -16,6 +16,15 @@
                             type="object"
                             class="btn-primary"
                             confirm="Are you sure you want to update the selected model and its related records to the target branch company?"/>
+                    <button name="action_fetch_pickings_by_type"
+                            string="🔍 Fetch Pickings by Op Type"
+                            type="object"
+                            class="btn-secondary"/>
+                    <button name="action_update_pickings_by_type"
+                            string="📦 Update Pickings by Op Type"
+                            type="object"
+                            class="btn-info"
+                            confirm="Are you sure you want to reassign company on Stock Pickings (and their stock moves) based on each picking's Operation Type company?"/>
                     <button name="action_update_all"
                             string="🚀 Update Entire Pipeline"
                             type="object"
@@ -39,10 +48,15 @@
                         </group>
                         <group string="Model-wise Update &amp; Status">
                             <field name="model_target"/>
-                            <field name="count_selected_model" invisible="1" readonly="1"/>
+                            <field name="count_selected_model" readonly="1"/>
+                            <field name="picking_type_scope" widget="radio" options="{'horizontal': true}"/>
+                            <field name="count_pickings_by_type" readonly="1"/>
                             <field name="last_fetch_date"/>
                         </group>
                     </group>
+
+                    <!-- Operation Type Pickings Count & Breakdown Preview -->
+                    <field name="picking_type_match_summary" nolabel="1" readonly="1"/>
 
                     <!-- Notebook with Logs -->
                     <notebook>
