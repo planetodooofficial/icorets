@@ -7,6 +7,8 @@
             <list string="unicommerce Orders" create="0" edit="0">
                 <field name="code"/>
                 <field name="name" optional="hide"/>
+                <field name="facility_code" optional="show"/>
+                <field name="company_id" optional="show"/>
                 <field name="status"/>
                 <field name="order_state" widget="badge" decoration-info="order_state == 'draft'"
                        decoration-success="order_state == 'done'" decoration-danger="order_state =='exception'"
@@ -33,6 +35,14 @@
         <field name="model">unicommerce.orders</field>
         <field name="arch" type="xml">
             <form string="Unicommerce Orders" create="0" edit="0">
+                <header>
+                    <button name="action_create_sale_order"
+                            string="Create Sale Order"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="order_state != 'draft'"/>
+                    <field name="order_state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
                 <sheet>
                     <group>
                         <group string="Customer Details">
@@ -61,6 +71,8 @@
                             <field name="displayOrderCode"/>
                             <field name="channel"/>
                             <field name="source"/>
+                            <field name="facility_code"/>
+                            <field name="company_id"/>
                             <field name="displayOrderDateTime"/>
                             <field name="shipping_date"/>
                             <field name="invoice_date"/>
@@ -207,6 +219,16 @@
                 Order Records From Api
             </p>
         </field>
+    </record>
+
+    <!-- Server Action to create Sale Orders for selected Unicommerce Orders -->
+    <record id="action_unicommerce_orders_create_sale" model="ir.actions.server">
+        <field name="name">Create Sale Order</field>
+        <field name="model_id" ref="unicommerce_integration.model_unicommerce_orders"/>
+        <field name="binding_model_id" ref="unicommerce_integration.model_unicommerce_orders"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_create_sale_order()</field>
     </record>
 
 </odoo>

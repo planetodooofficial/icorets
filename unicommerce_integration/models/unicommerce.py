@@ -15,6 +15,9 @@ class UnicommerceOrders(models.Model):
     order_data_json = fields.Text("Order data Json", readonly=True)
     sales_channel_id = fields.Many2one('shop.sales.channel', string='Sales Channel')
     shop_instance_id = fields.Many2one('shop.instance', string='Shop Instance')
+    facility_code = fields.Char(string='Facility Code', index=True)
+    facility_mapping_id = fields.Many2one('shop.facility.mapping', string='Facility Mapping')
+    company_id = fields.Many2one('res.company', string='Branch / Company', index=True)
     is_return = fields.Boolean(string="Is Return")
     return_state = fields.Selection([('draft', 'Draft'), ('done', 'Done'), ('exception', 'Exception')],
                                     string='Return State')
@@ -68,6 +71,17 @@ class UnicommerceOrders(models.Model):
     def create(self, vals_list):
         res = super(UnicommerceOrders, self).create(vals_list)
         return res
+
+    def action_create_sale_order(self):
+        """Manually create Sale Order(s), Delivery, and Invoice for the selected draft Unicommerce order(s)."""
+        draft_orders = self.filtered(lambda o: o.order_state == 'draft')
+        if not draft_orders:
+            return False
+        instance = draft_orders[:1].shop_instance_id or self.env['shop.instance'].search([], limit=1)
+        if not instance:
+            return False
+        instance.create_sales(orders=draft_orders)
+        return True
 
 
 class UnicommerceOrderLine(models.Model):

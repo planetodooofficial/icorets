@@ -49,9 +49,7 @@ class ProductInherit(models.Model):
     drop_box_link = fields.Char('Drop Box Link')
     country_origin = fields.Char('Country of Origin')
 
-    _sql_constraints = [
-        ('buin_unique', 'unique(buin)', "BUIN code can only be assigned to one product !"),
-    ]
+    _buin_unique = models.Constraint('unique(buin)', "BUIN code can only be assigned to one product !")
 
     # Added func for hsn
     @api.onchange('sale_hsn')

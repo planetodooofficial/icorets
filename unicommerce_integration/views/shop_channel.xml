@@ -8,7 +8,8 @@
             <list string="Shop Sales Channel">
                 <field name="name"/>
                 <field name="shop_instance_id"/>
-                <field name="company_id"/>
+                <field name="sale_journal_id" optional="show"/>
+                <field name="is_no_invoice" optional="hide"/>
             </list>
         </field>
     </record>
@@ -24,7 +25,6 @@
                         <group string="Channel Details">
                             <field name="name"/>
                             <field name="shop_instance_id"/>
-                            <field name="company_id"/>
                             <field name="is_no_invoice"/>
                         </group>
                         <group string="Accounts Details">

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 
 import requests
@@ -26,6 +26,123 @@ class ShopInstance(models.Model):
     last_import_date = fields.Datetime(string='Last Update Datetime', readonly=True)
     shop_import_logs_ids = fields.One2many('shop.import.logs', 'shop_id', string='Shop Import Logs')
     update_time = fields.Integer(string='Update Time (in minutes)', default=30)
+    default_facility_code = fields.Char(
+        string='API Facility Header',
+        default='karan',
+        tracking=True,
+        help="Facility header sent to Unicommerce APIs when fetching orders from this single instance.",
+    )
+    fetch_per_facility = fields.Boolean(
+        string='Fetch Orders Per Facility',
+        default=False,
+        tracking=True,
+        help="Enable only if Unicommerce requires separate API calls per mapped Facility Code. Leave unchecked if the single API Facility Header returns orders for all branches.",
+    )
+    facility_mapping_ids = fields.One2many(
+        'shop.facility.mapping',
+        'shop_instance_id',
+        string='Facility / Branch Mappings',
+    )
+
+    def _get_active_facility_codes(self):
+        """Return facility code(s) to send in the Unicommerce API Facility header."""
+        if self.fetch_per_facility:
+            codes = []
+            for mapping in self.facility_mapping_ids.filtered(lambda m: m.active and m.facility_code):
+                code = mapping.facility_code.strip()
+                if code and code not in codes:
+                    codes.append(code)
+            if codes:
+                return codes
+        return [(self.default_facility_code or 'karan').strip()]
+
+    def _get_facility_mapping(self, facility_code):
+        """Find the active facility-to-branch mapping for a given Unicommerce facilityCode."""
+        if not facility_code:
+            return self.env['shop.facility.mapping']
+        code = facility_code.strip()
+        mapping_obj = self.env['shop.facility.mapping'].sudo()
+        mapping = mapping_obj.search([
+            ('shop_instance_id', '=', self.id),
+            ('facility_code', '=ilike', code),
+            ('active', '=', True),
+        ], limit=1)
+        if not mapping:
+            mapping = mapping_obj.search([
+                ('facility_code', '=ilike', code),
+                ('active', '=', True),
+            ], limit=1)
+        return mapping
+
+    def _find_sales_channel(self, source=False, channel=False):
+        """Resolve common shop.sales.channel by source (fallback channel) across all branches."""
+        channel_obj = self.env['shop.sales.channel'].sudo()
+        for name in (source, channel):
+            if name:
+                rec = channel_obj.search([('name', '=', name)], limit=1)
+                if rec:
+                    return rec
+        return channel_obj
+
+    def _get_order_branch_config(self, facility_code=False, sales_channel_id=False):
+        """Resolve Branch (res.company), Warehouse, Stock Location from facility mapping,
+        and keep the common main-company Sales Journal from the Sales Channel."""
+        mapping = self._get_facility_mapping(facility_code)
+        channel_sudo = sales_channel_id.sudo() if sales_channel_id else False
+        company = mapping.company_id or self.env.company
+
+        # Warehouse for this branch
+        warehouse = mapping.warehouse_id
+        if not warehouse:
+            warehouse = self.env['stock.warehouse'].sudo().search(
+                [('company_id', '=', company.id)], limit=1
+            )
+        if not warehouse and company.parent_ids:
+            warehouse = self.env['stock.warehouse'].sudo().search(
+                [('company_id', 'in', company.parent_ids.ids)], limit=1
+            )
+
+        # Stock Location for this branch
+        location = mapping.location_id
+        if not location and warehouse:
+            location = warehouse.lot_stock_id
+        if not location:
+            stock_location = self.env['stock.location'].sudo().search([('name', '=', 'DEL')], limit=1)
+            if stock_location:
+                location = self.env['stock.location'].sudo().search(
+                    [('name', '=', 'Stock'), ('location_id', '=', stock_location.id)], limit=1
+                )
+
+        # Keep using the common Sales Journal configured on the Sales Channel (same as before)
+        sale_journal = channel_sudo.sale_journal_id if channel_sudo else False
+        if not sale_journal:
+            sale_journal = self.env['account.journal'].sudo().search(
+                [('type', '=', 'sale'), ('company_id', 'in', company.parent_ids.ids)], limit=1
+            )
+
+        return {
+            'facility_mapping': mapping,
+            'company': company,
+            'warehouse': warehouse,
+            'location': location,
+            'sale_journal': sale_journal,
+        }
+
+    def _find_gst_tax(self, tax_rate, company):
+        """Find default GST sales tax for the given rate in the branch or its parent companies."""
+        tax_obj = self.env['account.tax'].sudo()
+        rate = int(tax_rate or 0)
+        base_domain = [
+            ('amount', '=', rate),
+            ('is_a_default', '=', True),
+            ('type_tax_use', '=', 'sale'),
+            ('tax_group_id.name', '=', 'GST'),
+        ]
+        target_company = company or self.env.company
+        tax = tax_obj.search(base_domain + [('company_id', '=', target_company.id)], limit=1)
+        if not tax and target_company.parent_ids:
+            tax = tax_obj.search(base_domain + [('company_id', 'in', target_company.parent_ids.ids)], limit=1)
+        return tax
 
     def generate_token(self):
         """ Generate The Auth Token For The Shop Instance """
@@ -59,50 +176,77 @@ class ShopInstance(models.Model):
             return True
 
     def get_orders(self):
-        """ Get The Orders Code From The Shop Instance """
+        """ Get The Orders Code From The Shop Instance across all configured facilities """
         start_date = fields.Datetime.now()
         try:
-            url = self.shop_url + "/services/rest/v1/oms/saleOrder/search"
-            headers = {
-                'Authorization': self.auth_bearer,
-                'Content-Type': 'application/json',
-                'Facility': 'karan'
-            }
-            data = {
-                "updatedSinceInMinutes": self.update_time,
-            }
-            fetch_orders = post(url=url, headers=headers, data=json.dumps(data))
-            if fetch_orders.status_code != 200:
-                self.generate_exception_log(message=fetch_orders.text, start_date=start_date,
-                                            end_date=fields.Datetime.now(), count=1, state='exception',
-                                            operation_performed='Fetching Orders')
-                try:
+            url = (self.shop_url or '').rstrip('/') + "/services/rest/v1/oms/saleOrder/search"
+            facility_codes = self._get_active_facility_codes()
+            total_created = 0
+            total_updated = 0
+            for facility_code in facility_codes:
+                headers = {
+                    'Authorization': self.auth_bearer,
+                    'Content-Type': 'application/json',
+                    'Facility': facility_code,
+                }
+                data = {
+                    "updatedSinceInMinutes": self.update_time,
+                }
+                fetch_orders = post(url=url, headers=headers, data=json.dumps(data))
+                if fetch_orders.status_code != 200:
+                    self.generate_exception_log(
+                        message=f"[{facility_code}] {fetch_orders.text}",
+                        start_date=start_date,
+                        end_date=fields.Datetime.now(),
+                        count=1,
+                        state='exception',
+                        operation_performed='Fetching Orders',
+                    )
+                    try:
+                        orders_list = fetch_orders.json()
+                        if orders_list.get("errors", []):
+                            raise UserError(str(orders_list.get("errors", [])[0].get("message", "Error fetching orders")))
+                    except UserError:
+                        raise
+                    except Exception:
+                        pass
+                    raise UserError(str(fetch_orders.text))
+                elif fetch_orders.status_code == 200:
                     orders_list = fetch_orders.json()
                     if orders_list.get("errors", []):
                         raise UserError(str(orders_list.get("errors", [])[0].get("message", "Error fetching orders")))
-                except Exception:
-                    pass
-                raise UserError(str(fetch_orders.text))
-            elif fetch_orders.status_code == 200:
-                orders_list = fetch_orders.json()
-                if orders_list.get("errors", []):
-                    raise UserError(str(orders_list.get("errors", [])[0].get("message", "Error fetching orders")))
-                orders_list = self.get_order_list(orders_list)
-                if orders_list:
-                    searched_orders = self.search_orders(sale_order_codes=orders_list)
-                    order_count, updated_order = self.create_orders(orders=searched_orders)
-                    if len(order_count) > 0:
-                        self.generate_success_log(message="Successfully Fetched The Orders",
-                                                  start_date=start_date,
-                                                  end_date=fields.Datetime.now(), count=len(order_count),
-                                                  state='success', operation_performed='Fetching Orders')
-                    if len(updated_order) > 0:
-                        # self.create_returns()
-                        self.generate_success_log(message="Successfully Updated The Orders",
-                                                  start_date=start_date,
-                                                  end_date=fields.Datetime.now(), count=len(updated_order),
-                                                  state='success', operation_performed='Updated Orders')
-                self.last_import_date = fields.Datetime.now()
+                    orders_list = self.get_order_list(orders_list)
+                    if orders_list:
+                        searched_orders = self.search_orders(
+                            sale_order_codes=orders_list,
+                            facility_code=facility_code,
+                        )
+                        order_count, updated_order = self.create_orders(
+                            orders=searched_orders,
+                            facility_code=facility_code,
+                        )
+                        total_created += len(order_count)
+                        total_updated += len(updated_order)
+            if total_created > 0:
+                self.generate_success_log(
+                    message="Successfully Fetched The Orders",
+                    start_date=start_date,
+                    end_date=fields.Datetime.now(),
+                    count=total_created,
+                    state='success',
+                    operation_performed='Fetching Orders',
+                )
+            if total_updated > 0:
+                # self.create_returns()
+                self.generate_success_log(
+                    message="Successfully Updated The Orders",
+                    start_date=start_date,
+                    end_date=fields.Datetime.now(),
+                    count=total_updated,
+                    state='success',
+                    operation_performed='Updated Orders',
+                )
+            self.last_import_date = fields.Datetime.now()
         except Exception as e:
             self.generate_exception_log(message=str(e), start_date=start_date,
                                         operation_performed='Fetching Orders',
@@ -114,14 +258,14 @@ class ShopInstance(models.Model):
         matching_orders = [order for order in api_response.get("elements", []) if order["status"] == "COMPLETE"]
         return matching_orders
 
-    def search_orders(self, sale_order_codes):
+    def search_orders(self, sale_order_codes, facility_code=False):
         """ Get The Orders Details From The Shop Instance """
         start_date = fields.Datetime.now()
-        url = self.shop_url + "/services/rest/v1/oms/saleorder/get"
+        url = (self.shop_url or '').rstrip('/') + "/services/rest/v1/oms/saleorder/get"
         headers = {
             'Authorization': self.auth_bearer,
             'Content-Type': 'application/json',
-            'Facility': 'karan'
+            'Facility': facility_code or self.default_facility_code or 'karan',
         }
         search_orders = []
         for code in sale_order_codes:
@@ -138,7 +282,7 @@ class ShopInstance(models.Model):
                 search_orders.append(orders['saleOrderDTO'])
         return search_orders
 
-    def create_orders(self, orders):
+    def create_orders(self, orders, facility_code=False):
         """ Create The Orders From The Shop Instance """
         unicommerce_order_obj = self.env['unicommerce.orders']
         incoming_order_codes = [order['code'] for order in orders]
@@ -165,62 +309,95 @@ class ShopInstance(models.Model):
                 new_orders.append(order)
         for order in new_orders:
             # Create New Unicommerce Order
-            get_shipping_address_id = order['saleOrderItems'][0]['shippingAddressId']
+            sale_order_items = order.get('saleOrderItems') or []
+            get_shipping_address_id = sale_order_items[0]['shippingAddressId']
             get_shipping_address = [address for address in order['addresses'] if
                                     address['id'] == str(get_shipping_address_id)]
-            sales_channel_id = self.env['shop.sales.channel'].search([('name', '=', order['source'])], limit=1)
+
+            # Resolve facility code first so branch-specific or common sales channel can be matched
+            order_facility_code = next(
+                (item.get('facilityCode') for item in sale_order_items if item.get('facilityCode')),
+                False,
+            ) or facility_code or self.default_facility_code
+            sales_channel_id = self._find_sales_channel(
+                source=order.get('source'),
+                channel=order.get('channel'),
+            )
+            if not sales_channel_id:
+                raise UserError(_(
+                    "Sales Channel Not Found for Source '%s' / Channel '%s' (Order: %s)! "
+                    "Please create a Sales Channel with this name under Unicommerce Menu -> Shop Sales Channel.",
+                    order.get('source') or '',
+                    order.get('channel') or '',
+                    order.get('code') or '',
+                ))
+            branch_config = self._get_order_branch_config(
+                facility_code=order_facility_code,
+                sales_channel_id=sales_channel_id,
+            )
+            branch_company = branch_config['company']
             shipping_packages = order.get('shippingPackages', [])
 
             # date related to the orders
             shipping_date = shipping_packages[0].get('dispatched', '') if shipping_packages else False
             invoice_date = shipping_packages[0].get('invoiceDate', '') if shipping_packages else False
             invoice_no = shipping_packages[0].get('invoiceCode', '') if shipping_packages else False
-            order_lines = self.prepare_lines(order['saleOrderItems'], sales_channel_id)
+            order_lines = self.prepare_lines(sale_order_items, sales_channel_id, company=branch_company)
+
+            def _ts_to_dt(ts):
+                return datetime.fromtimestamp(ts // 1000, timezone.utc).replace(tzinfo=None) if ts else False
+
+            billing_addr = order.get('billingAddress') or {}
+            shipping_addr = get_shipping_address[0] if get_shipping_address else (order.get('addresses') or [{}])[0]
+
             # prepare the order dictionary
             unicommerce_order_vals = {
                 'code': order['code'],
-                'displayOrderCode': order['displayOrderCode'],
+                'displayOrderCode': order.get('displayOrderCode'),
                 'invoice_no': invoice_no,
-                'shipping_date': datetime.utcfromtimestamp(shipping_date // 1000) if shipping_date else False,
-                'invoice_date': datetime.utcfromtimestamp(invoice_date // 1000) if invoice_date else False,
-                'channel': order['channel'],
-                'source': order['source'],
+                'shipping_date': _ts_to_dt(shipping_date),
+                'invoice_date': _ts_to_dt(invoice_date),
+                'channel': order.get('channel'),
+                'source': order.get('source'),
                 'sales_channel_id': sales_channel_id.id,
-                'shop_instance_id': sales_channel_id.shop_instance_id.id,
-                'displayOrderDateTime': datetime.utcfromtimestamp(order['displayOrderDateTime'] // 1000),
-                'status': order['status'],
-                'created': datetime.utcfromtimestamp(order['created'] // 1000),
-                'updated': datetime.utcfromtimestamp(order['updated'] // 1000),
-                'fulfillmentTat': datetime.utcfromtimestamp(order['fulfillmentTat'] // 1000),
-                'notificationEmail': order['notificationEmail'],
-                'notificationMobile': order['notificationMobile'],
-                'customerGSTIN': order['customerGSTIN'],
-                'channelProcessingTime': datetime.utcfromtimestamp(order['channelProcessingTime'] // 1000),
-                'cod': order['cod'],
-                'thirdPartyShipping': order['thirdPartyShipping'],
-                'priority': order['priority'],
-                'currencyCode': order['currencyCode'],
-                'customerCode': order['customerCode'],
-                'billing_name': order['billingAddress']['name'],
-                'billing_addressLine1': order['billingAddress']['addressLine1'],
-                'billing_addressLine2': order['billingAddress']['addressLine2'],
-                'billing_city': order['billingAddress']['city'],
-                'billing_district': order['billingAddress']['district'],
-                'billing_state': order['billingAddress']['state'],
-                'billing_country': order['billingAddress']['country'],
-                'billing_pincode': order['billingAddress']['pincode'],
-                'billing_phone': order['billingAddress']['phone'],
-                'billing_email': order['billingAddress']['email'],
-                'shipping_name': order['addresses'][0]['name'],
-                'shipping_addressLine1': get_shipping_address[0]['addressLine1'],
-                'shipping_addressLine2': get_shipping_address[0]['addressLine2'],
-                'shipping_city': get_shipping_address[0]['city'],
-                'shipping_district': get_shipping_address[0]['district'],
-                'shipping_state': get_shipping_address[0]['state'],
-                'shipping_country': get_shipping_address[0]['country'],
-                'shipping_pincode': get_shipping_address[0]['pincode'],
-                'shipping_phone': get_shipping_address[0]['phone'],
-                'shipping_email': get_shipping_address[0]['email'],
+                'shop_instance_id': sales_channel_id.shop_instance_id.id or self.id,
+                'facility_code': order_facility_code,
+                'facility_mapping_id': branch_config['facility_mapping'].id if branch_config['facility_mapping'] else False,
+                'company_id': branch_company.id if branch_company else False,
+                'displayOrderDateTime': _ts_to_dt(order.get('displayOrderDateTime')),
+                'status': order.get('status'),
+                'created': _ts_to_dt(order.get('created')),
+                'updated': _ts_to_dt(order.get('updated')),
+                'fulfillmentTat': _ts_to_dt(order.get('fulfillmentTat')),
+                'notificationEmail': order.get('notificationEmail'),
+                'notificationMobile': order.get('notificationMobile'),
+                'customerGSTIN': order.get('customerGSTIN'),
+                'channelProcessingTime': _ts_to_dt(order.get('channelProcessingTime')),
+                'cod': order.get('cod'),
+                'thirdPartyShipping': order.get('thirdPartyShipping'),
+                'priority': order.get('priority'),
+                'currencyCode': order.get('currencyCode'),
+                'customerCode': order.get('customerCode'),
+                'billing_name': billing_addr.get('name'),
+                'billing_addressLine1': billing_addr.get('addressLine1'),
+                'billing_addressLine2': billing_addr.get('addressLine2'),
+                'billing_city ': billing_addr.get('city'),
+                'billing_district': billing_addr.get('district'),
+                'billing_state': billing_addr.get('state'),
+                'billing_country': billing_addr.get('country'),
+                'billing_pincode': billing_addr.get('pincode'),
+                'billing_phone': billing_addr.get('phone'),
+                'billing_email': billing_addr.get('email'),
+                'shipping_name': (order.get('addresses') or [{}])[0].get('name'),
+                'shipping_addressLine1': shipping_addr.get('addressLine1'),
+                'shipping_addressLine2': shipping_addr.get('addressLine2'),
+                'shipping_city': shipping_addr.get('city'),
+                'shipping_district': shipping_addr.get('district'),
+                'shipping_state': shipping_addr.get('state'),
+                'shipping_country': shipping_addr.get('country'),
+                'shipping_pincode': shipping_addr.get('pincode'),
+                'shipping_phone': shipping_addr.get('phone'),
+                'shipping_email': shipping_addr.get('email'),
                 'order_data_json': json.dumps(order, indent=2),
                 'order_state': 'exception' if self.has_exception(order_lines) else 'draft',
                 'order_line': order_lines,
@@ -241,35 +418,32 @@ class ShopInstance(models.Model):
                         return_line.write({'return_status': True})
         return orders, update_orders
 
-    def prepare_lines(self, lines, shop_channel_id=False):
+    def prepare_lines(self, lines, shop_channel_id=False, company=False):
         """Prepare Lines data for the api product lines"""
-        product_obj = self.env['product.product']
+        product_obj = self.env['product.product'].sudo()
         prepared_lines = []
         missing_products = []
-        shipping_product_id = self.env['product.product'].search([('default_code', '=', 'SHIPPING_CHARGES')]).id
+        shipping_product_id = product_obj.search([('default_code', '=', 'SHIPPING_CHARGES')], limit=1).id
         if not shipping_product_id:
             raise UserError(
                 _("Shipping Charges Product Not Found! Please Create a Product with Default Code `SHIPPING_CHARGE`"))
-        tax_obj = self.env['account.tax']
         if not shop_channel_id:
             raise UserError(_("Sales Channel Not Found! Please Create a Sales Channel !!"))
+        target_company = company or self.env.company
         for order_line in lines:
-            product = product_obj.search([('default_code', '=', order_line['itemSku'])])
+            product = product_obj.search([('default_code', '=', order_line['itemSku'])], limit=1)
             tax = False
             if order_line['totalIntegratedGst']:
                 tax = order_line['integratedGstPercentage']
             elif order_line['totalStateGst']:
                 tax = order_line['stateGstPercentage'] + order_line['centralGstPercentage']
-            search_tax = tax_obj.search([('amount', '=', int(tax)), ('is_a_default', '=', True),
-                                         ('type_tax_use', '=', 'sale'),
-                                         ('company_id', '=', shop_channel_id.company_id.id),
-                                         ('tax_group_id.name', '=', 'GST')])
+            search_tax = self._find_gst_tax(tax, target_company)
             if order_line['shippingCharges']:
                 # append a shipping line with the unit price of the shipping
+                tax_divisor = (1 + (search_tax.amount / 100)) if search_tax else 1
                 shipping_line = {
                     'product_id': shipping_product_id,
-                    'selling_price_without_taxes_and_discount': order_line['shippingCharges'] / (
-                            1 + (search_tax.amount / 100)),
+                    'selling_price_without_taxes_and_discount': order_line['shippingCharges'] / tax_divisor,
                     'tax_id': search_tax.id if search_tax else False,
                 }
                 prepared_lines.append((0, 0, shipping_line))
@@ -392,57 +566,77 @@ class ShopInstance(models.Model):
         }
         shop_import_logs_obj.create(vals)
 
-    def create_sales(self):
-        # Get all orders that are in draft state
-        orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')], limit=100,
-                                                       order='displayOrderDateTime desc')
+    def create_sales(self, orders=None):
+        # Get all orders that are in draft state (or use the explicitly passed recordset)
+        if orders is None:
+            orders = self.env['unicommerce.orders'].search([('order_state', '=', 'draft')], limit=100,
+                                                           order='displayOrderDateTime desc')
+        else:
+            orders = orders.filtered(lambda o: o.order_state == 'draft')
         count = 0
         sale_orders = list()
-        stock_location = self.env['stock.location'].search([('name', '=', 'DEL')], limit=1)
-        location_id = self.env['stock.location'].search(
-            [('name', '=', 'Stock'), ('location_id', '=', stock_location.id)], limit=1)
         start_date = fields.Datetime.now()
         try:
             for order in orders:
-                # Create sale order
-                # partners = self.create_partner(order)
-                partner_id = self.create_partner(order)
-                print("===partner", partner_id)
+                # Resolve branch/company, warehouse, stock location from facility code, and keep common Sales Journal
+                order_facility_code = order.facility_code or next(
+                    (line.facility_code for line in order.order_line if line.facility_code),
+                    False,
+                )
+                branch_config = self._get_order_branch_config(
+                    facility_code=order_facility_code,
+                    sales_channel_id=order.sales_channel_id,
+                )
+                branch_company = order.company_id or branch_config['company']
+                warehouse = branch_config['warehouse']
+                location = branch_config['location']
+                sale_journal = branch_config['sale_journal']
+
+                if not order.company_id and branch_company:
+                    order.company_id = branch_company.id
+                if not order.facility_code and order_facility_code:
+                    order.facility_code = order_facility_code
+                if not order.facility_mapping_id and branch_config['facility_mapping']:
+                    order.facility_mapping_id = branch_config['facility_mapping'].id
+
+                # Create or find partner
+                partner_id = self.sudo().with_company(branch_company).create_partner(order)
                 if partner_id.phone == 'null':
                     partner_id.phone = '9999999999'
 
-                # billing_id = self.env['res.partner'].search(
-                #     [('parent_id', '=', partner_id.id), ('type', '=', 'invoice')])
-                # shipping_id = self.env['res.partner'].search(
-                #     [('parent_id', '=', partner_id.id), ('type', '=', 'delivery')])
                 vals_list = {
+                    'company_id': branch_company.id,
                     'partner_id': partner_id.id,
-                    'order_line': self.create_order_lines(order),
-                    'l10n_in_journal_id': order.sales_channel_id.sale_journal_id.id,
+                    'order_line': self.create_order_lines(order, company=branch_company),
                     'date_order': order.displayOrderDateTime,
                     'state': 'draft',
-                    'shop_instance_id': order.shop_instance_id.id,
+                    'shop_instance_id': order.shop_instance_id.id or self.id,
                     'sales_channel_id': order.sales_channel_id.id,
                     'unicommerce_order_id': order.id,
                     'partner_shipping_id': partner_id.id,
                     'partner_invoice_id': partner_id.id,
                     'dump_sequence': order.code,
-                    'location_id': location_id.id,
-                    'gstin_id': self.env.company.partner_id.id,
+                    'gstin_id': branch_company.partner_id.id,
                     'client_order_ref': order.displayOrderCode,
                 }
+                if warehouse:
+                    vals_list['warehouse_id'] = warehouse.id
+                if location:
+                    vals_list['location_id'] = location.id
+                if sale_journal:
+                    vals_list['journal_id'] = sale_journal.id
+                    vals_list['l10n_in_journal_id'] = sale_journal.id
+
                 logger.info(vals_list)
-                sale_order = self.env['sale.order'].create(vals_list)
-                # Update order state to "done"
-                sale_order.set_order_line()
+                sale_order = self.env['sale.order'].sudo().with_company(branch_company).create(vals_list)
+                # Update fiscal position and taxes in the branch context
+                sale_order.sudo().with_company(branch_company).set_order_line()
                 order.order_state = 'done'
                 order.name = sale_order.id
                 sale_orders.append(sale_order)
                 count += 1
             if orders:
                 self.sale_order_confirm_batch(sale_orders, "unicommerce", orders[0].code)
-                # payments = [self.create_payments_entries(order, order.sales_channel_id) for order in sale_orders if
-                #             order.state == "sale"]
                 self.generate_success_log(message="Successfully Created Sales Orders", start_date=start_date,
                                           end_date=fields.Datetime.now(), count=count, state='success',
                                           operation_performed='Sales Order Creation')
@@ -493,38 +687,48 @@ class ShopInstance(models.Model):
     #         return payments
 
     def sale_order_confirm_batch(self, sale_orders, record_type, dump_sequence):
-        print("----sale_order_confirm_batch")
         order_dates = {}
         shipment_dates = {}
         invoice_dates = {}
 
         for sale_order in sale_orders:
-            # if sale_order.partner_id.phone == 'null':
-            #     sale_order.partner_id.phone = '9999999999'
-            if sale_order.sales_channel_id:
-                sale_order.action_confirm()
+            branch_company = sale_order.company_id
+            so_branch = sale_order.sudo().with_company(branch_company)
+            if so_branch.sales_channel_id:
+                so_branch.action_confirm()
                 if record_type == "unicommerce":
-                    order_dates[sale_order.id] = sale_order.unicommerce_order_id.displayOrderDateTime
-                    shipment_dates[sale_order.id] = sale_order.unicommerce_order_id.shipping_date
-                    invoice_dates[sale_order.id] = sale_order.unicommerce_order_id.invoice_date
+                    order_dates[so_branch.id] = so_branch.unicommerce_order_id.displayOrderDateTime
+                    shipment_dates[so_branch.id] = so_branch.unicommerce_order_id.shipping_date
+                    invoice_dates[so_branch.id] = so_branch.unicommerce_order_id.invoice_date
 
         # Batch update order dates
         for order_id, order_date in order_dates.items():
             if order_date:
-                self.env["sale.order"].browse(order_id).write({'date_order': order_date})
+                so_rec = self.env["sale.order"].sudo().browse(order_id)
+                so_rec.with_company(so_rec.company_id).write({'date_order': order_date})
 
         # Batch process deliveries
         for sale_order in sale_orders:
-            if not sale_order.partner_id.phone:
-                sale_order.partner_id.phone = '999999999'
-            if sale_order.state == "sale" and not sale_order.sales_channel_id.is_no_invoice:
-                search_delivery = self.env["stock.picking"].search([('origin', '=', sale_order.name)])
-                search_delivery.write({'dump_sequence': dump_sequence})
+            branch_company = sale_order.company_id
+            so_branch = sale_order.sudo().with_company(branch_company)
+            if not so_branch.partner_id.phone:
+                so_branch.partner_id.phone = '999999999'
+            if so_branch.state == "sale" and not so_branch.sales_channel_id.sudo().is_no_invoice:
+                search_delivery = so_branch.picking_ids.with_company(branch_company)
+                if not search_delivery:
+                    search_delivery = self.env["stock.picking"].sudo().with_company(branch_company).search([
+                        ('origin', '=', so_branch.name),
+                        ('company_id', '=', branch_company.id),
+                    ])
+                order_dump_seq = so_branch.dump_sequence or dump_sequence
+                search_delivery.write({'dump_sequence': order_dump_seq})
 
                 for delivery in search_delivery:
-                    delivery.write({'location_id': sale_order.location_id.id})
+                    delivery = delivery.sudo().with_company(branch_company)
+                    if so_branch.location_id:
+                        delivery.write({'location_id': so_branch.location_id.id})
 
-                    shipment_date = shipment_dates.get(sale_order.id)
+                    shipment_date = shipment_dates.get(so_branch.id)
                     if shipment_date:
                         delivery.write({'scheduled_date': shipment_date})
 
@@ -535,29 +739,40 @@ class ShopInstance(models.Model):
 
         # Batch process invoices
         for sale_order in sale_orders:
-            # if sale_order.partner_id.phone == 'null':
-            #     sale_order.partner_id.write({'phone': '9999999999'})
-            if sale_order.sales_channel_id and not sale_order.sales_channel_id.is_no_invoice:
-                invoice_vals = sale_order._prepare_invoice()
-                lst = [(0, 0, so_order_line._prepare_invoice_line()) for so_order_line in sale_order.order_line]
+            branch_company = sale_order.company_id
+            so_branch = sale_order.sudo().with_company(branch_company)
+            channel = so_branch.sales_channel_id.sudo()
+            if channel and not channel.is_no_invoice:
+                invoice_vals = so_branch._prepare_invoice()
+                invoice_vals['company_id'] = branch_company.id
+                if channel.sale_journal_id:
+                    invoice_vals['journal_id'] = channel.sale_journal_id.id
+                elif so_branch.journal_id:
+                    invoice_vals['journal_id'] = so_branch.journal_id.id
+                lst = [
+                    (0, 0, so_order_line.sudo().with_company(branch_company)._prepare_invoice_line())
+                    for so_order_line in so_branch.order_line
+                ]
                 invoice_vals['invoice_line_ids'] = lst
-                result = self.env['account.move'].create(invoice_vals)
+                result = self.env['account.move'].sudo().with_company(branch_company).create(invoice_vals)
 
-                invoice_date = invoice_dates.get(sale_order.id)
+                invoice_date = invoice_dates.get(so_branch.id)
                 if invoice_date:
                     result.write({'invoice_date': invoice_date})
 
-                for invoice_line in result.invoice_line_ids:
-                    invoice_line.write({'account_id': result.journal_id.default_account_id.id})
+                if result.journal_id.default_account_id:
+                    for invoice_line in result.invoice_line_ids:
+                        invoice_line.write({'account_id': result.journal_id.default_account_id.id})
 
-                if sale_order.unicommerce_order_id.invoice_no:
-                    result.write({'payment_reference': sale_order.unicommerce_order_id.invoice_no})
+                if so_branch.unicommerce_order_id.invoice_no:
+                    result.write({'payment_reference': so_branch.unicommerce_order_id.invoice_no})
 
-                result.write({'dump_sequence': dump_sequence,
-                              'sales_channel_id': sale_order.sales_channel_id.id,
-                              'shop_instance_id': sale_order.shop_instance_id.id,
-                              'unicommerce_order_id': sale_order.unicommerce_order_id.id,
-                              })
+                result.write({
+                    'dump_sequence': so_branch.dump_sequence or dump_sequence,
+                    'sales_channel_id': channel.id,
+                    'shop_instance_id': so_branch.shop_instance_id.id,
+                    'unicommerce_order_id': so_branch.unicommerce_order_id.id,
+                })
                 result.action_post()
 
     def create_partner(self, partner_data):
@@ -703,22 +918,36 @@ class ShopInstance(models.Model):
         country = self.env['res.country'].search([('code', '=', country_name)], limit=1)
         return country.id if country else False
 
-    def create_order_lines(self, order):
+    def create_order_lines(self, order, company=False):
         """ Create order lines for Sale Order """
         order_lines = []
+        branch_company = company or order.company_id or self.env.company
         uom_id = self.env['uom.uom'].search([('name', '=', 'Pieces')], limit=1)
+        channel = order.sales_channel_id.sudo()
+        analytics = channel.analytics_id if channel else False
+        analytic_distribution = False
+        if analytics and (not analytics.company_id or analytics.company_id in branch_company.parent_ids):
+            analytic_distribution = {f"{analytics.id}": 100}
+
         for line in order.order_line:
-            # added the discount deduction in line level to avoid the conflict with the pricing.
-            line.product_id.write({'taxes_id': [(6, 0, [line.tax_id.id])] if line.tax_id else False})
+            tax = line.tax_id
+            if tax and tax.company_id not in branch_company.parent_ids:
+                tax = self._find_gst_tax(tax.amount, branch_company)
+            if tax:
+                other_company_taxes = line.product_id.sudo().taxes_id.filtered(
+                    lambda t: t.company_id not in branch_company.parent_ids
+                )
+                line.product_id.sudo().with_company(branch_company).write({
+                    'taxes_id': [(6, 0, (other_company_taxes | tax).ids)]
+                })
             order_lines.append((0, 0, {
                 'product_id': line.product_id.id,
                 'name': line.product_id.name,
                 'product_uom_qty': 1,
                 'price_unit': line.selling_price_without_taxes_and_discount - line.discount,
-                'tax_ids': [(6, 0, [line.tax_id.id])] if line.tax_id else False,
-                'product_uom_id': uom_id.id,
-                'analytic_distribution': {
-                    f"{order.sales_channel_id.analytics_id.id}": 100} if order.sales_channel_id.analytics_id else False,
+                'tax_ids': [(6, 0, [tax.id])] if tax else False,
+                'product_uom_id': uom_id.id if uom_id else line.product_id.uom_id.id,
+                'analytic_distribution': analytic_distribution,
             }))
         return order_lines
 
@@ -734,13 +963,18 @@ class ShopInstance(models.Model):
             orders = self.env['unicommerce.orders'].search(
                 [('is_return', '=', True), ('name', '!=', False), ('return_state', '=', 'draft')])
             for uni_order in orders:
+                branch_company = uni_order.name.company_id or uni_order.company_id or self.env.company
                 lines_to_return = uni_order.order_line.filtered(lambda x: x.return_status is True)
-                search_delivery = self.env["stock.picking"].search([('origin', '=', uni_order.name.name)])
+                search_delivery = self.env["stock.picking"].sudo().with_company(branch_company).search([
+                    ('origin', '=', uni_order.name.name),
+                    ('company_id', '=', branch_company.id),
+                ])
                 if lines_to_return:
                     if len(uni_order.order_line) == len(lines_to_return):
                         # create a full return/refund
-                        stock_return_picking_obj = self.env["stock.return.picking"]
+                        stock_return_picking_obj = self.env["stock.return.picking"].sudo().with_company(branch_company)
                         for delivery in search_delivery:
+                            delivery = delivery.sudo().with_company(branch_company)
                             lst = []
                             for move_id_package in delivery.move_ids:
                                 reverse_transfer_line_val = (0, 0, {
@@ -761,7 +995,8 @@ class ShopInstance(models.Model):
                             new_picking_id = stock_return_wizard_id.create_returns()
                             new_picking_id = new_picking_id.get('res_id', False)
                             if new_picking_id:
-                                search_return_delivery = self.env["stock.picking"].search([('id', '=', new_picking_id)])
+                                search_return_delivery = self.env["stock.picking"].sudo().with_company(branch_company).search(
+                                    [('id', '=', new_picking_id)])
                                 for new_delivery in search_return_delivery:
                                     if new_delivery.products_availability == "Not Available":
                                         for stock_move_package in new_delivery.move_ids:
@@ -772,7 +1007,7 @@ class ShopInstance(models.Model):
                                     search_return_delivery.button_validate()
                                     search_return_delivery.write({'dump_sequence': uni_order.code})
                         # create a credit note
-                        self.create_credit_note(uni_order)
+                        self.with_company(branch_company).create_credit_note(uni_order)
                         lines_to_return.write({'return_status': False, 'is_returned': True})
                         uni_order.order_state = 'done'
                         uni_order.is_return = False
@@ -780,10 +1015,11 @@ class ShopInstance(models.Model):
                     else:
                         # handle the partial line return
                         move_lines = []
-                        stock_return_picking_obj = self.env["stock.return.picking"]
+                        stock_return_picking_obj = self.env["stock.return.picking"].sudo().with_company(branch_company)
                         # Create a dictionary to map default codes to lines
                         lines_dict = {line.product_id.default_code: line for line in lines_to_return}
                         for delivery in search_delivery:
+                            delivery = delivery.sudo().with_company(branch_company)
                             lst = []
                             for move_id_package in delivery.move_ids:
                                 line = lines_dict.get(move_id_package.product_id.default_code)
@@ -807,7 +1043,7 @@ class ShopInstance(models.Model):
                                 new_picking_id = stock_return_wizard_id.create_returns()
                                 new_picking_id = new_picking_id.get('res_id', False)
                                 if new_picking_id:
-                                    search_return_delivery = self.env["stock.picking"].search(
+                                    search_return_delivery = self.env["stock.picking"].sudo().with_company(branch_company).search(
                                         [('id', '=', new_picking_id)])
                                     for new_delivery in search_return_delivery:
                                         new_delivery.write({'shop_instance_id': uni_order.shop_instance_id.id})
@@ -819,7 +1055,7 @@ class ShopInstance(models.Model):
                                         search_return_delivery.button_validate()
                                         search_return_delivery.write({'dump_sequence': uni_order.code})
                         # create a credit note
-                        self.create_partial_credit_note(uni_order, lines_dict)
+                        self.with_company(branch_company).create_partial_credit_note(uni_order, lines_dict)
                         lines_to_return.write({'return_status': False, 'is_returned': True})
                         uni_order.order_state = 'done'
                         uni_order.is_return = False
@@ -831,12 +1067,18 @@ class ShopInstance(models.Model):
                                         end_date=fields.Datetime.now(), count=1, state='exception')
 
     def create_credit_note(self, order):
-        if not order.sales_channel_id.is_no_invoice:
+        if not order.sales_channel_id.sudo().is_no_invoice:
             sale_order = order.name
-            search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
-                                                              ('move_type', '=', 'out_invoice')])
+            branch_company = sale_order.company_id or order.company_id or self.env.company
+            search_invoice = self.env["account.move"].sudo().with_company(branch_company).search([
+                ('invoice_origin', '=', sale_order.name),
+                ('move_type', '=', 'out_invoice'),
+                ('company_id', '=', branch_company.id),
+            ], limit=1)
+            if not search_invoice:
+                return False
             invoice_no = order.return_invoice_no
-            account_move_reversal_obj = self.env["account.move.reversal"]
+            account_move_reversal_obj = self.env["account.move.reversal"].sudo().with_company(branch_company)
             invoice_val = {
                 'journal_id': search_invoice.journal_id.id,
                 'move_ids': [(4, search_invoice.id)]
@@ -844,7 +1086,7 @@ class ShopInstance(models.Model):
             account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
             data = account_move_reverse_wizard_id.reverse_moves()
             credit_note_id = account_move_reverse_wizard_id.new_move_ids.id or data.get('res_id')
-            search_credit_note = self.env["account.move"].browse(credit_note_id)
+            search_credit_note = self.env["account.move"].sudo().with_company(branch_company).browse(credit_note_id)
             if invoice_no:
                 search_credit_note.write({'payment_reference': invoice_no, 'dump_sequence': order.code})
                 return True
@@ -852,13 +1094,18 @@ class ShopInstance(models.Model):
 
     def create_partial_credit_note(self, order, lines_to_return):
         """ Create a partial credit note for the returned items """
-        if not order.sales_channel_id.is_no_invoice:
+        if not order.sales_channel_id.sudo().is_no_invoice:
             sale_order = order.name
+            branch_company = sale_order.company_id or order.company_id or self.env.company
             credit_note_no = order.return_invoice_no
-            search_invoice = self.env["account.move"].search([('invoice_origin', '=', sale_order.name),
-                                                              ('move_type', '=', 'out_invoice')])
-            # search_invoice.write("name")
-            account_move_reversal_obj = self.env["account.move.reversal"]
+            search_invoice = self.env["account.move"].sudo().with_company(branch_company).search([
+                ('invoice_origin', '=', sale_order.name),
+                ('move_type', '=', 'out_invoice'),
+                ('company_id', '=', branch_company.id),
+            ], limit=1)
+            if not search_invoice:
+                return False
+            account_move_reversal_obj = self.env["account.move.reversal"].sudo().with_company(branch_company)
             # in this invoice replace the invoice line with only the refundable products
             invoice_val = {
                 'journal_id': search_invoice.journal_id.id,
@@ -867,7 +1114,7 @@ class ShopInstance(models.Model):
             account_move_reverse_wizard_id = account_move_reversal_obj.create(invoice_val)
             data = account_move_reverse_wizard_id.reverse_moves()
             credit_note_id = account_move_reverse_wizard_id.new_move_ids.id or data.get('res_id')
-            search_credit_note = self.env["account.move"].browse(credit_note_id)
+            search_credit_note = self.env["account.move"].sudo().with_company(branch_company).browse(credit_note_id)
             # create the credit note lines
             lines_to_refund = list()
             for move_line in search_credit_note.invoice_line_ids:
@@ -879,10 +1126,6 @@ class ShopInstance(models.Model):
             if credit_note_no:
                 search_credit_note.write({'payment_reference': credit_note_no, 'dump_sequence': order.code})
                 search_credit_note.action_post()
-                # journal_id = search_invoice.sales_channel_id.prepaid_holding_journal_id if not order.cod \
-                #     else search_invoice.sales_channel_id.cod_holding_journal_id
-                # self.action_create_payment_entries_partial_line(invoice_id=search_credit_note,
-                #                                                 journal_id=journal_id)
                 return True
 
     # def action_create_payment_entries_partial_line(self, invoice_id, journal_id):
@@ -919,167 +1162,184 @@ class ShopInstance(models.Model):
         }
 
     def sync_odoo_inventory(self):
-        """ Sync the inventory of the products from the shop instance to the Odoo """
+        """ Sync the inventory of the products from Odoo to Unicommerce per configured facility/branch """
         start_date = fields.Datetime.now()
         count = 0
-        shop_instances = self.env['shop.instance'].search([])
+        shop_instances = self if self else self.env['shop.instance'].search([])
         for instance in shop_instances:
-            try:
-                inventory_adjustment = []
-                blocked_inventory = []
-                parent_location_id = self.env['stock.location'].search([('name', '=', 'DEL')], limit=1)
-                location_id = self.env['stock.location'].search(
+            active_mappings = instance.facility_mapping_ids.filtered(lambda m: m.active and m.facility_code)
+            sync_targets = []
+            if active_mappings:
+                for mapping in active_mappings:
+                    loc = mapping.location_id or (mapping.warehouse_id.lot_stock_id if mapping.warehouse_id else False)
+                    if loc:
+                        sync_targets.append((mapping.facility_code.strip(), loc, mapping.company_id))
+            else:
+                parent_location_id = self.env['stock.location'].sudo().search([('name', '=', 'DEL')], limit=1)
+                location_id = self.env['stock.location'].sudo().search(
                     [('name', '=', 'Stock'), ('location_id', '=', parent_location_id.id)], limit=1)
-                products = self.env['product.product'].search(
-                    [('default_code', '!=', False), ('is_storable', '=', True)])
+                if location_id:
+                    sync_targets.append(('playR_Delhi', location_id, self.env.company))
 
-                for product in products:
-                    product_quant = self.env['stock.quant'].search(
-                        [('location_id', '=', location_id.id),
-                         ('product_id', '=', product.id)], limit=1)
-                    quantity = product_quant.available_quantity if product_quant and product_quant.available_quantity >= 0 else 0
-                    inventory_adjustment.append({
-                        "itemSKU": product.default_code,
-                        "quantity": int(quantity),
-                        "shelfCode": "DEFAULT",
-                        "inventoryType": "GOOD_INVENTORY",
-                        "adjustmentType": "REPLACE",
-                        "facilityCode": "playR_Delhi"
-                    })
-                if inventory_adjustment:
-                    url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
-                    headers = {
-                        'Content-Type': 'application/json',
-                        'Authorization': instance.auth_bearer,
-                        'Accept': 'application/json'
-                    }
-                    data = {
-                        "inventoryAdjustments": inventory_adjustment
-                    }
-                    response = requests.post(url, headers=headers, data=json.dumps(data))
-                    if response.status_code == 200:
-                        data = response.json()
-                        for line in data['inventoryAdjustmentResponses']:
-                            if line['successful']:
-                                instance.generate_success_log(
-                                    message='Inventory Updated Successfully,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    count=line['facilityInventoryAdjustment']['quantity'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(),
-                                    state='success',
-                                    operation_performed='Inventory Adjustment')
-                                count += 1
-                            elif line['errors']:
-                                # logger.log(level=40, msg=line)
-                                blk_qty = line['errors'][0]['description'].split(",")[-1]
-                                if "Blocked Quantity" in blk_qty:
-                                    blk_qty = int(blk_qty.split(":")[-1])
-                                    blocked_inventory.append({
-                                        "itemSKU": line['facilityInventoryAdjustment']['itemSKU'],
-                                        "quantity": blk_qty,
-                                        "shelfCode": "DEFAULT",
-                                        "inventoryType": "GOOD_INVENTORY",
-                                        "adjustmentType": "REPLACE",
-                                        "facilityCode": "playR_Delhi"
-                                    })
-                                instance.generate_exception_log(
-                                    message='Inventory Update Failed,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(), state='exception',
-                                    operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
-                                        line['errors'], indent=2))
-                            elif line['warnings']:
-                                # logger.log(level=30, msg=data)
-                                instance.generate_exception_log(
-                                    message='Inventory Update Failed,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(), state='exception',
-                                    operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
-                                        line['errors'], indent=2))
-                            else:
-                                # logger.log(level=30, msg=data)
-                                instance.generate_exception_log(
-                                    message='Inventory Update Failed,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(), state='exception',
-                                    operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
-                                        line['errors'], indent=2))
-                    else:
-                        raise
-                if blocked_inventory:
-                    url = instance.shop_url + '/services/rest/v1/inventory/adjust/bulk'
-                    headers = {
-                        'Content-Type': 'application/json',
-                        'Authorization': instance.auth_bearer,
-                        'Accept': 'application/json'
-                    }
-                    data = {
-                        "inventoryAdjustments": blocked_inventory
-                    }
-                    response = requests.post(url, headers=headers, data=json.dumps(data))
-                    if response.status_code == 200:
-                        data = response.json()
-                        for line in data['inventoryAdjustmentResponses']:
-                            if line['successful']:
-                                instance.generate_success_log(
-                                    message='Blocked Inventory Updated Successfully,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    count=line['facilityInventoryAdjustment']['quantity'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(),
-                                    state='success',
-                                    operation_performed='Inventory Adjustment')
-                                count += 1
-                            elif line['errors']:
-                                instance.generate_exception_log(
-                                    message='Blocked Inventory Update Failed,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(), state='exception',
-                                    operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
-                                        line['errors'], indent=2))
-                            elif line['warnings']:
-                                instance.generate_exception_log(
-                                    message='Blocked Inventory Update Failed,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(), state='exception',
-                                    operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
-                                        line['errors'], indent=2))
-                            else:
-                                instance.generate_exception_log(
-                                    message='Blocked Inventory Update Failed,For %s Product' %
-                                            line['facilityInventoryAdjustment']['itemSKU'],
-                                    start_date=start_date,
-                                    end_date=fields.Datetime.now(), state='exception',
-                                    operation_performed='Inventory Adjustment',
-                                    error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
-                                        line['errors'], indent=2))
-                    else:
-                        raise
-            except TypeError as e:
-                instance.generate_exception_log(message="Your Token Has Probably Expired!",
-                                                start_date=fields.Datetime.now(),
-                                                operation_performed='Inventory Sync',
-                                                end_date=fields.Datetime.now(), count=1, state='exception')
-                pass
-            except Exception as e:
-                response = response.json()
-                instance.generate_exception_log(message=response['errors'][0]['message'],
-                                                start_date=fields.Datetime.now(),
-                                                operation_performed='Inventory Sync',
-                                                end_date=fields.Datetime.now(), count=1, state='exception',
-                                                error_message=json.dumps(response, indent=2))
-                pass
+            for facility_code, location_id, branch_company in sync_targets:
+                response = None
+                try:
+                    inventory_adjustment = []
+                    blocked_inventory = []
+                    products = self.env['product.product'].sudo().with_company(branch_company).search(
+                        [('default_code', '!=', False), ('is_storable', '=', True)])
+
+                    for product in products:
+                        product_quant = self.env['stock.quant'].sudo().with_company(branch_company).search(
+                            [('location_id', '=', location_id.id),
+                             ('product_id', '=', product.id)], limit=1)
+                        quantity = product_quant.available_quantity if product_quant and product_quant.available_quantity >= 0 else 0
+                        inventory_adjustment.append({
+                            "itemSKU": product.default_code,
+                            "quantity": int(quantity),
+                            "shelfCode": "DEFAULT",
+                            "inventoryType": "GOOD_INVENTORY",
+                            "adjustmentType": "REPLACE",
+                            "facilityCode": facility_code,
+                        })
+                    if inventory_adjustment:
+                        url = (instance.shop_url or '').rstrip('/') + '/services/rest/v1/inventory/adjust/bulk'
+                        headers = {
+                            'Content-Type': 'application/json',
+                            'Authorization': instance.auth_bearer,
+                            'Accept': 'application/json'
+                        }
+                        data = {
+                            "inventoryAdjustments": inventory_adjustment
+                        }
+                        response = requests.post(url, headers=headers, data=json.dumps(data))
+                        if response.status_code == 200:
+                            data = response.json()
+                            for line in data['inventoryAdjustmentResponses']:
+                                if line['successful']:
+                                    instance.generate_success_log(
+                                        message='[%s] Inventory Updated Successfully,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        count=line['facilityInventoryAdjustment']['quantity'],
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(),
+                                        state='success',
+                                        operation_performed='Inventory Adjustment')
+                                    count += 1
+                                elif line['errors']:
+                                    blk_qty = line['errors'][0]['description'].split(",")[-1]
+                                    if "Blocked Quantity" in blk_qty:
+                                        blk_qty = int(blk_qty.split(":")[-1])
+                                        blocked_inventory.append({
+                                            "itemSKU": line['facilityInventoryAdjustment']['itemSKU'],
+                                            "quantity": blk_qty,
+                                            "shelfCode": "DEFAULT",
+                                            "inventoryType": "GOOD_INVENTORY",
+                                            "adjustmentType": "REPLACE",
+                                            "facilityCode": facility_code,
+                                        })
+                                    instance.generate_exception_log(
+                                        message='[%s] Inventory Update Failed,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(), state='exception',
+                                        operation_performed='Inventory Adjustment',
+                                        error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                            line['errors'], indent=2))
+                                elif line['warnings']:
+                                    instance.generate_exception_log(
+                                        message='[%s] Inventory Update Failed,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(), state='exception',
+                                        operation_performed='Inventory Adjustment',
+                                        error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                            line['errors'], indent=2))
+                                else:
+                                    instance.generate_exception_log(
+                                        message='[%s] Inventory Update Failed,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(), state='exception',
+                                        operation_performed='Inventory Adjustment',
+                                        error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                            line['errors'], indent=2))
+                        else:
+                            raise UserError(response.text)
+                    if blocked_inventory:
+                        url = (instance.shop_url or '').rstrip('/') + '/services/rest/v1/inventory/adjust/bulk'
+                        headers = {
+                            'Content-Type': 'application/json',
+                            'Authorization': instance.auth_bearer,
+                            'Accept': 'application/json'
+                        }
+                        data = {
+                            "inventoryAdjustments": blocked_inventory
+                        }
+                        response = requests.post(url, headers=headers, data=json.dumps(data))
+                        if response.status_code == 200:
+                            data = response.json()
+                            for line in data['inventoryAdjustmentResponses']:
+                                if line['successful']:
+                                    instance.generate_success_log(
+                                        message='[%s] Blocked Inventory Updated Successfully,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        count=line['facilityInventoryAdjustment']['quantity'],
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(),
+                                        state='success',
+                                        operation_performed='Inventory Adjustment')
+                                    count += 1
+                                elif line['errors']:
+                                    instance.generate_exception_log(
+                                        message='[%s] Blocked Inventory Update Failed,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(), state='exception',
+                                        operation_performed='Inventory Adjustment',
+                                        error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                            line['errors'], indent=2))
+                                elif line['warnings']:
+                                    instance.generate_exception_log(
+                                        message='[%s] Blocked Inventory Update Failed,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(), state='exception',
+                                        operation_performed='Inventory Adjustment',
+                                        error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                            line['errors'], indent=2))
+                                else:
+                                    instance.generate_exception_log(
+                                        message='[%s] Blocked Inventory Update Failed,For %s Product' % (
+                                            facility_code, line['facilityInventoryAdjustment']['itemSKU']),
+                                        start_date=start_date,
+                                        end_date=fields.Datetime.now(), state='exception',
+                                        operation_performed='Inventory Adjustment',
+                                        error_message=json.dumps(data['errors'], indent=2) + "\n" + json.dumps(
+                                            line['errors'], indent=2))
+                        else:
+                            raise UserError(response.text)
+                except TypeError as e:
+                    instance.generate_exception_log(message="Your Token Has Probably Expired!",
+                                                    start_date=fields.Datetime.now(),
+                                                    operation_performed='Inventory Sync',
+                                                    end_date=fields.Datetime.now(), count=1, state='exception')
+                except Exception as e:
+                    err_msg = str(e)
+                    err_detail = ''
+                    if response is not None:
+                        try:
+                            resp_json = response.json()
+                            if resp_json.get('errors'):
+                                err_msg = resp_json['errors'][0].get('message', err_msg)
+                            err_detail = json.dumps(resp_json, indent=2)
+                        except Exception:
+                            err_detail = response.text
+                    instance.generate_exception_log(message=err_msg,
+                                                    start_date=fields.Datetime.now(),
+                                                    operation_performed='Inventory Sync',
+                                                    end_date=fields.Datetime.now(), count=1, state='exception',
+                                                    error_message=err_detail)
 
     @staticmethod
     def has_exception(dictionary_list):

@@ -47,10 +47,27 @@
                         <field name="username"/>
                         <field name="password" password="True"/>
                         <field name="auth_bearer" password="True"/>
+                        <field name="default_facility_code"/>
+                        <field name="fetch_per_facility"/>
                         <field name="update_time" groups="base.group_no_one"/>
                         <field name="last_import_date"/>
                         <field name="active"/>
                     </group>
+                    <notebook>
+                        <page string="Facility / Branch Mappings" name="facility_mappings">
+                            <field name="facility_mapping_ids">
+                                <list string="Facility / Branch Mappings" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="facility_code"/>
+                                    <field name="name"/>
+                                    <field name="company_id"/>
+                                    <field name="warehouse_id" options="{'no_create': True}"/>
+                                    <field name="location_id" options="{'no_create': True}"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                     <!-- Hidden to prevent slow form loading when logs are large -->
                     <!-- <notebook>
                         <page string="Import Logs">

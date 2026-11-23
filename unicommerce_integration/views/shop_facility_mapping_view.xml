@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_shop_facility_mapping_list" model="ir.ui.view">
+        <field name="name">shop.facility.mapping.list</field>
+        <field name="model">shop.facility.mapping</field>
+        <field name="arch" type="xml">
+            <list string="Facility / Branch Mappings">
+                <field name="sequence" widget="handle"/>
+                <field name="facility_code"/>
+                <field name="name"/>
+                <field name="shop_instance_id"/>
+                <field name="company_id"/>
+                <field name="warehouse_id"/>
+                <field name="location_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_shop_facility_mapping_form" model="ir.ui.view">
+        <field name="name">shop.facility.mapping.form</field>
+        <field name="model">shop.facility.mapping</field>
+        <field name="arch" type="xml">
+            <form string="Facility / Branch Mapping">
+                <sheet>
+                    <group>
+                        <group string="Unicommerce Facility">
+                            <field name="shop_instance_id"/>
+                            <field name="facility_code"/>
+                            <field name="name"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Odoo Branch Configuration">
+                            <field name="company_id"/>
+                            <field name="warehouse_id" options="{'no_create': True}"/>
+                            <field name="location_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_shop_facility_mapping" model="ir.actions.act_window">
+        <field name="name">Facility / Branch Mappings</field>
+        <field name="res_model">shop.facility.mapping</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Map each Unicommerce Facility Code to its respective Odoo Branch (Company), Warehouse, and Stock Location.
+            </p>
+        </field>
+    </record>
+</odoo>
+

@@ -7,6 +7,4 @@ class AccountDeducteeType(models.Model):
 
     name = fields.Char(string='Type', required=True)
 
-    _sql_constraints = [
-        ('type_uniq', 'unique(name)', 'Type should be Unique')
-    ]
+    _type_uniq = models.Constraint('unique(name)', 'Type should be Unique')
