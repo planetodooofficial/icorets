@@ -8,6 +8,7 @@ import pandas as pd
 
 class GrnDetails(models.TransientModel):
     _name = "grn.details"
+    _description = "GRN Details Import"
 
     file = fields.Binary("File")
     file_name = fields.Char("File Name")

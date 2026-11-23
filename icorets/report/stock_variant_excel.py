@@ -4,6 +4,7 @@ from io import BytesIO
 
 class StockVariantReport(models.AbstractModel):
     _name = "report.icorets.stock_variant_excel"
+    _description = "Stock Variant Excel Report"
     _inherit = "report.report_xlsx.abstract"
 
     def generate_xlsx_report(self, workbook, data, report):

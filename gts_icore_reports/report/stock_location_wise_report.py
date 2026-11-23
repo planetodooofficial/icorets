@@ -4,6 +4,7 @@ import string
 
 class StockRegisterReport(models.AbstractModel):
     _name = "report.gts_icore_reports.stock_location_wise_excel"
+    _description = "Stock Location Wise Excel Report"
     _inherit = "report.report_xlsx.abstract"
 
     def generate_xlsx_report(self, workbook, data, report):

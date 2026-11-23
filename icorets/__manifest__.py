@@ -1,6 +1,7 @@
 {
     'name': 'Icore',
     'version': '19.0.1.0.0',
+    'author': 'Geo Technosoft',
     'summary': 'Accessories and product',
     'sequence': -100,
     'description': """ product """,

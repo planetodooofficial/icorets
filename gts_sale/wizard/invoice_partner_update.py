@@ -8,6 +8,7 @@ import pandas as pd
 
 class InvoicePartnerUpdate(models.TransientModel):
     _name = "invoice.partner.update"
+    _description = "Invoice Partner Update"
 
     file = fields.Binary("File")
     file_name = fields.Char("File Name")

@@ -4,10 +4,11 @@ import base64
 
 class SelectWarehouseWizard(models.TransientModel):
     _name = 'select.warehouse.wizard'
+    _description = 'Select Warehouse Wizard'
 
     company_id = fields.Many2one("res.company", string="Company", readonly=False, default=lambda self: self.env.company)
-    warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse", tracking=True)
-    location_id = fields.Many2one("stock.location", string="Location", tracking=True)
+    warehouse_id = fields.Many2one("stock.warehouse", string="Warehouse")
+    location_id = fields.Many2one("stock.location", string="Location")
 
     def update_warehouse(self):
         if self.env.context.get('active_id'):

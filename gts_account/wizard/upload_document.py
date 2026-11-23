@@ -3,6 +3,7 @@ import base64
 
 class UploadDocument(models.TransientModel):
     _name = 'upload.document'
+    _description = 'Upload Document'
 
     binary_file = fields.Binary('Upload Document', attachment=False)
     file_name = fields.Char('Upload Document')

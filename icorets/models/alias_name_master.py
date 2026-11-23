@@ -4,6 +4,7 @@ from odoo.tools.misc import format_date, get_lang
 
 class AliasName(models.Model):
     _name = "alias.name"
+    _description = "Alias Name"
     _rec_name = "name"
 
     name = fields.Char("Name", copy=False)

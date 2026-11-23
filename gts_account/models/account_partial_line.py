@@ -12,7 +12,7 @@ class PartialLines(models.Model):
         ('advance', 'Advance'),
         ('on_account', 'On Account')
     ], string="State")
-    entry_id = fields.Many2one('account.move', string="Entry", auto_join=True, domain=[('payment_state', 'in', ('not_paid', 'partial')), ('state', '=', 'posted')])
+    entry_id = fields.Many2one('account.move', string="Entry", domain=[('payment_state', 'in', ('not_paid', 'partial')), ('state', '=', 'posted')])
     payment_line = fields.Many2one('account.move.line', string="Payment Line")
     payment_residual_amt = fields.Float(string="Payment Residual Amount", compute="set_payment_residual_amt", store=True)
     move_id = fields.Many2one('account.move', string="Move")

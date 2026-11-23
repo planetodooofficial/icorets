@@ -11,4 +11,4 @@ class AdvanceOrder(models.Model):
     payment_terms = fields.Many2one('account.payment.term', string="Payment Terms", readonly=True)
     order_amount = fields.Float(string="Order Amount", readonly=True)
     advance_amount = fields.Float(string="Advance Amount")
-    payment_id = fields.Many2one('account.payment', string="Payment", auto_join=True, ondelete='cascade')
+    payment_id = fields.Many2one('account.payment', string="Payment", ondelete='cascade')

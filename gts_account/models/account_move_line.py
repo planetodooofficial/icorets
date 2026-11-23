@@ -6,7 +6,6 @@ class AccountMoveLine(models.Model):
 
     without_sale_cogs = fields.Boolean(
         string="Without Sale Cogs",
-        default=False,
         related="move_id.without_sale_cogs",
         store=True
     )

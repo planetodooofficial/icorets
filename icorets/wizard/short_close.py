@@ -5,6 +5,7 @@ from odoo import models, api, fields, _
 
 class ShortClose(models.Model):
     _name = 'short.close'
+    _description = 'Short Close'
 
     reason_id = fields.Many2one('reason.reason')
     desc = fields.Char('Description')

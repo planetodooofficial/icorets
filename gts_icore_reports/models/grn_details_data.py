@@ -3,6 +3,7 @@ from odoo import models, fields, api, _
 
 class GRNDetailsData(models.Model):
     _name = "grn.details.data"
+    _description = "GRN Details Data"
 
     invoice_no = fields.Char(string="Invoice No")
     invoice_date = fields.Date(string="Invoice Date")
