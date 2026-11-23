@@ -11,7 +11,7 @@ class ShortClose(models.Model):
     desc = fields.Char('Description')
 
     def confirm_short_close(self):
-        print("---context", self.env.context)
+
         purchase_model = self.env.context.get('active_model')
         if purchase_model == 'purchase.order':
             if self.env.context.get('purchase_order_ids'):
