@@ -61,7 +61,7 @@ class PartialLines(models.Model):
     @api.model
     def fields_get(self, allfields=None, attributes=None):
         res = super(PartialLines, self).fields_get(allfields, attributes)
-        payment_type = self._context.get("default_custom_payment_type") or self._context.get('default_payment_type')
+        payment_type = self.env.context.get("default_custom_payment_type") or self.env.context.get('default_payment_type')
         if payment_type:
             if payment_type == 'inbound':
                 domain = "[('move_id.move_type', 'in', ['out_invoice', 'entry']), ('move_id.state', '=', 'posted')," \

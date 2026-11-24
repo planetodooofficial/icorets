@@ -27,7 +27,7 @@
         'views/account.xml',
         # 'views/stock_picking.xml',
         # 'views/stock_location.xml',
-        'views/contacts.xml',
+        # 'views/contacts.xml',
     ],
     'license': 'LGPL-3',
     'installable': True,

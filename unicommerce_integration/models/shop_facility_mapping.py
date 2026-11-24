@@ -44,6 +44,13 @@ class ShopFacilityMapping(models.Model):
         tracking=True,
         help="Source Stock Location used for orders and inventory sync for this facility. Defaults to the Warehouse's Stock location.",
     )
+    sale_journal_id = fields.Many2one(
+        'account.journal',
+        string='Sales Journal',
+        domain="[('type', '=', 'sale')]",
+        tracking=True,
+        help="Sales Journal used on Sale Orders and Invoices for this facility. If left empty, falls back to the Sales Channel's journal.",
+    )
     active = fields.Boolean(string='Active', default=True, tracking=True)
 
     _facility_instance_uniq = models.Constraint(

@@ -12,6 +12,7 @@
                 <field name="company_id"/>
                 <field name="warehouse_id"/>
                 <field name="location_id"/>
+                <field name="sale_journal_id"/>
                 <field name="active"/>
             </list>
         </field>
@@ -34,6 +35,7 @@
                             <field name="company_id"/>
                             <field name="warehouse_id" options="{'no_create': True}"/>
                             <field name="location_id" options="{'no_create': True}"/>
+                            <field name="sale_journal_id" options="{'no_create': True}"/>
                         </group>
                     </group>
                 </sheet>
