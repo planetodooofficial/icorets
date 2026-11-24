@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class ShopFacilityMapping(models.Model):
@@ -53,10 +54,17 @@ class ShopFacilityMapping(models.Model):
     )
     active = fields.Boolean(string='Active', default=True, tracking=True)
 
-    _facility_instance_uniq = models.Constraint(
-        'unique(shop_instance_id, facility_code)',
-        'Facility Code must be unique per Shop Instance!',
-    )
+    @api.constrains('shop_instance_id', 'facility_code')
+    def _check_facility_instance_uniq(self):
+        for rec in self:
+            if rec.shop_instance_id and rec.facility_code:
+                duplicate = self.search([
+                    ('id', '!=', rec.id),
+                    ('shop_instance_id', '=', rec.shop_instance_id.id),
+                    ('facility_code', '=', rec.facility_code),
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(_('Facility Code must be unique per Shop Instance!'))
 
     @api.onchange('company_id')
     def _onchange_company_id(self):

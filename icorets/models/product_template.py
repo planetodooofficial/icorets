@@ -1,4 +1,5 @@
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class ProductInherit(models.Model):
@@ -49,7 +50,16 @@ class ProductInherit(models.Model):
     drop_box_link = fields.Char('Drop Box Link')
     country_origin = fields.Char('Country of Origin')
 
-    _buin_unique = models.Constraint('unique(buin)', "BUIN code can only be assigned to one product !")
+    @api.constrains('buin')
+    def _check_buin_unique(self):
+        for rec in self:
+            if rec.buin:
+                duplicate = self.search([
+                    ('id', '!=', rec.id),
+                    ('buin', '=', rec.buin),
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(_("BUIN code can only be assigned to one product !"))
 
     # Added func for hsn
     @api.onchange('sale_hsn')

@@ -1,4 +1,5 @@
-from odoo import models, fields
+from odoo import api, models, fields, _
+from odoo.exceptions import ValidationError
 
 
 class AccountDeducteeType(models.Model):
@@ -7,4 +8,13 @@ class AccountDeducteeType(models.Model):
 
     name = fields.Char(string='Type', required=True)
 
-    _type_uniq = models.Constraint('unique(name)', 'Type should be Unique')
+    @api.constrains('name')
+    def _check_type_uniq(self):
+        for rec in self:
+            if rec.name:
+                duplicate = self.search([
+                    ('id', '!=', rec.id),
+                    ('name', '=', rec.name),
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(_('Type should be Unique'))
