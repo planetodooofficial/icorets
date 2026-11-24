@@ -122,7 +122,7 @@ class SaleOrderInherit(models.Model):
     def _prepare_invoice(self):
         invoice_vals = super(SaleOrderInherit, self)._prepare_invoice()
         invoice_vals['dispatch_partner_id'] = self.warehouse_id.partner_id.id
-        invoice_vals['gstin_id'] = self.gstin_id.id
+        invoice_vals['gstin_id'] = self.gstin_id.id or self.company_id.partner_id.id
         return invoice_vals
 
     def action_open_fo_wiz(self):

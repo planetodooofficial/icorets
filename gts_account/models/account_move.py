@@ -65,7 +65,11 @@ class AccountMove(models.Model):
     is_checked = fields.Boolean(string="Checked", default=False, tracking=True, copy=False)
     to_check = fields.Boolean(string="To Check", default=False, tracking=True, copy=False)
     checker_id = fields.Many2one('res.users', string="Checker")
-    gstin_id = fields.Many2one("res.partner", string="GSTIN Unit")
+    gstin_id = fields.Many2one(
+        "res.partner",
+        string="GSTIN Unit",
+        default=lambda self: self.env.company.partner_id,
+    )
 
     @api.depends('suitable_journal_ids')
     def _compute_show_journal(self):
